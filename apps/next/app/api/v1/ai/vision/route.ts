@@ -2,25 +2,28 @@ import { NextRequest, NextResponse } from 'next/server'
 import OpenAI from 'openai'
 import { z } from 'zod'
 import { zodResponseFormat } from 'openai/helpers/zod'
+import { createKysely } from '@vercel/postgres-kysely'
+import { Database } from '../../_db'
 
 const schema = z.object({
   base64Image: z.string().min(1).startsWith('data:image/'),
 })
 
-const AnimalSchema = z.object({
+const OrganismSchema = z.object({
   identification: z.object({
     commonName: z.string(),
     scientificClassification: z.object({
       genus: z.string(),
       species: z.string().optional(),
     }),
+    description: z.string().max(500).optional(),
     venomous: z.object({
       type: z.string().optional(),
       level: z.union([
-        z.literal('Non-venomous'),
-        z.literal('Mildly venomous'),
-        z.literal('Venomous'),
-        z.literal('Highly venomous'),
+        z.literal('NON_VENOMOUS'),
+        z.literal('MILDLY_VENOMOUS'),
+        z.literal('VENOMOUS'),
+        z.literal('HIGHLY_VENOMOUS'),
       ]),
     }),
   }),
@@ -30,6 +33,7 @@ const AnimalSchema = z.object({
 export async function POST(request: NextRequest) {
   try {
     const openai = new OpenAI()
+    const db = createKysely<Database>()
 
     if (!request.body) {
       throw new Error('No body provided')
@@ -66,12 +70,42 @@ export async function POST(request: NextRequest) {
       ],
       temperature: 0.5,
       user: userId,
-      response_format: zodResponseFormat(AnimalSchema, 'event'),
+      response_format: zodResponseFormat(OrganismSchema, 'event'),
     })
 
-    return NextResponse.json(response.choices[0].message.parsed, {
-      status: 200,
-    })
+    const parsed = OrganismSchema.parse(response.choices[0].message.parsed)
+
+    if (!parsed) {
+      return NextResponse.json(
+        { error: 'No response from AI' },
+        { status: 500 },
+      )
+    }
+
+    const id = `${parsed.identification.scientificClassification.genus}-${
+      parsed.identification.scientificClassification.species ?? 'sp'
+    }`
+
+    const existing = await db
+      .selectFrom('organism')
+      .select('id')
+      .where('id', '=', id)
+      .execute()
+
+    if (!existing.length) {
+      await db
+        .insertInto('organism')
+        .values({
+          id,
+          identification: parsed.identification,
+          confidence: parsed.confidence,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        })
+        .executeTakeFirst()
+    }
+
+    return NextResponse.json(parsed, { status: 200 })
   } catch (error) {
     console.log(error)
 
