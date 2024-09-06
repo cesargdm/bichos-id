@@ -1,16 +1,19 @@
 'use client'
 
-import { Text, View, ScrollView } from 'react-native'
+import { Text, View, ScrollView, FlatList, Image } from 'react-native'
 import useSWR from 'swr'
 import { TextLink } from 'solito/link'
 import { useParams } from 'solito/navigation'
 import { StatusBar } from 'expo-status-bar'
+
+import { Api, ASSETS_BASE_URL } from '@bichos-id/app/lib/api'
 
 const useUserParams = useParams<{ id: string }>
 
 type Props = {
   fallbackData?: {
     id: string
+    images: `${typeof ASSETS_BASE_URL}/${string}`[]
     identification: {
       commonName: string
       scientificClassification: {
@@ -27,7 +30,7 @@ export default function DiscoverDetailScreen({ fallbackData }: Props) {
   const params = useUserParams()
 
   const { data, error, isLoading } = useSWR<any>(
-    `https://bichos-id.fucesa.com/api/v1/organisms/${params.id}`,
+    Api.getOrganism(params.id),
     fetcher,
     { fallbackData },
   )
@@ -82,6 +85,23 @@ export default function DiscoverDetailScreen({ fallbackData }: Props) {
         ) : null}
 
         <Text>{data.identification?.description}</Text>
+
+        <Text>Últimas imágenes</Text>
+
+        <FlatList
+          data={data.images}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={{ width: '100%' }}
+          contentContainerStyle={{ gap: 8 }}
+          renderItem={({ item }) => (
+            <Image
+              alt={`${data.identification?.commonName} - ${data.identification?.scientificClassification.genus} ${data.identification?.scientificClassification.species}`}
+              style={{ width: 50, height: 50 }}
+              source={{ uri: item }}
+            />
+          )}
+        />
 
         <TextLink href="/">Explore</TextLink>
       </ScrollView>

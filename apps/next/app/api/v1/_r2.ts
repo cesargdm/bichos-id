@@ -1,7 +1,13 @@
 import { S3Client } from '@aws-sdk/client-s3'
 
-const { CLOUDFLARE_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY } =
-  process.env
+const {
+  CLOUDFLARE_ACCOUNT_ID,
+  R2_ACCESS_KEY_ID,
+  R2_SECRET_ACCESS_KEY,
+  R2_BUCKET_NAME,
+} = process.env
+
+export { R2_BUCKET_NAME }
 
 export function getR2Client() {
   return new S3Client({

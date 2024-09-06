@@ -7,7 +7,7 @@ import { PutObjectCommand } from '@aws-sdk/client-s3'
 import * as crypto from 'node:crypto'
 
 import { Database, OrganismSchema } from '../../_db'
-import { getR2Client } from '../../_r2'
+import { getR2Client, R2_BUCKET_NAME } from '../../_r2'
 
 const schema = z.object({
   base64Image: z.string().min(1).startsWith('data:image/'),
@@ -106,7 +106,7 @@ export async function POST(request: NextRequest) {
         }),
       getR2Client().send(
         new PutObjectCommand({
-          Bucket: 'bichos-id',
+          Bucket: R2_BUCKET_NAME,
           Key: `organisms/${id}/${crypto
             .randomBytes(20)
             .toString('hex')}-${Date.now()}.jpg`,
