@@ -3,10 +3,10 @@
   "name": "app",
   "main": "index.ts",
   "dependencies": {
-    "@react-navigation/native": "~6.1.7",
-    "@react-navigation/native-stack": "~6.9.13",
-    "@supabase/supabase-js": "~2.45.3",
-    "solito": "4.0.1"
+    "@react-navigation/native": "6.1.18",
+    "@react-navigation/native-stack": "6.9.26",
+    "@supabase/supabase-js": "2.45.3",
+    "solito": "4.2.2"
   },
   "sideEffects": false
 }

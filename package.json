@@ -6,10 +6,10 @@
     "packages/*"
   ],
   "devDependencies": {
-    "@types/react": "~18.2.21",
+    "@types/react": "~18.3.5",
     "eslint": "~8.21.0",
-    "turbo": "~1.4.2",
-    "typescript": "~5.3.3"
+    "turbo": "~2.1.1",
+    "typescript": "~5.5.4"
   },
   "scripts": {
     "native": "cd apps/expo && yarn start",
