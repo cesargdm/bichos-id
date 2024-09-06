@@ -16,8 +16,8 @@ export function NavigationProvider({
             initialRouteName: 'home',
             screens: {
               home: '',
-              discover: 'discover',
-              'discover-detail': 'discover/:id',
+              explore: 'explore',
+              'explore-detail': 'explore/:id',
             },
           },
         }),

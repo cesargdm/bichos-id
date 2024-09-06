@@ -19,12 +19,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 1,
     },
     {
-      url: '/discover',
+      url: '/explore',
       lastModified: new Date(),
       priority: 1,
     },
     ...organisms.map((organism) => ({
-      url: `/discover/${organism.id}`,
+      url: `/explore/${organism.id}`,
       lastModified: organism.updated_at,
       priority: 1,
     })),

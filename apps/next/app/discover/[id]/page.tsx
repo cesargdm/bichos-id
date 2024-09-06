@@ -2,7 +2,7 @@ import { Suspense } from 'react'
 import { notFound } from 'next/navigation'
 import { createKysely } from '@vercel/postgres-kysely'
 
-import DiscoveryDetailScreen from '@bichos-id/app/screens/DiscoverDetail'
+import DiscoveryDetailScreen from '@bichos-id/app/screens/ExploreDetail'
 
 import { Database } from '../../api/v1/_db'
 

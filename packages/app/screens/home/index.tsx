@@ -78,7 +78,7 @@ function HomeScreen() {
   }, [])
 
   function handleExplore() {
-    router.push('/discover')
+    router.push('/explore')
   }
 
   if (!permission) {

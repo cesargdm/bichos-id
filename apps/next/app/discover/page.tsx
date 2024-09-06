@@ -6,4 +6,4 @@ export const metadata: Metadata = {
     'Descubre insectos, arácnidos y otros bichos con Bichos ID usando inteligencia artificial.',
 }
 
-export { default } from '@bichos-id/app/screens/Discover'
+export { default } from '@bichos-id/app/screens/Explore'

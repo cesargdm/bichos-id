@@ -1,5 +1,6 @@
 import { createKysely } from '@vercel/postgres-kysely'
 import { NextResponse } from 'next/server'
+
 import { Database } from '../_db'
 
 export async function GET() {

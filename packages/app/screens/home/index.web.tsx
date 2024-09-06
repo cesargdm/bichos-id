@@ -5,9 +5,11 @@ import { Link } from 'solito/link'
 
 export default function HomeScreen() {
   return (
-    <View>
-      <Text>Web home</Text>
-      <Link href="/discover">Go to Discover</Link>
-    </View>
+    <>
+      <Text role="heading" aria-level="1">
+        Bicho ID
+      </Text>
+      <Link href="/explore">Ir a explorar</Link>
+    </>
   )
 }
