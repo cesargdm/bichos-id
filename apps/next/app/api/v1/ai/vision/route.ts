@@ -32,6 +32,13 @@ const OrganismSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    if (!process.env.OPENAI_API_KEY) {
+      return NextResponse.json(
+        { error: 'No OpenAI API key provided' },
+        { status: 500 },
+      )
+    }
+
     const openai = new OpenAI()
     const db = createKysely<Database>()
 
