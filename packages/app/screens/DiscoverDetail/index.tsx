@@ -1,4 +1,5 @@
-import { createParam } from 'solito'
+'use client'
+
 import { TextLink } from 'solito/link'
 import { useParams } from 'solito/navigation'
 

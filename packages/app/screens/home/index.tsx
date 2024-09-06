@@ -1,3 +1,5 @@
+'use client'
+
 import { CameraView, useCameraPermissions } from 'expo-camera'
 import { useCallback, useRef, useState } from 'react'
 import {

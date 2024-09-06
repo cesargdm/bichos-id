@@ -1,3 +1,5 @@
+'use client'
+
 import { createParam } from 'solito'
 import { TextLink } from 'solito/link'
 import { View } from 'react-native'

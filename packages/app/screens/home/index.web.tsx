@@ -1,3 +1,5 @@
+'use client'
+
 import { View, Text } from 'react-native'
 import { Link } from 'solito/link'
 
