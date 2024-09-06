@@ -3,6 +3,8 @@ import { NextResponse } from 'next/server'
 
 import { Database } from '../../_db'
 
+export const revalidate = 60 * 60 * 1 // 1 hour
+
 export async function GET(
   _request: Request,
   { params }: { params: { id: string } },
