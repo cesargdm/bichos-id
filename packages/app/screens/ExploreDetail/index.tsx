@@ -1,9 +1,9 @@
 'use client'
 
-import { TextLink } from 'solito/link'
 import { Text } from 'react-native'
-import { useParams } from 'solito/navigation'
 import useSWR from 'swr'
+import { TextLink } from 'solito/link'
+import { useParams } from 'solito/navigation'
 
 const useUserParams = useParams<{ id: string }>
 
