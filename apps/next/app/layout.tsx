@@ -16,6 +16,7 @@ type Props = {
 export default function RootLayout({ children }: Props) {
   return (
     <html lang="en">
+      <link rel="icon" href="/favicon.svg"/>
       <body>
         <StylesProvider>{children}</StylesProvider>
       </body>
