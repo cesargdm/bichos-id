@@ -4,6 +4,7 @@ import { z } from 'zod'
 import { zodResponseFormat } from 'openai/helpers/zod'
 import { createKysely } from '@vercel/postgres-kysely'
 import { Database, OrganismSchema } from '../../_db'
+import { put } from '@vercel/blob'
 
 const schema = z.object({
   base64Image: z.string().min(1).startsWith('data:image/'),
@@ -81,24 +82,30 @@ export async function POST(request: NextRequest) {
       }`,
     )
 
-    const existing = await db
-      .selectFrom('organism')
-      .select('id')
-      .where('id', '=', id)
-      .execute()
+    await Promise.allSettled([
+      db
+        .selectFrom('organism')
 
-    if (!existing.length) {
-      void (await db
-        .insertInto('organism')
-        .values({
-          id,
-          identification: parsed.identification,
-          confidence: parsed.confidence,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        })
-        .executeTakeFirst())
-    }
+        .where('id', '=', id)
+        .execute()
+        .then((existing) => {
+          if (!existing.length) {
+            return db
+              .insertInto('organism')
+              .values({
+                id,
+                identification: parsed.identification,
+                confidence: parsed.confidence,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+              })
+              .executeTakeFirst()
+          }
+        }),
+      put(`/organisms/${id}/${Date.now()}.jpeg`, data.base64Image, {
+        access: 'public',
+      }),
+    ])
 
     return NextResponse.json(parsed, { status: 200 })
   } catch (error) {
