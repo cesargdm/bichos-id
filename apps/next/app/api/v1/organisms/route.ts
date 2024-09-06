@@ -9,7 +9,7 @@ export async function GET() {
 
     const organisms = await db.selectFrom('organism').selectAll().execute()
 
-    return NextResponse.json({ organisms })
+    return NextResponse.json(organisms)
   } catch {
     return NextResponse.json(
       { error: 'Failed to connect to database' },

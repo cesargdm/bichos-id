@@ -44,7 +44,7 @@ export default function DiscoverDetailScreen({ fallbackData }: Props) {
       </Text>
       <Text>{data.identification.description}</Text>
       <Text>{JSON.stringify(data, null, 2)}</Text>
-      <TextLink href="/">Discover</TextLink>
+      <TextLink href="/">Explore</TextLink>
     </>
   )
 }

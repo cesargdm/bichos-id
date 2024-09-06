@@ -20,7 +20,7 @@ export async function GET(
       .selectAll()
       .executeTakeFirst()
 
-    return NextResponse.json({ organism })
+    return NextResponse.json(organism)
   } catch {
     return NextResponse.json(
       { error: 'Failed to connect to database' },
