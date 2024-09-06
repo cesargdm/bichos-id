@@ -13,7 +13,7 @@ const useUserParams = useParams<{ id: string }>
 type Props = {
   fallbackData?: {
     id: string
-    images: `${typeof ASSETS_BASE_URL}/${string}`[]
+    images?: `${typeof ASSETS_BASE_URL}/${string}`[]
     identification: {
       commonName: string
       scientificClassification: {
