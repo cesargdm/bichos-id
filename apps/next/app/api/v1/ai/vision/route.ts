@@ -3,31 +3,10 @@ import OpenAI from 'openai'
 import { z } from 'zod'
 import { zodResponseFormat } from 'openai/helpers/zod'
 import { createKysely } from '@vercel/postgres-kysely'
-import { Database } from '../../_db'
+import { Database, OrganismSchema } from '../../_db'
 
 const schema = z.object({
   base64Image: z.string().min(1).startsWith('data:image/'),
-})
-
-const OrganismSchema = z.object({
-  identification: z.object({
-    commonName: z.string(),
-    scientificClassification: z.object({
-      genus: z.string(),
-      species: z.string().optional(),
-    }),
-    description: z.string().max(500).optional(),
-    venomous: z.object({
-      type: z.string().optional(),
-      level: z.union([
-        z.literal('NON_VENOMOUS'),
-        z.literal('MILDLY_VENOMOUS'),
-        z.literal('VENOMOUS'),
-        z.literal('HIGHLY_VENOMOUS'),
-      ]),
-    }),
-  }),
-  confidence: z.number(),
 })
 
 export async function POST(request: NextRequest) {

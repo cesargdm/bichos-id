@@ -1,3 +1,26 @@
+import { z } from 'zod'
+
+export const OrganismSchema = z.object({
+  identification: z.object({
+    commonName: z.string(),
+    scientificClassification: z.object({
+      genus: z.string(),
+      species: z.string().optional(),
+    }),
+    description: z.string().optional(),
+    venomous: z.object({
+      type: z.string().optional(),
+      level: z.union([
+        z.literal('NON_VENOMOUS'),
+        z.literal('MILDLY_VENOMOUS'),
+        z.literal('VENOMOUS'),
+        z.literal('HIGHLY_VENOMOUS'),
+      ]),
+    }),
+  }),
+  confidence: z.number(),
+})
+
 export interface Organism {
   id: string
   identification: {

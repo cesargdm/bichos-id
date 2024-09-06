@@ -37,15 +37,18 @@ function HomeScreen() {
 
       console.log('Sending image....')
 
-      const response = await fetch(`http://10.0.4.49:3000/api/v1/ai/vision`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        `https://bichos-id.fucesa.com/api/v1/ai/vision`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            base64Image: `data:image/jpeg;base64,${base64Image.base64}`,
+          }),
         },
-        body: JSON.stringify({
-          base64Image: `data:image/jpeg;base64,${base64Image.base64}`,
-        }),
-      }).then((response) => response.json())
+      ).then((response) => response.json())
 
       Alert.alert(
         'Animal Identification',
