@@ -1,6 +1,8 @@
+/* eslint-disable @next/next/no-img-element */
+
 'use client'
 
-import { useCallback } from 'react'
+import { useCallback, useState } from 'react'
 import { Link } from 'solito/link'
 
 import { Api } from '@bichos-id/app/lib/api'
@@ -15,35 +17,100 @@ function toBase64(file) {
 }
 
 export default function HomeScreen() {
+  const [isLoading, setIsLoading] = useState(false)
+  const [imageData, setImageData] = useState<string | null>(null)
+
   const handleSubmitForm = useCallback(async (event) => {
     event.preventDefault()
 
-    const file = event.target.elements.file.files[0]
+    try {
+      setIsLoading(true)
 
-    const base64Image = await toBase64(file)
+      const file = event.target.elements.file.files[0]
 
-    const data = await Api.identify(base64Image)
+      const base64Image = await toBase64(file)
 
-    if (data.id) {
-      window.location.href = `/explore/${data.id}`
+      console.log({ base64Image })
+
+      const data = await Api.identify(base64Image)
+
+      if (data.id) {
+        window.location.href = `/explore/${data.id}`
+      }
+    } finally {
+      setIsLoading(false)
+      setImageData(null)
     }
   }, [])
 
-  return (
-    <>
-      <h1>Bicho ID</h1>
+  const handleChangeFile = useCallback((event) => {
+    const file = event.target.files[0]
 
-      <form onSubmit={handleSubmitForm}>
-        <label>
-          <b>Imagen</b>
-          <input name="file" type="file" accept="image/jpeg" />
+    setImageData(URL.createObjectURL(file))
+  }, [])
+
+  return (
+    <main
+      style={{
+        padding: 16,
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
+      <h1>Bicho ID</h1>
+      <p>
+        Identifica insectos, arácnidos y otros artrópodos usando Inteligencia
+        Artificial.
+      </p>
+
+      <form
+        style={{ display: 'flex', flexDirection: 'column', gap: 16 }}
+        onSubmit={handleSubmitForm}
+      >
+        <label
+          style={{ cursor: 'pointer', padding: 16, backgroundColor: '#ddd' }}
+        >
+          {imageData ? (
+            <img
+              alt=""
+              src={imageData}
+              style={{ width: 100, height: 100, objectFit: 'cover' }}
+            />
+          ) : (
+            <b>Seleccionar imagen</b>
+          )}
+          <input
+            onChange={handleChangeFile}
+            hidden
+            name="file"
+            type="file"
+            accept="image/jpeg"
+          />
         </label>
-        <button type="submit">Identificar</button>
+
+        <button
+          disabled={isLoading}
+          style={{
+            padding: 16,
+            backgroundColor: '#ddd',
+            border: 'none',
+            fontSize: '1rem',
+          }}
+          type="submit"
+        >
+          {isLoading ? 'Cargando...' : 'Identificar'}
+        </button>
       </form>
 
       <Link href="/explore">
         <p>Ir a explorar</p>
       </Link>
-    </>
+
+      <p style={{ fontSize: '0.9rem', color: 'gray', marginTop: 'auto' }}>
+        Esta herramienta se ofrece tal cual, sin ninguna garantía. No nos
+        hacemos responsables de cualquier daño causado por su uso.
+      </p>
+    </main>
   )
 }
