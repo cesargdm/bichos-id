@@ -1,12 +1,13 @@
 {
   "expo": {
-    "name": "solito-blank",
-    "slug": "solito-blank",
+    "name": "bicho-id",
+    "slug": "bicho-id",
     "version": "1.0.0",
-    "scheme": "solito-blank",
+    "scheme": "bicho-id",
     "platforms": ["ios", "android"],
+    "orientation": "default",
     "ios": {
-      "bundleIdentifier": "com.solito.blank"
+      "bundleIdentifier": "com.fucesa.bicho-id"
     },
     "plugins": [
       [
