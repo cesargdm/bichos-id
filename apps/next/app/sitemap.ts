@@ -7,6 +7,8 @@ export const dynamic = 'force-dynamic'
 
 export const revalidate = 60
 
+const origin = process.env.NEXT_PUBLIC_ORIGIN
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const db = createKysely<Database>()
 
@@ -14,17 +16,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   return [
     {
-      url: '/',
+      url: `${origin}/`,
       lastModified: new Date(),
       priority: 1,
     },
     {
-      url: '/explore',
+      url: `${origin}/explore`,
       lastModified: new Date(),
       priority: 1,
     },
     ...organisms.map((organism) => ({
-      url: `/explore/${organism.id}`,
+      url: `${origin}/explore/${organism.id}`,
       lastModified: organism.updated_at,
       priority: 1,
     })),
