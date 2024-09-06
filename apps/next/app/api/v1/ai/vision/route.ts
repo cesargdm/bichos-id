@@ -116,7 +116,7 @@ export async function POST(request: NextRequest) {
           ),
           ContentType: 'image/jpeg',
           ContentEncoding: 'base64',
-          CacheControl: 'public, max-age=31536000',
+          CacheControl: 'immutable, max-age=31536000, immutable',
         }),
       ),
     ])
