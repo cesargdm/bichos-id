@@ -3,8 +3,6 @@ import OpenAI from 'openai'
 import { z } from 'zod'
 import { zodResponseFormat } from 'openai/helpers/zod'
 
-const openai = new OpenAI()
-
 const schema = z.object({
   base64Image: z.string().min(1).startsWith('data:image/'),
 })
@@ -31,6 +29,8 @@ const AnimalSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    const openai = new OpenAI()
+
     if (!request.body) {
       throw new Error('No body provided')
     }
