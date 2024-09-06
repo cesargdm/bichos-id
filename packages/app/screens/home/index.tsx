@@ -16,6 +16,7 @@ import * as Clipboard from 'expo-clipboard'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { StatusBar } from 'expo-status-bar'
 import * as ImagePicker from 'expo-image-picker'
+import { Link } from 'solito/link'
 
 const API_BASE_URL = 'https://bichos-id.fucesa.com/api/v1'
 
@@ -32,6 +33,7 @@ class Api {
 function HomeScreen() {
   const [permission, requestPermission] = useCameraPermissions()
   const [isLoading, setIsLoading] = useState(false)
+  const [isTorchEnabled, setIsTorchEnabled] = useState(false)
   const router = useRouter()
   const cameraRef = useRef<CameraView>(null)
 
@@ -61,6 +63,10 @@ function HomeScreen() {
       setIsLoading(false)
     }
   }, [router])
+
+  const handleToggleTorch = useCallback(() => {
+    setIsTorchEnabled((prev) => !prev)
+  }, [])
 
   const handlePickImage = useCallback(async () => {
     try {
@@ -127,6 +133,7 @@ function HomeScreen() {
       <StatusBar style="light" />
       <View style={{ flex: 1 }}>
         <CameraView
+          enableTorch={isTorchEnabled}
           ref={cameraRef}
           style={{
             flex: 1,
@@ -145,12 +152,12 @@ function HomeScreen() {
                 justifyContent: 'space-between',
               }}
             >
-              <Pressable style={{ padding: 16 }}>
+              <Pressable onPress={handleToggleTorch} style={{ padding: 16 }}>
                 <Ionicons size={24} color="white" name="flashlight" />
               </Pressable>
-              <Pressable style={{ padding: 16 }}>
+              <Link href="/settings" style={{ padding: 16 }}>
                 <Ionicons size={24} color="white" name="settings" />
-              </Pressable>
+              </Link>
             </View>
 
             <View
