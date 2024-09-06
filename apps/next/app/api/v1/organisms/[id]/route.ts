@@ -29,7 +29,12 @@ export async function GET(
             Prefix: `organisms/${id}`,
           }),
         )
-        .catch(() => []),
+        .catch(() => ({ Contents: [] }))
+        .then(({ Contents = [] }) =>
+          Contents.map(
+            ({ Key }) => `https://bichos-id.assets.fucesa.com/${Key}`,
+          ),
+        ),
     ])
 
     return NextResponse.json({ ...organism, images })
