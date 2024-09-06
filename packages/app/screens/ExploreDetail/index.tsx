@@ -7,12 +7,17 @@ import useSWR from 'swr'
 
 const useUserParams = useParams<{ id: string }>
 
-export default function DiscoverDetailScreen() {
+type Props = {
+  fallbackData?: object
+}
+
+export default function DiscoverDetailScreen({ fallbackData }: Props) {
   const params = useUserParams()
 
-  const { data, error, isLoading } = useSWR(
+  const { data, error, isLoading } = useSWR<object>(
     `https://bicho-id.fucesa.com/api/v1/organisms/${params.id}`,
     fetch,
+    { fallbackData },
   )
 
   if (!data) {

@@ -1,5 +1,5 @@
 import { Suspense } from 'react'
-import { notFound } from 'next/navigation'
+import { notFound, useParams } from 'next/navigation'
 import { createKysely } from '@vercel/postgres-kysely'
 
 import DiscoveryDetailScreen from '@bichos-id/app/screens/ExploreDetail'
@@ -14,15 +14,20 @@ export const dynamic = 'force-dynamic'
 
 export const revalidate = 60 * 60 * 24 // 1 day
 
-export async function generateMetadata({ params }: Props) {
+function getOrganism(id: string) {
   const db = createKysely<Database>()
+
+  return db
+    .selectFrom('organism')
+    .where('id', '=', id)
+    .selectAll()
+    .executeTakeFirst()
+}
+
+export async function generateMetadata({ params }: Props) {
   const id = params.id
 
-  const organism = await db
-    .selectFrom('organism')
-    .select('identification')
-    .where('id', '=', id)
-    .executeTakeFirst()
+  const organism = await getOrganism(id)
 
   if (!organism) {
     return notFound()
@@ -34,10 +39,14 @@ export async function generateMetadata({ params }: Props) {
   }
 }
 
-export default function DiscoveryDetailPage() {
+export default async function DiscoveryDetailPage({ params }: Props) {
+  const id = params.id
+
+  const organism = await getOrganism(id)
+
   return (
     <Suspense fallback={null}>
-      <DiscoveryDetailScreen />
+      <DiscoveryDetailScreen fallbackData={organism} />
     </Suspense>
   )
 }

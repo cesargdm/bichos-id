@@ -1,5 +1,5 @@
 import { createKysely } from '@vercel/postgres-kysely'
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 
 import { Database } from '../../_db'
 
