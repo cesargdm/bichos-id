@@ -3,8 +3,9 @@ import OpenAI from 'openai'
 import { z } from 'zod'
 import { zodResponseFormat } from 'openai/helpers/zod'
 import { createKysely } from '@vercel/postgres-kysely'
-import { Database, OrganismSchema } from '../../_db'
 import { put } from '@vercel/blob'
+
+import { Database, OrganismSchema } from '../../_db'
 
 const schema = z.object({
   base64Image: z.string().min(1).startsWith('data:image/'),
