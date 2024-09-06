@@ -2,7 +2,7 @@ import { createKysely } from '@vercel/postgres-kysely'
 import { NextResponse } from 'next/server'
 import { Database } from '../_db'
 
-export async function GET(req: Request) {
+export async function GET() {
   try {
     const db = createKysely<Database>()
 

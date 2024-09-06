@@ -1,9 +1,39 @@
-import { Metadata } from 'next'
+import { Suspense } from 'react'
+import { notFound } from 'next/navigation'
+import { createKysely } from '@vercel/postgres-kysely'
 
-export const metadata: Metadata = {
-  title: 'Detalle de Descubrimiento - Bichos ID - Fucesa',
-  description:
-    'Descubre insectos, arácnidos y otros bichos con Bichos ID usando inteligencia artificial.',
+import DiscoveryDetailScreen from '@bichos-id/app/screens/DiscoverDetail'
+
+import { Database } from '../../api/v1/_db'
+
+type Props = {
+  params: { id: string }
 }
 
-export { default } from '@bichos-id/app/screens/DiscoverDetail'
+export async function generateMetadata({ params }: Props) {
+  const db = createKysely<Database>()
+  const id = params.id
+
+  const organism = await db
+    .selectFrom('organism')
+    .select('identification')
+    .where('id', '=', id)
+    .executeTakeFirst()
+
+  if (!organism) {
+    return notFound()
+  }
+
+  return {
+    title: `${organism.identification.commonName} - Bichos ID - Fucesa`,
+    description: organism.identification.description,
+  }
+}
+
+export default function DiscoveryDetailPage() {
+  return (
+    <Suspense fallback={null}>
+      <DiscoveryDetailScreen />
+    </Suspense>
+  )
+}
