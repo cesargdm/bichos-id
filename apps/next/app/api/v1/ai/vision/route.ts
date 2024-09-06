@@ -9,6 +9,13 @@ const schema = z.object({
   base64Image: z.string().min(1).startsWith('data:image/'),
 })
 
+function slugify(text: string) {
+  return text
+    .toLowerCase()
+    .replace(/\s+/g, '-')
+    .replace(/[^a-z0-9-]/g, '')
+}
+
 export async function POST(request: NextRequest) {
   try {
     if (!process.env.OPENAI_API_KEY) {
@@ -68,9 +75,11 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const id = `${parsed.identification.scientificClassification.genus}-${
-      parsed.identification.scientificClassification.species ?? 'sp'
-    }`
+    const id = slugify(
+      `${parsed.identification.scientificClassification.genus}-${
+        parsed.identification.scientificClassification.species ?? 'sp'
+      }`,
+    )
 
     const existing = await db
       .selectFrom('organism')
