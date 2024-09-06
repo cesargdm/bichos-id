@@ -15,26 +15,35 @@ function toBase64(file) {
 }
 
 export default function HomeScreen() {
-  const handleUploadFile = useCallback(async (event) => {
-    const file = event.target.files[0]
+  const handleSubmitForm = useCallback(async (event) => {
+    event.preventDefault()
+
+    const file = event.target.elements.file.files[0]
 
     const base64Image = await toBase64(file)
 
     const data = await Api.identify(base64Image)
 
-    console.log(data)
+    if (data.id) {
+      window.location.href = `/explore/${data.id}`
+    }
   }, [])
 
   return (
     <>
       <h1>Bicho ID</h1>
 
-      <label>
-        <b>Subir imagen</b>
-        <input type="file" accept="image/jpeg" onChange={handleUploadFile} />
-      </label>
+      <form onSubmit={handleSubmitForm}>
+        <label>
+          <b>Imagen</b>
+          <input name="file" type="file" accept="image/jpeg" />
+        </label>
+        <button type="submit">Identificar</button>
+      </form>
 
-      <Link href="/explore">Ir a explorar</Link>
+      <Link href="/explore">
+        <p>Ir a explorar</p>
+      </Link>
     </>
   )
 }
