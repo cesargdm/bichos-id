@@ -15,6 +15,7 @@ export async function GET(
     const organism = await db
       .selectFrom('organism')
       .where('id', '=', id)
+      .selectAll()
       .executeTakeFirst()
 
     return NextResponse.json({ organism })
