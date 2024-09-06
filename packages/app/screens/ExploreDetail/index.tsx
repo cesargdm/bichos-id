@@ -20,7 +20,7 @@ type Props = {
   }
 }
 
-const fetcher = (url) => fetch(url).then((r) => r.json())
+const fetcher = (url: string) => fetch(url).then((response) => response.json())
 
 export default function DiscoverDetailScreen({ fallbackData }: Props) {
   const params = useUserParams()
