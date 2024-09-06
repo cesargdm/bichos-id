@@ -85,7 +85,6 @@ export async function POST(request: NextRequest) {
     await Promise.allSettled([
       db
         .selectFrom('organism')
-
         .where('id', '=', id)
         .execute()
         .then((existing) => {
@@ -102,10 +101,12 @@ export async function POST(request: NextRequest) {
               .executeTakeFirst()
           }
         }),
-
       put(
         `/organisms/${id}/${Date.now()}.jpeg`,
-        Buffer.from(data.base64Image, 'base64'),
+        Buffer.from(
+          data.base64Image.replace(/^data:image\/\w+;base64,/, ''),
+          'base64',
+        ),
         { access: 'public' },
       ),
     ])
