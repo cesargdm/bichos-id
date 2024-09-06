@@ -20,12 +20,14 @@ type Props = {
   }
 }
 
+const fetcher = (url) => fetch(url).then((r) => r.json())
+
 export default function DiscoverDetailScreen({ fallbackData }: Props) {
   const params = useUserParams()
 
   const { data, error, isLoading } = useSWR<any>(
     `https://bichos-id.fucesa.com/api/v1/organisms/${params.id}`,
-    fetch,
+    fetcher,
     { fallbackData },
   )
 
