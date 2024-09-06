@@ -39,10 +39,10 @@ export default function DiscoverDetailScreen({ fallbackData }: Props) {
   return (
     <>
       <Text role="heading" aria-level={1}>
-        {data.identification.scientificClassification.genus}{' '}
-        {data.identification.scientificClassification.species}
+        {data.identification?.scientificClassification.genus}{' '}
+        {data.identification?.scientificClassification.species}
       </Text>
-      <Text>{data.identification.description}</Text>
+      <Text>{data.identification?.description}</Text>
       <Text>{JSON.stringify(data, null, 2)}</Text>
       <TextLink href="/">Explore</TextLink>
     </>
