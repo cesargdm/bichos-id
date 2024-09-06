@@ -4,10 +4,15 @@
     "slug": "bicho-id",
     "version": "1.0.0",
     "scheme": "bicho-id",
+    "icon": "./assets/icon.png",
     "platforms": ["ios", "android"],
-    "orientation": "default",
+    "orientation": "portrait",
     "ios": {
-      "bundleIdentifier": "com.fucesa.bicho-id"
+      "bundleIdentifier": "com.fucesa.bicho-id",
+      "infoPlist": {
+        "NSCameraUsageDescription": "$(PRODUCT_NAME) needs access to your Camera.",
+        "NSMicrophoneUsageDescription": "$(PRODUCT_NAME) needs access to your Microphone."
+      }
     },
     "plugins": [
       [
@@ -23,7 +28,22 @@
         {
           "photosPermission": "The app accesses your photos to let you share them with your friends."
         }
+      ],
+      [
+        "react-native-vision-camera",
+        {
+          "cameraPermissionText": "$(PRODUCT_NAME) needs access to your Camera.",
+          "enableMicrophonePermission": true,
+          "microphonePermissionText": "$(PRODUCT_NAME) needs access to your Microphone."
+        }
       ]
-    ]
+    ],
+    "android": {
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
+      ],
+      "package": "com.fucesa.bichos_id"
+    }
   }
 }
