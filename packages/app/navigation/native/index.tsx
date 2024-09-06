@@ -1,11 +1,13 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 
 import HomeScreen from 'app/screens/home'
-import UserDetailScreen from 'app/screens/user'
+import DiscoverDetailScreen from 'app/screens/DiscoverDetail'
+import DiscoverScreen from 'app/screens/Discover'
 
 const Stack = createNativeStackNavigator<{
   home: undefined
-  user: {
+  discover: undefined
+  'discover-detail': {
     id: string
   }
 }>()
@@ -16,12 +18,17 @@ export function NativeNavigation() {
       <Stack.Screen
         name="home"
         component={HomeScreen}
-        options={{ title: 'Home' }}
+        options={HomeScreen.options}
       />
       <Stack.Screen
-        name="user"
-        component={UserDetailScreen}
-        options={{ title: 'User' }}
+        name="discover"
+        component={DiscoverScreen}
+        options={{ title: 'Discover' }}
+      />
+      <Stack.Screen
+        name="discover-detail"
+        component={DiscoverDetailScreen}
+        options={{ title: 'Discover Detail' }}
       />
     </Stack.Navigator>
   )
