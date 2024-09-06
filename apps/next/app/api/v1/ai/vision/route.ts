@@ -72,7 +72,6 @@ export async function POST(request: NextRequest) {
       parsed.identification.scientificClassification.species ?? 'sp'
     }`
 
-    console.log('Checking if exists...')
     const existing = await db
       .selectFrom('organism')
       .select('id')
@@ -80,15 +79,14 @@ export async function POST(request: NextRequest) {
       .execute()
 
     if (!existing.length) {
-      console.log('Inserting...')
       void (await db
         .insertInto('organism')
         .values({
           id,
           identification: parsed.identification,
           confidence: parsed.confidence,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
         })
         .executeTakeFirst())
     }
