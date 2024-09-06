@@ -3,13 +3,17 @@ import OpenAI from 'openai'
 import { z } from 'zod'
 import { zodResponseFormat } from 'openai/helpers/zod'
 import { createKysely } from '@vercel/postgres-kysely'
-import { put } from '@vercel/blob'
+import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3'
+import * as crypto from 'node:crypto'
 
 import { Database, OrganismSchema } from '../../_db'
 
 const schema = z.object({
   base64Image: z.string().min(1).startsWith('data:image/'),
 })
+
+const { CLOUDFLARE_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY } =
+  process.env
 
 function slugify(text: string) {
   return text
@@ -102,13 +106,26 @@ export async function POST(request: NextRequest) {
               .executeTakeFirst()
           }
         }),
-      put(
-        `/organisms/${id}/${Date.now()}.jpeg`,
-        Buffer.from(
-          data.base64Image.replace(/^data:image\/\w+;base64,/, ''),
-          'base64',
-        ).toString('binary'),
-        { access: 'public' },
+      new S3Client({
+        region: 'auto',
+        endpoint: `https://${CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+        credentials: {
+          accessKeyId: R2_ACCESS_KEY_ID as string,
+          secretAccessKey: R2_SECRET_ACCESS_KEY as string,
+        },
+      }).send(
+        new PutObjectCommand({
+          Bucket: 'bichos-id',
+          Key: `organisms/${id}/${crypto
+            .randomBytes(20)
+            .toString('hex')}-${Date.now()}.jpg`,
+          Body: Buffer.from(
+            data.base64Image.replace(/^data:image\/\w+;base64,/, ''),
+            'base64',
+          ),
+          ContentType: 'image/jpeg',
+          ContentEncoding: 'base64',
+        }),
       ),
     ])
 

@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "3.645.0",
     "@expo/next-adapter": "6.0.0",
     "@vercel/blob": "0.23.4",
     "@vercel/og": "0.6.2",
