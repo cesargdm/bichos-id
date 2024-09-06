@@ -3,7 +3,10 @@ import { NextRequest, NextResponse } from 'next/server'
 
 import { Database } from '../../_db'
 
-export async function GET({ params }: { params: { id: string } }) {
+export async function GET(
+  _request: Request,
+  { params }: { params: { id: string } },
+) {
   try {
     const db = createKysely<Database>()
 
