@@ -111,7 +111,7 @@ export async function POST(request: NextRequest) {
       ),
     ])
 
-    return NextResponse.json(parsed, { status: 200 })
+    return NextResponse.json({ id, ...parsed }, { status: 200 })
   } catch (error) {
     console.log(error)
 
