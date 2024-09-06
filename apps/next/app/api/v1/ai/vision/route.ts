@@ -35,6 +35,8 @@ export async function POST(request: NextRequest) {
       throw new Error('No body provided')
     }
 
+    const userId = request.headers.get('x-user-id') ?? 'anonymous'
+
     const data = await request.json()
 
     schema.parse(data)
@@ -62,6 +64,8 @@ export async function POST(request: NextRequest) {
           ],
         },
       ],
+      temperature: 0.5,
+      user: userId,
       response_format: zodResponseFormat(AnimalSchema, 'event'),
     })
 
