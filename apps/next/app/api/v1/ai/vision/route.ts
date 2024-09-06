@@ -102,9 +102,12 @@ export async function POST(request: NextRequest) {
               .executeTakeFirst()
           }
         }),
-      put(`/organisms/${id}/${Date.now()}.jpeg`, data.base64Image, {
-        access: 'public',
-      }),
+
+      put(
+        `/organisms/${id}/${Date.now()}.jpeg`,
+        Buffer.from(data.base64Image, 'base64'),
+        { access: 'public' },
+      ),
     ])
 
     return NextResponse.json(parsed, { status: 200 })
