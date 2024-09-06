@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
           ],
         },
       ],
-      temperature: 0.5,
+      temperature: 0.3,
       user: userId,
       response_format: zodResponseFormat(OrganismSchema, 'event'),
     })

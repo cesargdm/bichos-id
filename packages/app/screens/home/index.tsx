@@ -9,11 +9,25 @@ import {
   Text,
   Button,
   Pressable,
-  Linking,
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useRouter } from 'solito/navigation'
 import * as Clipboard from 'expo-clipboard'
+import Ionicons from '@expo/vector-icons/Ionicons'
+import { StatusBar } from 'expo-status-bar'
+import * as ImagePicker from 'expo-image-picker'
+
+const API_BASE_URL = 'https://bichos-id.fucesa.com/api/v1'
+
+class Api {
+  static async identify(base64Image: string) {
+    return fetch(`${API_BASE_URL}/ai/vision`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ base64Image }),
+    }).then((response) => response.json())
+  }
+}
 
 function HomeScreen() {
   const [permission, requestPermission] = useCameraPermissions()
@@ -25,48 +39,19 @@ function HomeScreen() {
     setIsLoading(true)
 
     try {
-      const base64Image = await cameraRef.current?.takePictureAsync({
+      const image = await cameraRef.current?.takePictureAsync({
         base64: true,
         quality: 0.3,
         imageType: 'jpg',
       })
 
-      if (!base64Image) {
+      if (!image || !image.base64) {
         throw new Error('No image taken')
       }
 
-      console.log('Sending image....')
+      const data = await Api.identify(`data:image/jpeg;base64,${image.base64}`)
 
-      const response = await fetch(
-        `https://bichos-id.fucesa.com/api/v1/ai/vision`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            base64Image: `data:image/jpeg;base64,${base64Image.base64}`,
-          }),
-        },
-      ).then((response) => response.json())
-
-      Alert.alert(
-        'Animal Identification',
-        `Common name:${response.identification.commonName}\nGenus: ${response.identification.scientificClassification.genus}\nSpecies: ${response.identification.scientificClassification.species}\n\nVenomous: ${response.identification.venomous.level}`,
-        [
-          {
-            text: 'Copy image',
-            onPress: () => {
-              Clipboard.setStringAsync(
-                `data:image/jpeg;base64,${base64Image.base64}`,
-              )
-            },
-          },
-          {
-            text: 'Done',
-          },
-        ],
-      )
+      router.push(`/explore/${data.id}`)
     } catch (error) {
       console.log(error)
       console.dir(error)
@@ -75,11 +60,43 @@ function HomeScreen() {
     } finally {
       setIsLoading(false)
     }
-  }, [])
+  }, [router])
 
-  function handleExplore() {
+  const handlePickImage = useCallback(async () => {
+    try {
+      setIsLoading(true)
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        quality: 0.3,
+        base64: true,
+      })
+
+      if (result.canceled) {
+        throw new Error('Image selection canceled')
+      }
+
+      const image = result.assets[0]
+
+      if (!image) {
+        throw new Error('No image selected')
+      }
+
+      const data = await Api.identify(`data:image/jpeg;base64,${image.base64}`)
+
+      router.push(`/explore/${data.id}`)
+    } catch (error) {
+      console.log(error)
+      console.dir(error)
+      //
+    } finally {
+      setIsLoading(false)
+    }
+  }, [router])
+
+  const handleExplore = useCallback(() => {
     router.push('/explore')
-  }
+  }, [router])
 
   if (!permission) {
     // Camera permissions are still loading.
@@ -89,68 +106,98 @@ function HomeScreen() {
   if (!permission.granted) {
     // Camera permissions are not granted yet.
     return (
-      <View>
-        <Text>We need your permission to show the camera</Text>
+      <SafeAreaView
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundColor: 'black',
+        }}
+      >
+        <Text style={{ color: 'white' }}>
+          We need your permission to show the camera
+        </Text>
         <Button onPress={requestPermission} title="grant permission" />
-      </View>
+      </SafeAreaView>
     )
   }
 
   return (
-    <View style={{ flex: 1 }}>
-      {/* <StatusBar /> */}
-      <CameraView
-        ref={cameraRef}
-        style={{
-          flex: 1,
-          justifyContent: 'flex-end',
-          alignItems: 'center',
-        }}
-      >
-        <SafeAreaView
+    <>
+      <StatusBar style="light" />
+      <View style={{ flex: 1 }}>
+        <CameraView
+          ref={cameraRef}
           style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            width: '100%',
+            flex: 1,
+            justifyContent: 'flex-end',
+            alignItems: 'center',
           }}
-          edges={['bottom', 'left', 'right']}
         >
-          <View />
-          <Pressable
-            disabled={isLoading}
-            onPress={handleCapture}
-            style={{
-              opacity: isLoading ? 0.5 : 1,
-              borderWidth: 3,
-              borderColor: 'white',
-              width: 70,
-              height: 70,
-              borderRadius: 999,
-              padding: 3,
-            }}
+          <SafeAreaView
+            style={{ flex: 1, justifyContent: 'space-between' }}
+            edges={['top', 'bottom', 'left', 'right']}
           >
             <View
               style={{
                 width: '100%',
-                height: '100%',
-                backgroundColor: 'white',
-                borderRadius: 999,
-                justifyContent: 'center',
-                alignItems: 'center',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
               }}
             >
-              {isLoading ? <ActivityIndicator size="large" /> : null}
+              <Pressable style={{ padding: 16 }}>
+                <Ionicons size={24} color="white" name="flashlight" />
+              </Pressable>
+              <Pressable style={{ padding: 16 }}>
+                <Ionicons size={24} color="white" name="settings" />
+              </Pressable>
             </View>
-          </Pressable>
-          <Pressable
-            style={{ backgroundColor: 'red', minHeight: 40, minWidth: 40 }}
-            onPress={handleExplore}
-          >
-            <Text>Explore</Text>
-          </Pressable>
-        </SafeAreaView>
-      </CameraView>
-    </View>
+
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                width: '100%',
+              }}
+            >
+              <Pressable onPress={handlePickImage} style={{ padding: 16 }}>
+                <Ionicons size={32} color="white" name="images-outline" />
+              </Pressable>
+              <Pressable
+                disabled={isLoading}
+                onPress={handleCapture}
+                style={{
+                  opacity: isLoading ? 0.5 : 1,
+                  borderWidth: 3,
+                  borderColor: 'white',
+                  width: 70,
+                  height: 70,
+                  borderRadius: 999,
+                  padding: 3,
+                }}
+              >
+                <View
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    backgroundColor: 'white',
+                    borderRadius: 999,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}
+                >
+                  {isLoading ? <ActivityIndicator size="large" /> : null}
+                </View>
+              </Pressable>
+              <Pressable style={{ padding: 16 }} onPress={handleExplore}>
+                <Ionicons size={32} color="white" name="compass-outline" />
+              </Pressable>
+            </View>
+          </SafeAreaView>
+        </CameraView>
+      </View>
+    </>
   )
 }
 

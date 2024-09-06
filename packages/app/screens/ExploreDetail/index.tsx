@@ -1,9 +1,10 @@
 'use client'
 
-import { Text } from 'react-native'
+import { Text, View, ScrollView } from 'react-native'
 import useSWR from 'swr'
 import { TextLink } from 'solito/link'
 import { useParams } from 'solito/navigation'
+import { StatusBar } from 'expo-status-bar'
 
 const useUserParams = useParams<{ id: string }>
 
@@ -40,13 +41,50 @@ export default function DiscoverDetailScreen({ fallbackData }: Props) {
 
   return (
     <>
-      <Text role="heading" aria-level={1}>
-        {data.identification?.scientificClassification.genus}{' '}
-        {data.identification?.scientificClassification.species}
-      </Text>
-      <Text>{data.identification?.description}</Text>
-      <Text>{JSON.stringify(data, null, 2)}</Text>
-      <TextLink href="/">Explore</TextLink>
+      <StatusBar style="auto" />
+      <ScrollView
+        contentContainerStyle={{ gap: 8 }}
+        style={{ flex: 1, padding: 10 }}
+      >
+        <Text
+          style={{ fontSize: 20, fontWeight: '600' }}
+          role="heading"
+          aria-level={1}
+        >
+          {data.identification?.commonName} (
+          {data.identification?.scientificClassification.genus}{' '}
+          {data.identification?.scientificClassification.species})
+        </Text>
+
+        {data.identification.venomous ? (
+          <View
+            style={{
+              padding: 8,
+              paddingHorizontal: 16,
+              borderRadius: 8,
+              backgroundColor: data.identification.venomous.level.includes(
+                'HIGH',
+              )
+                ? 'rgba(255,0,0,0.2)'
+                : 'rgba(251, 255, 0, 0.1)',
+            }}
+          >
+            <Text
+              style={{
+                color: data.identification.venomous.level.includes('HIGH')
+                  ? 'red'
+                  : 'yellow',
+              }}
+            >
+              {data.identification.venomous.level}
+            </Text>
+          </View>
+        ) : null}
+
+        <Text>{data.identification?.description}</Text>
+
+        <TextLink href="/">Explore</TextLink>
+      </ScrollView>
     </>
   )
 }

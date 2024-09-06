@@ -1798,9 +1798,12 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@bichos-id/app@workspace:packages/app"
   dependencies:
+    "@expo/vector-icons": "npm:^14.0.2"
     "@react-navigation/native": "npm:6.1.18"
     "@react-navigation/native-stack": "npm:6.9.26"
     "@supabase/supabase-js": "npm:2.45.3"
+    expo-image-picker: "npm:~15.0.7"
+    expo-status-bar: "npm:~1.12.1"
     react-native-safe-area-context: "npm:^4.10.9"
     solito: "npm:4.2.2"
     swr: "npm:2.2.5"
@@ -2236,7 +2239,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@expo/vector-icons@npm:^14.0.0":
+"@expo/vector-icons@npm:^14.0.0, @expo/vector-icons@npm:^14.0.2":
   version: 14.0.2
   resolution: "@expo/vector-icons@npm:14.0.2"
   dependencies:
