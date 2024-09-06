@@ -1,10 +1,10 @@
 'use client'
 
-import { createParam } from 'solito'
 import { Link, TextLink } from 'solito/link'
-import { ScrollView, Text, View } from 'react-native'
+import { ScrollView, Text } from 'react-native'
 import useSWR from 'swr'
 import { StatusBar } from 'expo-status-bar'
+import { Api } from '@bichos-id/app/lib/api'
 
 type Props = {
   fallbackData?: any[]
@@ -14,7 +14,7 @@ const fetcher = (url: string) => fetch(url).then((response) => response.json())
 
 export default function DiscoverScreen({ fallbackData }: Props) {
   const { data, error, isLoading } = useSWR<any>(
-    `https://bichos-id.fucesa.com/api/v1/organisms`,
+    Api.getOrganismsKey(),
     fetcher,
     { fallbackData },
   )

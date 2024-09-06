@@ -30,7 +30,7 @@ export default function DiscoverDetailScreen({ fallbackData }: Props) {
   const params = useUserParams()
 
   const { data, error, isLoading } = useSWR<any>(
-    Api.getOrganism(params.id),
+    Api.getOrganismKey(params.id),
     fetcher,
     { fallbackData },
   )
@@ -84,9 +84,14 @@ export default function DiscoverDetailScreen({ fallbackData }: Props) {
           </View>
         ) : null}
 
+        <Text role="heading" aria-level="2">
+          Descripción
+        </Text>
         <Text>{data.identification?.description}</Text>
 
-        <Text>Últimas imágenes</Text>
+        <Text role="heading" aria-level="2">
+          Últimas imágenes
+        </Text>
 
         <FlatList
           data={data.images}
@@ -97,7 +102,7 @@ export default function DiscoverDetailScreen({ fallbackData }: Props) {
           renderItem={({ item }) => (
             <Image
               alt={`${data.identification?.commonName} - ${data.identification?.scientificClassification.genus} ${data.identification?.scientificClassification.species}`}
-              style={{ width: 50, height: 50 }}
+              style={{ width: 200, height: 200 }}
               source={{ uri: item }}
             />
           )}
