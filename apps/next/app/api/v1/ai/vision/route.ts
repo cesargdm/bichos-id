@@ -106,7 +106,7 @@ export async function POST(request: NextRequest) {
         Buffer.from(
           data.base64Image.replace(/^data:image\/\w+;base64,/, ''),
           'base64',
-        ),
+        ).toString('binary'),
         { access: 'public' },
       ),
     ])

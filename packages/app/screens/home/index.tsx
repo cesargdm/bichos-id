@@ -12,23 +12,12 @@ import {
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useRouter } from 'solito/navigation'
-import * as Clipboard from 'expo-clipboard'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { StatusBar } from 'expo-status-bar'
 import * as ImagePicker from 'expo-image-picker'
 import { Link } from 'solito/link'
 
-const API_BASE_URL = 'https://bichos-id.fucesa.com/api/v1'
-
-class Api {
-  static async identify(base64Image: string) {
-    return fetch(`${API_BASE_URL}/ai/vision`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ base64Image }),
-    }).then((response) => response.json())
-  }
-}
+import { Api } from '@bichos-id/app/lib/api'
 
 function HomeScreen() {
   const [permission, requestPermission] = useCameraPermissions()
