@@ -14,11 +14,13 @@
     "next": "14.2.8",
     "openai": "4.58.0",
     "raf": "3.4.1",
+    "react-dom": "18.3.1",
     "setimmediate": "1.0.5",
     "zod": "3.23.8"
   },
   "devDependencies": {
     "@types/node": "~22.5.4",
+    "@types/react-dom": "^18",
     "eslint-config-next": "~14.2.8"
   }
 }
