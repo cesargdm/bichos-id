@@ -1,5 +1,5 @@
 {
-  "name": "solito-blank",
+  "name": "bichos-id",
   "private": true,
   "workspaces": [
     "apps/*",

@@ -1,8 +1,8 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 
-import HomeScreen from 'app/screens/home'
-import DiscoverDetailScreen from 'app/screens/DiscoverDetail'
-import DiscoverScreen from 'app/screens/Discover'
+import HomeScreen from '@bichos-id/app/screens/home'
+import DiscoverDetailScreen from '@bichos-id/app/screens/DiscoverDetail'
+import DiscoverScreen from '@bichos-id/app/screens/Discover'
 
 const Stack = createNativeStackNavigator<{
   home: undefined

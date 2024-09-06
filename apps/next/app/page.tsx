@@ -1,3 +1,3 @@
 'use client'
 
-export { default } from 'app/screens/home'
+export { default } from '@bichos-id/app/screens/home'

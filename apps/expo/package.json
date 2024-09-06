@@ -1,6 +1,5 @@
 {
   "dependencies": {
-    "app": "*",
     "expo": "~51.0.32",
     "expo-camera": "~15.0.15",
     "expo-clipboard": "~6.0.3",

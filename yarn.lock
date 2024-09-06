@@ -1794,6 +1794,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@bichos-id/app@workspace:packages/app":
+  version: 0.0.0-use.local
+  resolution: "@bichos-id/app@workspace:packages/app"
+  dependencies:
+    "@react-navigation/native": "npm:6.1.18"
+    "@react-navigation/native-stack": "npm:6.9.26"
+    "@supabase/supabase-js": "npm:2.45.3"
+    react-native-safe-area-context: "npm:^4.10.9"
+    solito: "npm:4.2.2"
+  languageName: unknown
+  linkType: soft
+
 "@egjs/hammerjs@npm:^2.0.17":
   version: 2.0.17
   resolution: "@egjs/hammerjs@npm:2.0.17"
@@ -4272,17 +4284,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"app@npm:*, app@workspace:packages/app":
-  version: 0.0.0-use.local
-  resolution: "app@workspace:packages/app"
-  dependencies:
-    "@react-navigation/native": "npm:6.1.18"
-    "@react-navigation/native-stack": "npm:6.9.26"
-    "@supabase/supabase-js": "npm:2.45.3"
-    solito: "npm:4.2.2"
-  languageName: unknown
-  linkType: soft
-
 "appdirsjs@npm:^1.2.4":
   version: 1.2.7
   resolution: "appdirsjs@npm:1.2.7"
@@ -4682,6 +4683,17 @@ __metadata:
   checksum: 10/24668e5a837d0d2c0edf17ad5ebcfeb00a8a5578a5eb09f7a409e1a60617cdfea40b8ebfc95e5f12d9568157930d033e6805788fcf0780413ac982c95d3745d1
   languageName: node
   linkType: hard
+
+"bichos-id@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "bichos-id@workspace:."
+  dependencies:
+    "@types/react": "npm:~18.3.5"
+    eslint: "npm:~8.21.0"
+    turbo: "npm:~2.1.1"
+    typescript: "npm:~5.5.4"
+  languageName: unknown
+  linkType: soft
 
 "big-integer@npm:1.6.x":
   version: 1.6.51
@@ -6506,7 +6518,6 @@ __metadata:
     "@babel/plugin-transform-private-methods": "npm:~7.25.4"
     "@types/react": "npm:~18.2.79"
     "@types/react-native": "npm:~0.73.0"
-    app: "npm:*"
     expo: "npm:~51.0.32"
     expo-camera: "npm:~15.0.15"
     expo-clipboard: "npm:~6.0.3"
@@ -9756,13 +9767,13 @@ __metadata:
     "@expo/next-adapter": "npm:6.0.0"
     "@types/node": "npm:~22.5.4"
     "@types/react-dom": "npm:^18"
-    app: "npm:*"
     eslint-config-next: "npm:~14.2.8"
     next: "npm:14.2.8"
     openai: "npm:4.58.0"
     raf: "npm:3.4.1"
     react-dom: "npm:18.3.1"
     react-native: "npm:0.75.2"
+    react-native-web: "npm:^0.19.12"
     setimmediate: "npm:1.0.5"
     zod: "npm:3.23.8"
   languageName: unknown
@@ -10948,6 +10959,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-native-safe-area-context@npm:^4.10.9":
+  version: 4.10.9
+  resolution: "react-native-safe-area-context@npm:4.10.9"
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+  checksum: 10/c7ec6e42a16bc5a497c5187858152854aa702b01e13a273a43c870975c7faa11f3691035558973e19359c616bc7ee326c68905f63e8a1f25f7dcea1a1f009927
+  languageName: node
+  linkType: hard
+
 "react-native-screens@npm:3.31.1":
   version: 3.31.1
   resolution: "react-native-screens@npm:3.31.1"
@@ -10961,7 +10982,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-web@npm:~0.19.12":
+"react-native-web@npm:^0.19.12, react-native-web@npm:~0.19.12":
   version: 0.19.12
   resolution: "react-native-web@npm:0.19.12"
   dependencies:
@@ -11930,17 +11951,6 @@ __metadata:
   checksum: 10/5074f7d6a13b3155fa655191df1c7e7a48ce3234b8ccf99afa2ccb56591c195e75e8bb78486f8e9ea8168e95a29573cbaad55b2b5e195160ae4d2ea6811ba833
   languageName: node
   linkType: hard
-
-"solito-blank@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "solito-blank@workspace:."
-  dependencies:
-    "@types/react": "npm:~18.3.5"
-    eslint: "npm:~8.21.0"
-    turbo: "npm:~2.1.1"
-    typescript: "npm:~5.5.4"
-  languageName: unknown
-  linkType: soft
 
 "solito@npm:4.2.2":
   version: 4.2.2

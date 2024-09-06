@@ -1,3 +1,3 @@
 'use client'
 
-export { default } from 'app/screens/Discover'
+export { default } from '@bichos-id/app/screens/Discover'
