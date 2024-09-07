@@ -85,6 +85,22 @@ export default function DiscoverDetailScreen({ fallbackData }: Props) {
         ) : null}
 
         <Text role="heading" aria-level="2">
+          Taxonomía
+        </Text>
+
+        <View>
+          <Text>
+            Familia: {data.identification?.scientificClassification.family}
+          </Text>
+          <Text>
+            Género: {data.identification?.scientificClassification.genus}
+          </Text>
+          <Text>
+            Especie: {data.identification?.scientificClassification.species}
+          </Text>
+        </View>
+
+        <Text role="heading" aria-level="2">
           Descripción
         </Text>
         <Text>{data.identification?.description}</Text>
@@ -107,6 +123,12 @@ export default function DiscoverDetailScreen({ fallbackData }: Props) {
             />
           )}
         />
+
+        <TextLink
+          href={`https://google.com/search?q=${data.identification?.scientificClassification.genus} ${data.identification?.scientificClassification.species}`}
+        >
+          Google It
+        </TextLink>
 
         <TextLink href="/">Explore</TextLink>
       </ScrollView>

@@ -4,6 +4,7 @@ export const OrganismSchema = z.object({
   identification: z.object({
     commonName: z.string(),
     scientificClassification: z.object({
+      family: z.string(),
       genus: z.string(),
       species: z.string().optional(),
     }),
@@ -26,6 +27,7 @@ export interface Organism {
   identification: {
     commonName: string
     scientificClassification: {
+      family: string
       genus: string
       species?: string
     }
