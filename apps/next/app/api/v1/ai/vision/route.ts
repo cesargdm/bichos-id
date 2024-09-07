@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
 
     const choice = response.choices[0].message
 
-    console.log(choice)
+    console.log(choice?.parsed)
 
     if (!choice?.parsed || !choice.parsed.identification) {
       return NextResponse.json(
