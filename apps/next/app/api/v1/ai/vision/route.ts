@@ -47,7 +47,9 @@ export async function POST(request: NextRequest) {
       messages: [
         {
           role: 'system',
-          content: `You are an expert entomologist that will recognize species based on a photo. Use shape, color and subject surroundings and metadata to archive the best identification.`,
+          content: `You are an expert entomologist that will recognize species based on a photo.
+Use shape, color and subject surroundings and metadata to archive the best identification.
+Try to be as accurate as possible with genus and species.`,
         },
         {
           role: 'user',
