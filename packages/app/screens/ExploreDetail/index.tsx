@@ -45,76 +45,12 @@ export default function DiscoverDetailScreen({ fallbackData }: Props) {
   return (
     <>
       <StatusBar style="auto" />
-      <ScrollView
-        contentContainerStyle={{ gap: 8 }}
-        style={{ flex: 1, padding: 10 }}
-      >
-        <Text
-          style={{ fontSize: 20, fontWeight: '600' }}
-          role="heading"
-          aria-level={1}
-        >
-          {data.identification?.commonName} (
-          {data.identification?.scientificClassification.genus}{' '}
-          {data.identification?.scientificClassification.species})
-        </Text>
-
-        {data.identification?.venomous ? (
-          <View
-            style={{
-              padding: 8,
-              paddingHorizontal: 16,
-              borderRadius: 8,
-              backgroundColor: data.identification.venomous.level.includes(
-                'HIGH',
-              )
-                ? 'rgba(255,0,0,0.2)'
-                : 'rgba(251, 255, 0, 0.1)',
-            }}
-          >
-            <Text
-              style={{
-                color: data.identification.venomous.level.includes('HIGH')
-                  ? 'red'
-                  : 'yellow',
-              }}
-            >
-              {data.identification.venomous.level}
-            </Text>
-          </View>
-        ) : null}
-
-        <Text role="heading" aria-level="2">
-          Taxonomía
-        </Text>
-
-        <View>
-          <Text>
-            Familia: {data.identification?.scientificClassification.family}
-          </Text>
-          <Text>
-            Género: {data.identification?.scientificClassification.genus}
-          </Text>
-          <Text>
-            Especie: {data.identification?.scientificClassification.species}
-          </Text>
-        </View>
-
-        <Text role="heading" aria-level="2">
-          Descripción
-        </Text>
-        <Text>{data.identification?.description}</Text>
-
-        <Text role="heading" aria-level="2">
-          Últimas imágenes
-        </Text>
-
+      <ScrollView style={{ flex: 1 }}>
         <FlatList
           data={data.images}
           horizontal
           showsHorizontalScrollIndicator={false}
           style={{ width: '100%' }}
-          contentContainerStyle={{ gap: 8 }}
           renderItem={({ item }) => (
             <Image
               alt={`${data.identification?.commonName} - ${data.identification?.scientificClassification.genus} ${data.identification?.scientificClassification.species}`}
@@ -124,13 +60,75 @@ export default function DiscoverDetailScreen({ fallbackData }: Props) {
           )}
         />
 
-        <TextLink
-          href={`https://google.com/search?q=${data.identification?.scientificClassification.genus} ${data.identification?.scientificClassification.species}`}
-        >
-          Google It
-        </TextLink>
+        <View style={{ gap: 16, padding: 10 }}>
+          <Text
+            style={{ fontSize: 20, fontWeight: '600' }}
+            role="heading"
+            aria-level={1}
+          >
+            {data.identification?.commonName} (
+            {data.identification?.scientificClassification.genus}{' '}
+            {data.identification?.scientificClassification.species})
+          </Text>
 
-        <TextLink href="/">Explore</TextLink>
+          {data.identification?.venomous ? (
+            <View
+              style={{
+                padding: 8,
+                paddingHorizontal: 16,
+                borderRadius: 8,
+                backgroundColor: data.identification.venomous.level.includes(
+                  'HIGH',
+                )
+                  ? 'rgba(255,0,0,0.2)'
+                  : 'rgba(251, 255, 0, 0.1)',
+              }}
+            >
+              <Text
+                style={{
+                  color: data.identification.venomous.level.includes('HIGH')
+                    ? 'red'
+                    : 'yellow',
+                }}
+              >
+                {data.identification.venomous.level}
+              </Text>
+            </View>
+          ) : null}
+
+          <Text role="heading" aria-level="2">
+            Taxonomía
+          </Text>
+
+          <View>
+            <Text>
+              Familia: {data.identification?.scientificClassification.family}
+            </Text>
+            <Text>
+              Género: {data.identification?.scientificClassification.genus}
+            </Text>
+            <Text>
+              Especie: {data.identification?.scientificClassification.species}
+            </Text>
+          </View>
+
+          <Text role="heading" aria-level="2">
+            Descripción
+          </Text>
+          <Text>{data.identification?.description}</Text>
+
+          <Text role="heading" aria-level="2">
+            Últimas imágenes
+          </Text>
+
+          <TextLink
+            href={`https://google.com/search?q=${data.identification?.scientificClassification.genus} ${data.identification?.scientificClassification.species}`}
+          >
+            Google It
+          </TextLink>
+
+          <TextLink href="/">Explore</TextLink>
+        </View>
       </ScrollView>
     </>
   )

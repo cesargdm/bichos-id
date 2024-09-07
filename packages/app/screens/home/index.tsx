@@ -6,6 +6,7 @@ import {
   Text,
   ActivityIndicator,
   View,
+  Alert,
   Pressable,
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -131,10 +132,13 @@ function HomeScreen() {
 
       const data = await Api.identify(`data:image/jpeg;base64,${base64Image}`)
 
+      if (!data.id) {
+        throw new Error('No data returned')
+      }
+
       router.push(`/explore/${data.id}`)
     } catch (error) {
-      console.log(error)
-      //
+      Alert.alert('Error', error?.message ?? 'No se pudo identificar la imagen')
     } finally {
       setIsLoading(false)
     }
@@ -166,10 +170,13 @@ function HomeScreen() {
 
       const data = await Api.identify(`data:image/jpeg;base64,${image.base64}`)
 
+      if (!data.id) {
+        throw new Error('No data returned')
+      }
+
       router.push(`/explore/${data.id}`)
     } catch (error) {
-      console.log(error)
-      console.dir(error)
+      Alert.alert('Error', error?.message ?? 'No se pudo identificar la imagen')
       //
     } finally {
       setIsLoading(false)
