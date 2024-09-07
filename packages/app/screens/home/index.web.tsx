@@ -1,7 +1,6 @@
-/* eslint-disable @next/next/no-img-element */
-
 'use client'
 
+/* eslint-disable @next/next/no-img-element */
 import { useCallback, useState } from 'react'
 import { Link } from 'solito/link'
 
@@ -35,7 +34,7 @@ export default function HomeScreen() {
       const data = await Api.identify(base64Image)
 
       if (data.id) {
-        window.location.href = `/explore/${data.id}`
+        // window.location.href = `/explore/${data.id}`
       }
     } finally {
       setIsLoading(false)

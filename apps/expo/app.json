@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "bichos-id",
+    "name": "Bichos ID",
     "slug": "bichos-id",
     "version": "1.0.0",
     "scheme": "bichos-id",
@@ -9,20 +9,18 @@
     "orientation": "portrait",
     "ios": {
       "usesAppleSignIn": true,
-      "bundleIdentifier": "com.fucesa.bichos-id",
-      "infoPlist": {
-        "NSCameraUsageDescription": "$(PRODUCT_NAME) needs access to your Camera.",
-        "NSMicrophoneUsageDescription": "$(PRODUCT_NAME) needs access to your Microphone."
-      }
+      "bundleIdentifier": "com.fucesa.bichos-id"
     },
     "plugins": [
       "expo-apple-authentication",
       [
-        "expo-camera",
+        "react-native-vision-camera",
         {
-          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera",
-          "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone",
-          "recordAudioAndroid": true
+          "cameraPermissionText": "$(PRODUCT_NAME) needs access to your Camera.",
+
+          // optionally, if you want to record audio:
+          "enableMicrophonePermission": true,
+          "microphonePermissionText": "$(PRODUCT_NAME) needs access to your Microphone."
         }
       ],
       [
@@ -33,10 +31,7 @@
       ]
     ],
     "android": {
-      "permissions": [
-        "android.permission.CAMERA",
-        "android.permission.RECORD_AUDIO"
-      ],
+      "permissions": ["android.permission.CAMERA"],
       "package": "com.fucesa.bichos_id"
     },
     "extra": {

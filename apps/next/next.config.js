@@ -10,7 +10,6 @@ const nextConfig = {
   reactStrictMode: false,
   transpilePackages: [
     'react-native',
-    'expo-camera',
     'expo-modules-core',
     'react-native-web',
     'solito',

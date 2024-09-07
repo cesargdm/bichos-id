@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
     schema.parse(data)
 
     const response = await openai.beta.chat.completions.parse({
-      model: 'gpt-4o-mini',
+      model: 'gpt-4o',
       messages: [
         {
           role: 'system',
@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
           ],
         },
       ],
-      temperature: 0.2,
+      temperature: 0.3,
       user: userId,
       response_format: zodResponseFormat(OrganismSchema, 'event'),
     })

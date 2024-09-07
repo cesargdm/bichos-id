@@ -102,7 +102,7 @@ export default function DiscoverDetailScreen({ fallbackData }: Props) {
           renderItem={({ item }) => (
             <Image
               alt={`${data.identification?.commonName} - ${data.identification?.scientificClassification.genus} ${data.identification?.scientificClassification.species}`}
-              style={{ width: 200, height: 200 }}
+              style={{ width: 200, height: 200, objectFit: 'contain' }}
               source={{ uri: item }}
             />
           )}

@@ -1,76 +1,139 @@
 'use client'
 
-import { CameraView, useCameraPermissions } from 'expo-camera'
 import { useCallback, useRef, useState } from 'react'
 import {
-  Alert,
+  StyleSheet,
+  Text,
   ActivityIndicator,
   View,
-  Text,
-  Button,
   Pressable,
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useRouter } from 'solito/navigation'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { StatusBar } from 'expo-status-bar'
-import * as ImagePicker from 'expo-image-picker'
+import { launchImageLibraryAsync, MediaTypeOptions } from 'expo-image-picker'
+import { manipulateAsync, SaveFormat } from 'expo-image-manipulator'
+import { runOnJS } from 'react-native-reanimated'
+import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import { Link } from 'solito/link'
 import MaskedView from '@react-native-masked-view/masked-view'
-// import { Gesture } from 'react-native-gesture-handler'
-
-import { Api } from '@bichos-id/app/lib/api'
+import {
+  Camera,
+  useCameraPermission,
+  useCameraDevice,
+  Point,
+} from 'react-native-vision-camera'
 import { useIsFocused } from '@react-navigation/native'
 
-function HomeScreen() {
-  const [permission, requestPermission] = useCameraPermissions()
-  const [isLoading, setIsLoading] = useState(false)
-  const [zoom, setZoom] = useState(1)
+import { Api } from '@bichos-id/app/lib/api'
 
-  const [isTorchEnabled, setIsTorchEnabled] = useState(false)
+const CAPTURABLE_WIDTH_PERCENTAGE = 0.6
+const CAPTURABLE_HEIGHT_PERCENTAGE = 0.4
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: 'black',
+    justifyContent: 'space-between',
+  },
+  camera: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    position: 'relative',
+  },
+  maskContainer: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  mask: {
+    width: `${CAPTURABLE_WIDTH_PERCENTAGE * 100}%`,
+    height: `${CAPTURABLE_HEIGHT_PERCENTAGE * 100}%`,
+    borderRadius: 16,
+    backgroundColor: 'black',
+  },
+  maskedView: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+  },
+  topActionsContainer: {
+    width: '100%',
+    justifyContent: 'space-between',
+  },
+  topActionsContent: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  bottomActionsContainer: {
+    width: '100%',
+    justifyContent: 'space-between',
+  },
+})
+
+function HomeScreen() {
+  const { hasPermission } = useCameraPermission()
+  const [isLoading, setIsLoading] = useState(false)
+  const device = useCameraDevice('back')
+
+  const [isTorchEnabled, setIsTorchEnabled] = useState<'on' | 'off'>('off')
   const router = useRouter()
-  const cameraRef = useRef<CameraView>(null)
+  const cameraRef = useRef<Camera>(null)
 
   const isFocused = useIsFocused()
 
-  const isCameraActive = permission?.granted && isFocused
-
-  // const onPinchEnd = useCallback(
-  //   (event) => {
-  //     setZoom(zoom)
-  //   },
-  //   [zoom, setZoom],
-  // )
-
-  // const pinchGesture = Gesture.Pinch()
-  //   .onUpdate((event) => {
-  //     console.log('GESTURE UPDATE', event)
-  //   })
-  //   .onEnd(() => {
-  //     console.log('GESTURE END')
-  //   })
+  const isCameraActive = hasPermission && isFocused
 
   const handleCapture = useCallback(async () => {
     setIsLoading(true)
 
     try {
-      const image = await cameraRef.current?.takePictureAsync({
-        base64: true,
-        quality: 0.3,
-        imageType: 'jpg',
+      const photo = await cameraRef.current?.takePhoto({
+        enableShutterSound: false,
       })
 
-      if (!image || !image.base64) {
+      if (!photo) {
         throw new Error('No image taken')
       }
 
-      const data = await Api.identify(`data:image/jpeg;base64,${image.base64}`)
+      const photoHeight = photo.height
+      const photoWidth = photo.width
+
+      const photoRatio = photoHeight / photoWidth
+
+      const PHOTO_HEIGHT = 500 / CAPTURABLE_HEIGHT_PERCENTAGE
+      const PHOTO_WIDTH = Math.round(PHOTO_HEIGHT * photoRatio)
+
+      const base64Image = await manipulateAsync(
+        photo.path,
+        [
+          {
+            resize: {
+              width: PHOTO_WIDTH,
+              height: PHOTO_HEIGHT,
+            },
+          },
+          {
+            crop: {
+              width: PHOTO_WIDTH * CAPTURABLE_WIDTH_PERCENTAGE,
+              height: PHOTO_HEIGHT * CAPTURABLE_HEIGHT_PERCENTAGE,
+              originX: PHOTO_WIDTH * ((1 - CAPTURABLE_WIDTH_PERCENTAGE) / 2),
+              originY: PHOTO_HEIGHT * ((1 - CAPTURABLE_HEIGHT_PERCENTAGE) / 2),
+            },
+          },
+        ],
+        { compress: 0.666, format: SaveFormat.JPEG, base64: true },
+      ).then((result) => result.base64)
+
+      const data = await Api.identify(`data:image/jpeg;base64,${base64Image}`)
 
       router.push(`/explore/${data.id}`)
     } catch (error) {
       console.log(error)
-      console.dir(error)
-      console.log(JSON.stringify(error, null, 2))
       //
     } finally {
       setIsLoading(false)
@@ -78,15 +141,15 @@ function HomeScreen() {
   }, [router])
 
   const handleToggleTorch = useCallback(() => {
-    setIsTorchEnabled((prev) => !prev)
+    setIsTorchEnabled((prev) => (prev === 'on' ? 'off' : 'on'))
   }, [])
 
   const handlePickImage = useCallback(async () => {
     try {
       setIsLoading(true)
 
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      const result = await launchImageLibraryAsync({
+        mediaTypes: MediaTypeOptions.Images,
         quality: 0.3,
         base64: true,
       })
@@ -113,6 +176,15 @@ function HomeScreen() {
     }
   }, [router])
 
+  const focus = useCallback((point: Point) => {
+    if (cameraRef.current == null) return
+    cameraRef.current.focus(point)
+  }, [])
+
+  const gesture = Gesture.Tap().onEnd(({ x, y }) => {
+    runOnJS(focus)({ x, y })
+  })
+
   const handleExplore = useCallback(() => {
     router.push('/explore')
   }, [router])
@@ -120,70 +192,40 @@ function HomeScreen() {
   return (
     <>
       <StatusBar style="light" />
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: 'black',
-          justifyContent: 'space-between',
-        }}
-      >
-        {/* <GestureDetector gesture={pinchGesture}> */}
-        {/* <View style={{ flex: 1, backgroundColor: 'orange' }} /> */}
+      <View style={styles.container}>
         <MaskedView
-          style={{
-            position: 'absolute',
-            width: '100%',
-            height: '100%',
-          }}
+          style={styles.maskedView}
           maskElement={
-            <View
-              style={{
-                flex: 1,
-                backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}
-            >
-              <View
-                style={{
-                  width: '60%',
-                  height: '40%',
-                  borderRadius: 16,
-                  backgroundColor: 'black',
-                }}
-              />
+            <View style={styles.maskContainer}>
+              <View style={styles.mask} />
             </View>
           }
         >
-          <CameraView
-            active={isCameraActive}
-            enableTorch={isTorchEnabled}
-            ref={cameraRef}
-            style={{
-              flex: 1,
-              justifyContent: 'flex-end',
-              alignItems: 'center',
-              position: 'relative',
-            }}
-          />
+          <GestureDetector gesture={gesture}>
+            {device ? (
+              <Camera
+                torch={isTorchEnabled}
+                ref={cameraRef}
+                device={device}
+                isActive={isCameraActive}
+                outputOrientation="preview"
+                photoQualityBalance="balanced"
+                photoHdr
+                photo
+                enableZoomGesture
+                style={styles.camera}
+              />
+            ) : (
+              <Text>Sin camara</Text>
+            )}
+          </GestureDetector>
         </MaskedView>
-        {/* </GestureDetector> */}
 
         <SafeAreaView
-          style={{
-            width: '100%',
-            justifyContent: 'space-between',
-            backgroundColor: 'red',
-          }}
+          style={styles.topActionsContainer}
           edges={['top', 'left', 'right']}
         >
-          <View
-            style={{
-              width: '100%',
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-            }}
-          >
+          <View style={styles.topActionsContent}>
             <Pressable onPress={handleToggleTorch} style={{ padding: 16 }}>
               <Ionicons size={24} color="white" name="flashlight" />
             </Pressable>
@@ -194,11 +236,7 @@ function HomeScreen() {
         </SafeAreaView>
 
         <SafeAreaView
-          style={{
-            width: '100%',
-            justifyContent: 'space-between',
-            backgroundColor: 'green',
-          }}
+          style={styles.bottomActionsContainer}
           edges={['bottom', 'left', 'right']}
         >
           <View
@@ -233,9 +271,10 @@ function HomeScreen() {
                   borderRadius: 999,
                   justifyContent: 'center',
                   alignItems: 'center',
+                  alignContent: 'center',
                 }}
               >
-                {isLoading ? <ActivityIndicator size="large" /> : null}
+                {isLoading ? <ActivityIndicator /> : null}
               </View>
             </Pressable>
             <Pressable style={{ padding: 16 }} onPress={handleExplore}>

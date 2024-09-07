@@ -6,15 +6,18 @@
     "packages/*"
   ],
   "devDependencies": {
-    "@types/react": "~18.3.5",
+    "@types/react": "~18.2.79",
     "eslint": "~8.21.0",
     "turbo": "~2.1.1",
-    "typescript": "~5.5.4"
+    "typescript": "~5.3.3"
   },
   "scripts": {
     "native": "cd apps/expo && yarn start",
     "web": "cd apps/next && yarn next",
     "prebuild": "cd apps/expo && yarn prebuild"
   },
-  "packageManager": "yarn@4.1.1"
+  "packageManager": "yarn@4.4.1",
+  "resolutions": {
+    "react-native": "0.74.5"
+  }
 }
