@@ -25,17 +25,17 @@ export function NativeNavigation() {
       <Stack.Screen
         name="settings"
         component={SettingsScreen}
-        options={{ title: 'Explore' }}
+        options={SettingsScreen.options}
       />
       <Stack.Screen
         name="explore"
         component={DiscoverScreen}
-        options={{ title: 'Explore' }}
+        options={DiscoverScreen.options}
       />
       <Stack.Screen
         name="explore-detail"
         component={DiscoverDetailScreen}
-        options={{ title: 'Explore Detail' }}
+        options={DiscoverDetailScreen.options}
       />
     </Stack.Navigator>
   )

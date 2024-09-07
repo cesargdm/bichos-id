@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect } from 'react'
 import { Text, View, ScrollView, FlatList, Image } from 'react-native'
 import useSWR from 'swr'
 import { TextLink } from 'solito/link'
@@ -7,6 +8,7 @@ import { useParams } from 'solito/navigation'
 import { StatusBar } from 'expo-status-bar'
 
 import { Api, ASSETS_BASE_URL } from '@bichos-id/app/lib/api'
+import { NativeStackNavigationOptions } from '@react-navigation/native-stack'
 
 const useUserParams = useParams<{ id: string }>
 
@@ -26,7 +28,32 @@ type Props = {
 
 const fetcher = (url: string) => fetch(url).then((response) => response.json())
 
-export default function DiscoverDetailScreen({ fallbackData }: Props) {
+function getVenomousLabel(level: string) {
+  switch (level) {
+    case 'HIGHLY_VENOMOUS':
+      return '🚨 De importancia médica'
+    case 'MILDLY_VENOMOUS':
+      return '🚨 De importancia médica'
+    case 'VENOMOUS':
+      return '⚠️ Puede causar alergias'
+    case 'NON_VENOMOUS':
+      return '✅ Sin importancia médica'
+  }
+}
+
+function getVenomousColor(level: string) {
+  switch (level) {
+    case 'HIGHLY_VENOMOUS':
+      return 'rgba(255,0,0,0.2)'
+    case 'MILDLY_VENOMOUS':
+      return 'rgba(255, 123, 0, 0.2)'
+    case 'VENOMOUS':
+      return 'rgba(238, 207, 5, 0.2)'
+    case 'NON_VENOMOUS':
+      return 'rgba(0,255,0,0.2)'
+  }
+}
+function DiscoverDetailScreen({ fallbackData }: Props) {
   const params = useUserParams()
 
   const { data, error, isLoading } = useSWR<any>(
@@ -34,6 +61,8 @@ export default function DiscoverDetailScreen({ fallbackData }: Props) {
     fetcher,
     { fallbackData },
   )
+
+  useEffect(() => {}, [data])
 
   if (!data) {
     if (isLoading) {
@@ -44,7 +73,7 @@ export default function DiscoverDetailScreen({ fallbackData }: Props) {
 
   return (
     <>
-      <StatusBar style="auto" />
+      <StatusBar style="light" />
       <ScrollView style={{ flex: 1 }}>
         <FlatList
           data={data.images}
@@ -54,15 +83,15 @@ export default function DiscoverDetailScreen({ fallbackData }: Props) {
           renderItem={({ item }) => (
             <Image
               alt={`${data.identification?.commonName} - ${data.identification?.scientificClassification.genus} ${data.identification?.scientificClassification.species}`}
-              style={{ width: 200, height: 200, objectFit: 'contain' }}
+              style={{ width: 200, height: 200, objectFit: 'cover' }}
               source={{ uri: item }}
             />
           )}
         />
 
-        <View style={{ gap: 16, padding: 10 }}>
+        <View style={{ gap: 24, padding: 10 }}>
           <Text
-            style={{ fontSize: 20, fontWeight: '600' }}
+            style={{ fontSize: 32, fontWeight: '800', color: 'white' }}
             role="heading"
             aria-level={1}
           >
@@ -74,52 +103,50 @@ export default function DiscoverDetailScreen({ fallbackData }: Props) {
           {data.identification?.venomous ? (
             <View
               style={{
-                padding: 8,
-                paddingHorizontal: 16,
+                padding: 16,
                 borderRadius: 8,
-                backgroundColor: data.identification.venomous.level.includes(
-                  'HIGH',
-                )
-                  ? 'rgba(255,0,0,0.2)'
-                  : 'rgba(251, 255, 0, 0.1)',
+                backgroundColor: getVenomousColor(
+                  data.identification.venomous.level,
+                ),
               }}
             >
-              <Text
-                style={{
-                  color: data.identification.venomous.level.includes('HIGH')
-                    ? 'red'
-                    : 'yellow',
-                }}
-              >
-                {data.identification.venomous.level}
+              <Text style={{ color: 'white', fontWeight: '700' }}>
+                {getVenomousLabel(data.identification.venomous.level)}
               </Text>
             </View>
           ) : null}
 
-          <Text role="heading" aria-level="2">
-            Taxonomía
-          </Text>
-
-          <View>
-            <Text>
+          <View style={{ gap: 8 }}>
+            <Text
+              style={{ color: 'white', fontWeight: '800', fontSize: 18 }}
+              role="heading"
+              aria-level="2"
+            >
+              Taxonomía
+            </Text>
+            <Text style={{ color: 'white', lineHeight: 28, fontSize: 16 }}>
               Familia: {data.identification?.scientificClassification.family}
             </Text>
-            <Text>
+            <Text style={{ color: 'white', lineHeight: 28, fontSize: 16 }}>
               Género: {data.identification?.scientificClassification.genus}
             </Text>
-            <Text>
+            <Text style={{ color: 'white', lineHeight: 28, fontSize: 16 }}>
               Especie: {data.identification?.scientificClassification.species}
             </Text>
           </View>
 
-          <Text role="heading" aria-level="2">
-            Descripción
-          </Text>
-          <Text>{data.identification?.description}</Text>
-
-          <Text role="heading" aria-level="2">
-            Últimas imágenes
-          </Text>
+          <View style={{ gap: 8 }}>
+            <Text
+              style={{ color: 'white', fontWeight: '800', fontSize: 18 }}
+              role="heading"
+              aria-level="2"
+            >
+              Descripción
+            </Text>
+            <Text style={{ color: 'white', lineHeight: 28, fontSize: 16 }}>
+              {data.identification?.description}
+            </Text>
+          </View>
 
           <TextLink
             href={`https://google.com/search?q=${data.identification?.scientificClassification.genus} ${data.identification?.scientificClassification.species}`}
@@ -133,3 +160,12 @@ export default function DiscoverDetailScreen({ fallbackData }: Props) {
     </>
   )
 }
+
+DiscoverDetailScreen.options = {
+  title: '',
+  headerTintColor: 'white',
+  headerBackTitleVisible: false,
+  headerBlurEffect: 'dark',
+} as NativeStackNavigationOptions
+
+export default DiscoverDetailScreen

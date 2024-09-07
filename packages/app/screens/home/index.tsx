@@ -28,6 +28,7 @@ import {
 import { useIsFocused } from '@react-navigation/native'
 
 import { Api } from '@bichos-id/app/lib/api'
+import { NativeStackNavigationOptions } from '@react-navigation/native-stack'
 
 const CAPTURABLE_WIDTH_PERCENTAGE = 0.6
 const CAPTURABLE_HEIGHT_PERCENTAGE = 0.4
@@ -294,6 +295,10 @@ function HomeScreen() {
   )
 }
 
-HomeScreen.options = { title: 'Home', headerShown: false }
+HomeScreen.options = {
+  title: 'Home',
+  headerTintColor: 'white',
+  headerShown: false,
+} as NativeStackNavigationOptions
 
 export default HomeScreen

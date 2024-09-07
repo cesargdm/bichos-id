@@ -3,11 +3,12 @@
 import { ScrollView, Text } from 'react-native'
 import * as AppleAuthentication from 'expo-apple-authentication'
 import { StatusBar } from 'expo-status-bar'
+import { NativeStackNavigationOptions } from '@react-navigation/native-stack'
 
-export default function SettingsScreen() {
+function SettingsScreen() {
   return (
     <>
-      <StatusBar style="auto" />
+      <StatusBar style="light" />
       <ScrollView>
         <Text role="heading" aria-level="1">
           Settings
@@ -29,7 +30,7 @@ export default function SettingsScreen() {
               console.warn(credential)
               // signed in
             } catch (e: any) {
-console.log(e)
+              console.log(e)
 
               if (e.code === 'ERR_REQUEST_CANCELED') {
                 // handle that the user canceled the sign-in flow
@@ -43,3 +44,11 @@ console.log(e)
     </>
   )
 }
+
+SettingsScreen.options = {
+  title: 'Ajustes',
+  headerTintColor: 'white',
+  headerBackTitleVisible: false,
+} as NativeStackNavigationOptions
+
+export default SettingsScreen

@@ -50,7 +50,9 @@ export async function POST(request: NextRequest) {
           content: `You are an expert entomologist that will recognize species based on a photo.
 Use shape, color and subject surroundings and metadata to archive the best identification.
 Do not return any information if the photo is inappropriate, blurry or unrelated.
-Try to be as accurate as possible with family, genus and species, if unsure, return 'sp' as species.`,
+Try to be as accurate as possible with family, genus and species, if unsure, return 'sp' as species.
+
+Finally make sure to translate the result to spanish.`,
         },
         {
           role: 'user',
@@ -103,7 +105,7 @@ Try to be as accurate as possible with family, genus and species, if unsure, ret
         .execute()
         .then((existing) => {
           if (!existing.length) {
-            return db
+            return void db
               .insertInto('organism')
               .values({
                 id,
@@ -112,6 +114,16 @@ Try to be as accurate as possible with family, genus and species, if unsure, ret
                 created_at: new Date().toISOString(),
                 updated_at: new Date().toISOString(),
               })
+              .executeTakeFirst()
+          } else {
+            return void db
+              .updateTable('organism')
+              .set({
+                identification: parsed.identification,
+                confidence: parsed.confidence,
+                updated_at: new Date().toISOString(),
+              })
+              .where('id', '=', id)
               .executeTakeFirst()
           }
         }),
