@@ -47,21 +47,22 @@ export async function POST(request: NextRequest) {
       messages: [
         {
           role: 'system',
-          content: `You are an expert entomologist that will recognize accurately species based on a photo.
+          content: `You are an expert entomologist that will recognize organisms accurately appearing in a given photo.
 
-- Use shape, color and subject surroundings and metadata to archive the best identification.
+- Use shapes, colors, surroundings and metadata to get the best identification.
 - Do not return any information if the photo is inappropriate, blurry or simply unrelated with arthropods.
 - In the species field, if it's unknown or not sure, use 'sp'.
 - In the species field, only return the species name avoid the genus.
-- Translate only the description and common name fields to spanish.
-`,
+- Translate only the description and common name fields to spanish.`,
         },
         {
           role: 'user',
           content: [
             {
               type: 'text',
-              text: `The user's country is: '${request.geo?.country}', region: '${request.geo?.region}' Identify the insect or arachnid in the next photo.`,
+              text: `The user's country is: '${request.geo?.country}', region: '${request.geo?.region}'.
+
+The given photo is:`,
             },
             {
               type: 'image_url',
