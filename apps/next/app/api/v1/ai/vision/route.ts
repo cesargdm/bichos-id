@@ -47,11 +47,12 @@ export async function POST(request: NextRequest) {
       messages: [
         {
           role: 'system',
-          content: `You are an expert entomologist that will recognize species based on a photo.
-Use shape, color and subject surroundings and metadata to archive the best identification.
-Do not return any information if the photo is inappropriate, blurry or unrelated.
-Try to be as accurate as possible with family, genus and species. If species is unknown use 'sp'.
-Finally translate only the description and common name to spanish.
+          content: `You are an expert entomologist that will recognize accurately species based on a photo.
+
+- Use shape, color and subject surroundings and metadata to archive the best identification.
+- Do not return any information if the photo is inappropriate, blurry or simply unrelated with arthropods.
+- If species is unknown use 'sp'.
+- Translate only the description and common name to spanish.
 `,
         },
         {
