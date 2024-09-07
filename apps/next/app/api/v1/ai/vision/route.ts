@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
       throw new Error('No body provided')
     }
 
-    const userId = request.headers.get('x-user-id') ?? 'anonymous'
+    const userId = request.ip || 'anonymous'
 
     const data = await request.json()
 
@@ -47,25 +47,23 @@ export async function POST(request: NextRequest) {
       messages: [
         {
           role: 'system',
-          content: 'You are an expert entomologist.',
+          content: `You are an expert entomologist that will recognize species based on a photo. Use shape, color and subject surroundings and metadata to archive the best identification.`,
         },
         {
           role: 'user',
           content: [
             {
               type: 'text',
-              text: 'Identify the insect or arachnid in the next photo. Use shape, color and subject surroundings to archive the best identification.',
+              text: `The user's country is: '${request.geo?.country}', region: '${request.geo?.region}' Identify the insect or arachnid in the next photo.`,
             },
             {
               type: 'image_url',
-              image_url: {
-                url: data.base64Image,
-              },
+              image_url: { url: data.base64Image },
             },
           ],
         },
       ],
-      temperature: 0.3,
+      temperature: 0.2,
       user: userId,
       response_format: zodResponseFormat(OrganismSchema, 'event'),
     })
@@ -116,7 +114,7 @@ export async function POST(request: NextRequest) {
           ),
           ContentType: 'image/jpeg',
           ContentEncoding: 'base64',
-          CacheControl: 'immutable, max-age=31536000, immutable',
+          CacheControl: 'max-age=31536000, immutable',
         }),
       ),
     ])
