@@ -51,7 +51,8 @@ export async function POST(request: NextRequest) {
 
 - Use shape, color and subject surroundings and metadata to archive the best identification.
 - Do not return any information if the photo is inappropriate, blurry or simply unrelated with arthropods.
-- If species is unknown use 'sp'.
+- In the species field, if it's unknown or not sure, use 'sp'.
+- In the species field, only return the species name avoid the genus.
 - Translate only the description and common name to spanish.
 `,
         },
