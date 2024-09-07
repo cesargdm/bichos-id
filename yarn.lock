@@ -2477,6 +2477,7 @@ __metadata:
   resolution: "@bichos-id/app@workspace:packages/app"
   dependencies:
     "@expo/vector-icons": "npm:^14.0.2"
+    "@react-native-masked-view/masked-view": "npm:0.3.1"
     "@react-navigation/native": "npm:6.1.18"
     "@react-navigation/native-stack": "npm:6.9.26"
     "@supabase/supabase-js": "npm:2.45.3"
@@ -3753,6 +3754,16 @@ __metadata:
   bin:
     rnc-cli: build/bin.js
   checksum: 10/ae6ec29f015704aaf2ddaa60be822d277644787e4d788a13fb9de0c80e3b39e313d8ac05fac2512761b04c3d89d86b58ffb97f90067764932921288c084f5c22
+  languageName: node
+  linkType: hard
+
+"@react-native-masked-view/masked-view@npm:0.3.1":
+  version: 0.3.1
+  resolution: "@react-native-masked-view/masked-view@npm:0.3.1"
+  peerDependencies:
+    react: ">=16"
+    react-native: ">=0.57"
+  checksum: 10/71d7a6277a869beaed34497d5b92cba7405586fe19ad05c2e892e5e5843b664386080573f4cfaea1fb68ed77de94bf46c20958f4e58d1a5a716c3652d65815b9
   languageName: node
   linkType: hard
 
@@ -5167,7 +5178,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react-native@npm:~0.73.0":
+"@types/react-native@npm:^0.73.0, @types/react-native@npm:~0.73.0":
   version: 0.73.0
   resolution: "@types/react-native@npm:0.73.0"
   dependencies:
@@ -5536,6 +5547,18 @@ __metadata:
     clean-stack: "npm:^2.0.0"
     indent-string: "npm:^4.0.0"
   checksum: 10/1101a33f21baa27a2fa8e04b698271e64616b886795fd43c31068c07533c7b3facfcaf4e9e0cab3624bd88f729a592f1c901a1a229c9e490eafce411a8644b79
+  languageName: node
+  linkType: hard
+
+"ajv@npm:8.11.0":
+  version: 8.11.0
+  resolution: "ajv@npm:8.11.0"
+  dependencies:
+    fast-deep-equal: "npm:^3.1.1"
+    json-schema-traverse: "npm:^1.0.0"
+    require-from-string: "npm:^2.0.2"
+    uri-js: "npm:^4.2.2"
+  checksum: 10/aa0dfd6cebdedde8e77747e84e7b7c55921930974b8547f54b4156164ff70445819398face32dafda4bd4c61bbc7513d308d4c2bf769f8ea6cb9c8449f9faf54
   languageName: node
   linkType: hard
 
@@ -7973,11 +7996,14 @@ __metadata:
   dependencies:
     "@babel/core": "npm:~7.25.2"
     "@babel/plugin-transform-private-methods": "npm:~7.25.4"
+    "@react-native-masked-view/masked-view": "npm:0.3.1"
     "@types/react": "npm:~18.2.79"
     "@types/react-native": "npm:~0.73.0"
     expo: "npm:~51.0.32"
+    expo-apple-authentication: "npm:~6.4.2"
     expo-camera: "npm:~15.0.15"
     expo-clipboard: "npm:~6.0.3"
+    expo-dev-client: "npm:~4.0.26"
     expo-image: "npm:~1.12.15"
     expo-image-picker: "npm:~15.0.7"
     expo-linear-gradient: "npm:~13.0.2"
@@ -7995,6 +8021,15 @@ __metadata:
     typescript: "npm:~5.3.3"
   languageName: unknown
   linkType: soft
+
+"expo-apple-authentication@npm:~6.4.2":
+  version: 6.4.2
+  resolution: "expo-apple-authentication@npm:6.4.2"
+  peerDependencies:
+    expo: "*"
+  checksum: 10/fced4d55983c622671de2f8df063408f4975c83bd8408f73ee00f488b99dab42dffe1c5538aa58d6458a13d23238dc8b556adcdc4b7b018aaf6d46da0080a4fd
+  languageName: node
+  linkType: hard
 
 "expo-asset@npm:~10.0.10":
   version: 10.0.10
@@ -8038,6 +8073,57 @@ __metadata:
   peerDependencies:
     expo: "*"
   checksum: 10/f2f8b15932ab2f805544fd96c6740d2354c6409706eee2664be1703c3480c7531a709112af811dc22f05c164c06501aec20f81617675e87b5a3b66ab5b8d7611
+  languageName: node
+  linkType: hard
+
+"expo-dev-client@npm:~4.0.26":
+  version: 4.0.26
+  resolution: "expo-dev-client@npm:4.0.26"
+  dependencies:
+    expo-dev-launcher: "npm:4.0.27"
+    expo-dev-menu: "npm:5.0.21"
+    expo-dev-menu-interface: "npm:1.8.3"
+    expo-manifests: "npm:~0.14.0"
+    expo-updates-interface: "npm:~0.16.2"
+  peerDependencies:
+    expo: "*"
+  checksum: 10/0df3d98ab7b18ab2ea098b5e6096aa37a46161afb155ad73f249cbba0bd9c6fc04917276521505f82d8fc0d45fc1f6be206975e52f1b3fa26632a469818d77eb
+  languageName: node
+  linkType: hard
+
+"expo-dev-launcher@npm:4.0.27":
+  version: 4.0.27
+  resolution: "expo-dev-launcher@npm:4.0.27"
+  dependencies:
+    ajv: "npm:8.11.0"
+    expo-dev-menu: "npm:5.0.21"
+    expo-manifests: "npm:~0.14.0"
+    resolve-from: "npm:^5.0.0"
+    semver: "npm:^7.6.0"
+  peerDependencies:
+    expo: "*"
+  checksum: 10/b8f46c8237f364ccb60587ae6e9a12a5fa2c13de0a4595d7b5306435096844c719e4f93c1a12b1ca462cc80eebcd76502f725b8d034d2432b8163f187972cc1b
+  languageName: node
+  linkType: hard
+
+"expo-dev-menu-interface@npm:1.8.3":
+  version: 1.8.3
+  resolution: "expo-dev-menu-interface@npm:1.8.3"
+  peerDependencies:
+    expo: "*"
+  checksum: 10/c63b7a1c2e7591085527a7944f3a9eaf6fc77d845400c5d064518ef06904ab193b77020e5fe029ff2897e359a07217ff81b7074cbfd1435780cf0a0b5bc8cf17
+  languageName: node
+  linkType: hard
+
+"expo-dev-menu@npm:5.0.21":
+  version: 5.0.21
+  resolution: "expo-dev-menu@npm:5.0.21"
+  dependencies:
+    expo-dev-menu-interface: "npm:1.8.3"
+    semver: "npm:^7.5.4"
+  peerDependencies:
+    expo: "*"
+  checksum: 10/209556a2cde1263288dbb6b6b86060ff9e70cc4c89234cec6d5fcbe192a90653608deb3fb4a3df2c80a86a9ac03706b6a608caaebba5cbeda30be8c56ad00001
   languageName: node
   linkType: hard
 
@@ -8090,6 +8176,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"expo-json-utils@npm:~0.13.0":
+  version: 0.13.1
+  resolution: "expo-json-utils@npm:0.13.1"
+  checksum: 10/b6c5d5ec1c7b5c3de9910013aec1c2106c1279dfdbfe0c8b5b0e33dc19d15519c0f485cdc22e805c585442a98b5319d1c375100dd818bbf4c2364c16219fce7e
+  languageName: node
+  linkType: hard
+
 "expo-keep-awake@npm:~13.0.2":
   version: 13.0.2
   resolution: "expo-keep-awake@npm:13.0.2"
@@ -8115,6 +8208,18 @@ __metadata:
     expo-constants: "npm:~16.0.0"
     invariant: "npm:^2.2.4"
   checksum: 10/07ee4417ae6e58351797b805bd88215ceb6f89ec16c99e305db6d826925da1d1620e3baaa733a5c8848663dc2b3c39b6d375b381cf590a603a98eb671fef105d
+  languageName: node
+  linkType: hard
+
+"expo-manifests@npm:~0.14.0":
+  version: 0.14.3
+  resolution: "expo-manifests@npm:0.14.3"
+  dependencies:
+    "@expo/config": "npm:~9.0.0"
+    expo-json-utils: "npm:~0.13.0"
+  peerDependencies:
+    expo: "*"
+  checksum: 10/385163504d2c437ce2e9adc5197ac1444fe43aeb445f83c9f9b9e006fdb8a324a39dd773f1b1450e86e45bda8395df8ce0d60b92bdd49d633fc573ba26c4c6a2
   languageName: node
   linkType: hard
 
@@ -8159,6 +8264,15 @@ __metadata:
   version: 1.12.1
   resolution: "expo-status-bar@npm:1.12.1"
   checksum: 10/49dd71578c877068e0efd8d511f54f512e8d9929549345c618af9b017067113f8a6e21fec4b4b736e364cf21aa14456b0336db16661c0f5d982b1660917610c5
+  languageName: node
+  linkType: hard
+
+"expo-updates-interface@npm:~0.16.2":
+  version: 0.16.2
+  resolution: "expo-updates-interface@npm:0.16.2"
+  peerDependencies:
+    expo: "*"
+  checksum: 10/2a86ec6d001b75a5788970e01bbcc9d8fb5afe228bb7b38035282b6c381dbb87d5dc21fb36d4260f63d5cb13f060e0af86dc79b5f880310398d0870ca96e7c2c
   languageName: node
   linkType: hard
 
@@ -10219,6 +10333,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"json-schema-traverse@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "json-schema-traverse@npm:1.0.0"
+  checksum: 10/02f2f466cdb0362558b2f1fd5e15cce82ef55d60cd7f8fa828cf35ba74330f8d767fcae5c5c2adb7851fa811766c694b9405810879bc4e1ddd78a7c0e03658ad
+  languageName: node
+  linkType: hard
+
 "json-stable-stringify-without-jsonify@npm:^1.0.1":
   version: 1.0.1
   resolution: "json-stable-stringify-without-jsonify@npm:1.0.1"
@@ -11281,13 +11402,14 @@ __metadata:
     "@expo/next-adapter": "npm:6.0.0"
     "@types/node": "npm:~22.5.4"
     "@types/react-dom": "npm:^18"
+    "@types/react-native": "npm:^0.73.0"
     "@vercel/blob": "npm:0.23.4"
     "@vercel/og": "npm:0.6.2"
     "@vercel/postgres-kysely": "npm:0.9.0"
     eslint-config-next: "npm:~14.2.8"
     kysely: "npm:^0.27.4"
     next: "npm:14.2.8"
-    openai: "npm:4.58.0"
+    openai: "npm:4.58.1"
     raf: "npm:3.4.1"
     react-dom: "npm:18.3.1"
     react-native: "npm:0.75.2"
@@ -11769,9 +11891,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"openai@npm:4.58.0":
-  version: 4.58.0
-  resolution: "openai@npm:4.58.0"
+"openai@npm:4.58.1":
+  version: 4.58.1
+  resolution: "openai@npm:4.58.1"
   dependencies:
     "@types/node": "npm:^18.11.18"
     "@types/node-fetch": "npm:^2.6.4"
@@ -11789,7 +11911,7 @@ __metadata:
       optional: true
   bin:
     openai: bin/cli
-  checksum: 10/07259b2fd235fe2da0665e662450cf5efca41281fda7f1ee6d894be64c0fbadd271709b555fcc2b8908083e4da4572f9996a6f12de56c008a016471d90c6e73c
+  checksum: 10/ea80606009bc43aae3e54bfdd48bbaab386edd6f6766bd099ec0e6b17933aa83f793e91d284af540e63527fd6bb9a414a5da6338c654a01f9e5e11efcfd3d9d4
   languageName: node
   linkType: hard
 

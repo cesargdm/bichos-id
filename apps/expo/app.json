@@ -1,20 +1,22 @@
 {
   "expo": {
-    "name": "bicho-id",
-    "slug": "bicho-id",
+    "name": "bichos-id",
+    "slug": "bichos-id",
     "version": "1.0.0",
-    "scheme": "bicho-id",
+    "scheme": "bichos-id",
     "icon": "./assets/icon.png",
     "platforms": ["ios", "android"],
     "orientation": "portrait",
     "ios": {
-      "bundleIdentifier": "com.fucesa.bicho-id",
+      "usesAppleSignIn": true,
+      "bundleIdentifier": "com.fucesa.bichos-id",
       "infoPlist": {
         "NSCameraUsageDescription": "$(PRODUCT_NAME) needs access to your Camera.",
         "NSMicrophoneUsageDescription": "$(PRODUCT_NAME) needs access to your Microphone."
       }
     },
     "plugins": [
+      "expo-apple-authentication",
       [
         "expo-camera",
         {
@@ -28,14 +30,6 @@
         {
           "photosPermission": "The app accesses your photos to let you share them with your friends."
         }
-      ],
-      [
-        "react-native-vision-camera",
-        {
-          "cameraPermissionText": "$(PRODUCT_NAME) needs access to your Camera.",
-          "enableMicrophonePermission": true,
-          "microphonePermissionText": "$(PRODUCT_NAME) needs access to your Microphone."
-        }
       ]
     ],
     "android": {
@@ -44,6 +38,11 @@
         "android.permission.RECORD_AUDIO"
       ],
       "package": "com.fucesa.bichos_id"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "06d6d2b0-dde6-43b7-98c7-e7fe213e509a"
+      }
     }
   }
 }

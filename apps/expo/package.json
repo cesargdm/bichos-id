@@ -1,8 +1,21 @@
 {
+  "name": "expo-app",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.js",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
+    "prebuild": "expo prebuild --clean"
+  },
   "dependencies": {
+    "@react-native-masked-view/masked-view": "0.3.1",
     "expo": "~51.0.32",
+    "expo-apple-authentication": "~6.4.2",
     "expo-camera": "~15.0.15",
     "expo-clipboard": "~6.0.3",
+    "expo-dev-client": "~4.0.26",
     "expo-image": "~1.12.15",
     "expo-image-picker": "~15.0.7",
     "expo-linear-gradient": "~13.0.2",
@@ -24,14 +37,5 @@
     "@types/react": "~18.2.79",
     "@types/react-native": "~0.73.0",
     "typescript": "~5.3.3"
-  },
-  "scripts": {
-    "start": "expo start",
-    "android": "expo run:android",
-    "ios": "expo run:ios"
-  },
-  "main": "index.js",
-  "version": "1.0.0",
-  "private": true,
-  "name": "expo-app"
+  }
 }

@@ -13,7 +13,8 @@
   },
   "scripts": {
     "native": "cd apps/expo && yarn start",
-    "web": "cd apps/next && yarn next"
+    "web": "cd apps/next && yarn next",
+    "prebuild": "cd apps/expo && yarn prebuild"
   },
   "packageManager": "yarn@4.1.1"
 }
