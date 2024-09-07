@@ -30,9 +30,7 @@
       ]
     ],
     "android": {
-      "permissions": [
-        "android.permission.CAMERA",
-      ],
+      "permissions": ["android.permission.CAMERA"],
       "package": "com.fucesa.bichos_id"
     },
     "extra": {
