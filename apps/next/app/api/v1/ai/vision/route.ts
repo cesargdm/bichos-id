@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
     schema.parse(data)
 
     const response = await openai.beta.chat.completions.parse({
-      model: 'gpt-4o',
+      model: 'gpt-4o-2024-08-06',
       messages: [
         {
           role: 'system',
@@ -69,6 +69,13 @@ Try to be as accurate as possible with genus and species, if unsure, return 'sp'
       user: userId,
       response_format: zodResponseFormat(OrganismSchema, 'event'),
     })
+
+    if (!response?.choices?.[0]?.message?.parsed) {
+      return NextResponse.json(
+        { error: 'No response from AI' },
+        { status: 500 },
+      )
+    }
 
     const parsed = OrganismSchema.parse(response.choices[0].message.parsed)
 

@@ -59,7 +59,7 @@ export default function DiscoverDetailScreen({ fallbackData }: Props) {
           {data.identification?.scientificClassification.species})
         </Text>
 
-        {data.identification.venomous ? (
+        {data.identification?.venomous ? (
           <View
             style={{
               padding: 8,
