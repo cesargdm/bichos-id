@@ -53,6 +53,7 @@ export async function POST(request: NextRequest) {
 - Do not return any information if the photo is inappropriate, blurry or simply unrelated with arthropods.
 - In the species field, if it's unknown or not sure, use 'sp'.
 - Make sure venomous fields are correct.
+- If common name is unavailable, use the scientific name.
 - In the species field, only return the species name avoid the genus.
 - Translate only the description and common name fields to spanish.
 ${
