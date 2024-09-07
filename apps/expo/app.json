@@ -9,18 +9,17 @@
     "orientation": "portrait",
     "ios": {
       "usesAppleSignIn": true,
-      "bundleIdentifier": "com.fucesa.bichos-id"
+      "bundleIdentifier": "com.fucesa.bichos-id",
+      "infoPlist": {
+        "NSCameraUsageDescription": "$(PRODUCT_NAME) needs access to your Camera."
+      }
     },
     "plugins": [
       "expo-apple-authentication",
       [
         "react-native-vision-camera",
         {
-          "cameraPermissionText": "$(PRODUCT_NAME) needs access to your Camera.",
-
-          // optionally, if you want to record audio:
-          "enableMicrophonePermission": true,
-          "microphonePermissionText": "$(PRODUCT_NAME) needs access to your Microphone."
+          "cameraPermissionText": "$(PRODUCT_NAME) needs access to your Camera."
         }
       ],
       [
@@ -31,12 +30,14 @@
       ]
     ],
     "android": {
-      "permissions": ["android.permission.CAMERA"],
+      "permissions": [
+        "android.permission.CAMERA",
+      ],
       "package": "com.fucesa.bichos_id"
     },
     "extra": {
       "eas": {
-        "projectId": "06d6d2b0-dde6-43b7-98c7-e7fe213e509a"
+        "projectId": "1a55a13f-ac76-44fa-b40f-10125fd7e4bf"
       }
     }
   }
