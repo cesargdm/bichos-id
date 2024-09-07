@@ -52,17 +52,21 @@ export async function POST(request: NextRequest) {
 - Use shapes, colors, surroundings and metadata to get the best identification.
 - Do not return any information if the photo is inappropriate, blurry or simply unrelated with arthropods.
 - In the species field, if it's unknown or not sure, use 'sp'.
+- Make sure venomous fields are correct.
 - In the species field, only return the species name avoid the genus.
-- Translate only the description and common name fields to spanish.`,
+- Translate only the description and common name fields to spanish.
+${
+  request.geo
+    ? `- The user's geo data is, country: '${request.geo?.country}', region: '${request.geo?.region}'.`
+    : ''
+}`,
         },
         {
           role: 'user',
           content: [
             {
               type: 'text',
-              text: `The user's country is: '${request.geo?.country}', region: '${request.geo?.region}'.
-
-The given photo is:`,
+              text: `The given photo is:`,
             },
             {
               type: 'image_url',
