@@ -32,8 +32,6 @@ function getVenomousLabel(level: string) {
   switch (level) {
     case 'HIGHLY_VENOMOUS':
       return '🚨 De importancia médica'
-    case 'MILDLY_VENOMOUS':
-      return '🚨 De importancia médica'
     case 'VENOMOUS':
       return '⚠️ Puede causar alergias'
     case 'NON_VENOMOUS':
@@ -45,8 +43,6 @@ function getVenomousColor(level: string) {
   switch (level) {
     case 'HIGHLY_VENOMOUS':
       return 'rgba(255,0,0,0.2)'
-    case 'MILDLY_VENOMOUS':
-      return 'rgba(255, 123, 0, 0.2)'
     case 'VENOMOUS':
       return 'rgba(238, 207, 5, 0.2)'
     case 'NON_VENOMOUS':

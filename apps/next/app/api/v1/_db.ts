@@ -13,7 +13,6 @@ export const OrganismSchema = z.object({
       type: z.string().optional(),
       level: z.union([
         z.literal('NON_VENOMOUS'),
-        z.literal('MILDLY_VENOMOUS'),
         z.literal('VENOMOUS'),
         z.literal('HIGHLY_VENOMOUS'),
       ]),
@@ -34,7 +33,7 @@ export interface Organism {
     description?: string
     venomous: {
       type?: string
-      level: 'NON_VENOMOUS' | 'MILDLY_VENOMOUS' | 'VENOMOUS' | 'HIGHLY_VENOMOUS'
+      level: 'NON_VENOMOUS' | 'VENOMOUS' | 'HIGHLY_VENOMOUS'
     }
   }
   confidence: number
