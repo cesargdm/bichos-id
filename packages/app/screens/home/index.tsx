@@ -138,7 +138,7 @@ function HomeScreen() {
       }
 
       router.push(`/explore/${data.id}`)
-    } catch (error) {
+    } catch (error: any) {
       Alert.alert('Error', error?.message ?? 'No se pudo identificar la imagen')
     } finally {
       setIsLoading(false)
@@ -176,7 +176,7 @@ function HomeScreen() {
       }
 
       router.push(`/explore/${data.id}`)
-    } catch (error) {
+    } catch (error: any) {
       Alert.alert('Error', error?.message ?? 'No se pudo identificar la imagen')
       //
     } finally {
