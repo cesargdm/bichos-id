@@ -1,4 +1,4 @@
-import { Metadata } from 'next'
+
 import { Suspense } from 'react'
 
 import HomeScreen from '@bichos-id/app/screens/home'

@@ -1,10 +1,8 @@
 import { Suspense } from 'react'
-import { notFound, useParams } from 'next/navigation'
-import { createKysely } from '@vercel/postgres-kysely'
+import { notFound } from 'next/navigation'
 
 import DiscoveryDetailScreen from '@bichos-id/app/screens/ExploreDetail'
-
-import { Database } from '../../api/v1/_db'
+import { getOrganism } from './_db'
 
 type Props = {
   params: { id: string }
@@ -13,16 +11,6 @@ type Props = {
 export const dynamic = 'force-dynamic'
 
 export const revalidate = 60 * 60 * 24 // 1 day
-
-function getOrganism(id: string) {
-  const db = createKysely<Database>()
-
-  return db
-    .selectFrom('organism')
-    .where('id', '=', id)
-    .selectAll()
-    .executeTakeFirst()
-}
 
 export async function generateMetadata({ params }: Props) {
   const id = params.id
@@ -34,7 +22,7 @@ export async function generateMetadata({ params }: Props) {
   }
 
   return {
-    title: `${organism.identification.commonName} - Bichos ID - Fucesa`,
+    title: organism.identification.commonName,
     description: organism.identification.description,
   }
 }

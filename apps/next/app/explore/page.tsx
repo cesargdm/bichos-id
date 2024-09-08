@@ -4,7 +4,7 @@ import { Metadata } from 'next'
 import ExploreScreen from '@bichos-id/app/screens/Explore'
 
 export const metadata: Metadata = {
-  title: 'Explorar - Bichos ID - Fucesa',
+  title: 'Explorar',
   description:
     'Descubre insectos, arácnidos y otros bichos con Bichos ID usando inteligencia artificial.',
 }

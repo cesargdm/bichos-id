@@ -4,7 +4,10 @@ import { StylesProvider } from './styles-provider'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Bichos ID - Fucesa',
+  title: {
+    template: '%s - Bichos ID Fucesa',
+    default: 'Bichos ID Fucesa',
+  },
   description:
     'Identifica insectos, arácnidos y otros bichos con Bichos ID usando inteligencia artificial.',
 }
