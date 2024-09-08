@@ -36,6 +36,8 @@ function getVenomousLabel(level: string) {
       return '⚠️ Puede causar alergias'
     case 'NON_VENOMOUS':
       return '✅ Sin importancia médica'
+    default:
+      return level
   }
 }
 
@@ -47,6 +49,8 @@ function getVenomousColor(level: string) {
       return 'rgba(238, 207, 5, 0.2)'
     case 'NON_VENOMOUS':
       return 'rgba(0,255,0,0.2)'
+    default:
+      return 'rgba(255,255,255,0.2)'
   }
 }
 function DiscoverDetailScreen({ fallbackData }: Props) {
@@ -96,7 +100,7 @@ function DiscoverDetailScreen({ fallbackData }: Props) {
             {data.identification?.scientificClassification.species})
           </Text>
 
-          {data.identification?.venomous ? (
+          {data.identification?.venomous?.level ? (
             <View
               style={{
                 padding: 16,

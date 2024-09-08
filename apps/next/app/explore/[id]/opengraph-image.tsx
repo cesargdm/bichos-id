@@ -36,6 +36,7 @@ export default async function Image({ params }: Props) {
           width: '100%',
           height: '100%',
           padding: 20,
+          color: 'white',
         }}
       >
         {organism.identification.commonName}
