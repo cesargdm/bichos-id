@@ -144,13 +144,21 @@ function DiscoverDetailScreen({ fallbackData }: Props) {
             </Text>
           </View>
 
-          <TextLink
-            href={`https://google.com/search?q=${data.identification?.scientificClassification.genus} ${data.identification?.scientificClassification.species}`}
-          >
-            Google It
-          </TextLink>
-
-          <TextLink href="/">Explore</TextLink>
+          <View>
+            <Text
+              style={{ color: 'white', fontWeight: '800', fontSize: 18 }}
+              role="heading"
+              aria-level="2"
+            >
+              Links
+            </Text>
+            <TextLink
+              style={{ color: 'white', fontSize: 16 }}
+              href={`https://google.com/search?q=${data.identification?.scientificClassification.genus} ${data.identification?.scientificClassification.species}`}
+            >
+              Google It
+            </TextLink>
+          </View>
         </View>
       </ScrollView>
     </>

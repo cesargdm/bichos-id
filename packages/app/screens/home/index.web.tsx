@@ -48,7 +48,7 @@ export default function HomeScreen() {
   }, [])
 
   return (
-    <>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
       <h1>Bicho ID</h1>
       <p>
         Identifica insectos, arácnidos y otros artrópodos usando Inteligencia
@@ -56,11 +56,22 @@ export default function HomeScreen() {
       </p>
 
       <form
-        style={{ display: 'flex', flexDirection: 'column', gap: 16 }}
+        style={{ display: 'flex', flexDirection: 'column', gap: 20 }}
         onSubmit={handleSubmitForm}
       >
         <label
-          style={{ cursor: 'pointer', padding: 16, backgroundColor: '#ddd' }}
+          style={{
+            borderRadius: 8,
+            borderWidth: 2,
+            borderColor: '#ccc',
+            borderStyle: 'dashed',
+            cursor: 'pointer',
+            padding: 16,
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            minHeight: 200,
+          }}
         >
           {imageData ? (
             <img
@@ -69,7 +80,7 @@ export default function HomeScreen() {
               style={{ width: 100, height: 100, objectFit: 'cover' }}
             />
           ) : (
-            <b>Seleccionar imagen</b>
+            <b>Selecciona o arrastra una fotografía</b>
           )}
           <input
             onChange={handleChangeFile}
@@ -86,13 +97,13 @@ export default function HomeScreen() {
             padding: 16,
             backgroundColor: '#ddd',
             border: 'none',
-            fontSize: '1rem',
+            borderRadius: 8,
           }}
           type="submit"
         >
           {isLoading ? 'Cargando...' : 'Identificar'}
         </button>
       </form>
-    </>
+    </div>
   )
 }

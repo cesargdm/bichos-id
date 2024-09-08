@@ -30,13 +30,15 @@ export default async function Image({ params }: Props) {
       <div
         style={{
           display: 'flex',
-          fontSize: 128,
-          background: 'white',
+          fontSize: 50,
+          fontWeight: '600',
+          background: 'black',
           width: '100%',
           height: '100%',
+          padding: 20,
         }}
       >
-        Hello, World!
+        {organism.identification.commonName}
       </div>
     ),
   )

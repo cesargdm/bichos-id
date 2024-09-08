@@ -119,9 +119,17 @@ body {
 
 main {
   max-width: 1000px;
-  padding: 100px 20px 20px;
+  padding: 70px 20px 20px;
   margin: 0 auto;
   width: 100%;
   min-height: 0;
   min-height: 100svh;
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+  font-size: 100%;
 }
