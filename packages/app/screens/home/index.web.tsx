@@ -2,7 +2,6 @@
 
 /* eslint-disable @next/next/no-img-element */
 import { useCallback, useState } from 'react'
-import { Link } from 'solito/link'
 
 import { Api } from '@bichos-id/app/lib/api'
 
@@ -49,14 +48,7 @@ export default function HomeScreen() {
   }, [])
 
   return (
-    <main
-      style={{
-        padding: 16,
-        minHeight: '100vh',
-        display: 'flex',
-        flexDirection: 'column',
-      }}
-    >
+    <>
       <h1>Bicho ID</h1>
       <p>
         Identifica insectos, arácnidos y otros artrópodos usando Inteligencia
@@ -101,15 +93,6 @@ export default function HomeScreen() {
           {isLoading ? 'Cargando...' : 'Identificar'}
         </button>
       </form>
-
-      <Link href="/explore">
-        <p>Ir a explorar</p>
-      </Link>
-
-      <p style={{ fontSize: '0.9rem', color: 'gray', marginTop: 'auto' }}>
-        Esta herramienta se ofrece tal cual, sin ninguna garantía. No nos
-        hacemos responsables de cualquier daño causado por su uso.
-      </p>
-    </main>
+    </>
   )
 }

@@ -70,7 +70,7 @@ function DiscoverDetailScreen({ fallbackData }: Props) {
   return (
     <>
       <StatusBar style="light" />
-      <ScrollView style={{ flex: 1 }}>
+      <ScrollView role="article" style={{ flex: 1 }}>
         <FlatList
           data={data.images}
           horizontal

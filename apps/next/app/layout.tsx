@@ -2,14 +2,16 @@ import { Metadata } from 'next'
 
 import { StylesProvider } from './styles-provider'
 import './globals.css'
+import Nav from '../components/Nav'
+import Footer from '../components/Footer'
 
 export const metadata: Metadata = {
   title: {
-    template: '%s - Bichos ID Fucesa',
-    default: 'Bichos ID Fucesa',
+    template: '%s - Bichos ID de Fucesa',
+    default: 'Bichos ID de Fucesa',
   },
   description:
-    'Identifica insectos, arácnidos y otros bichos con Bichos ID usando inteligencia artificial.',
+    'Identifica insectos, arácnidos y otros bichos con Bichos ID utilizando inteligencia artificial avanzada.',
 }
 
 type Props = {
@@ -39,7 +41,11 @@ export default function RootLayout({ children }: Props) {
       <link rel="icon" href="/favicon.svg" />
       <link rel="manifest" href="/site.webmanifest" />
       <body>
-        <StylesProvider>{children}</StylesProvider>
+        <Nav />
+        <StylesProvider>
+          <main>{children}</main>
+        </StylesProvider>
+        <Footer />
       </body>
     </html>
   )
