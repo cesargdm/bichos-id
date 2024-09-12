@@ -22,6 +22,9 @@ function slugify(text: string) {
 
 export async function POST(request: NextRequest) {
   try {
+    // TODO: limit usage to verified app clients (APP ATTESTATION)
+    // https://developer.apple.com/documentation/devicecheck/validating-apps-that-connect-to-your-server
+
     if (!process.env.OPENAI_API_KEY) {
       return NextResponse.json(
         { error: 'No OpenAI API key provided' },

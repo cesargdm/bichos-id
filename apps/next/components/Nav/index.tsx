@@ -15,7 +15,7 @@ export default function Nav() {
             <Link href="/explore">Explorar</Link>
           </li>
           <li>
-            <Link href="https://fucesa.com">Fucesa</Link>
+            <b>Descargar</b>
           </li>
         </ul>
       </div>
