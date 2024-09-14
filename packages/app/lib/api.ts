@@ -1,7 +1,13 @@
 import { Platform } from 'react-native'
+import { getIdToken } from './auth'
 
-export const API_BASE_URL =
-  Platform.OS === 'web' ? '/api/v1' : 'https://bichos-id.fucesa.com/api/v1'
+const USE_LOCAL_API = true
+
+export const API_BASE_URL = USE_LOCAL_API
+  ? 'http://localhost:3000/api/v1'
+  : Platform.OS === 'web'
+  ? '/api/v1'
+  : 'https://bichos-id.fucesa.com/api/v1'
 
 export const ASSETS_BASE_URL = 'https://bichos-id.assets.fucesa.com'
 
@@ -10,9 +16,14 @@ export const fetcher = (url: string) =>
 
 export class Api {
   static async identify(base64Image: string) {
+    const idToken = await getIdToken()
+
     return fetch(`${API_BASE_URL}/ai/vision`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${idToken}`,
+      },
       body: JSON.stringify({ base64Image }),
     }).then((response) => response.json())
   }

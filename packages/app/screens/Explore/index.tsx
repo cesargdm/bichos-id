@@ -1,11 +1,12 @@
 'use client'
 
 import { Link, TextLink } from 'solito/link'
-import { View, FlatList, Text } from 'react-native'
+import { ImageBackground, FlatList, Text } from 'react-native'
 import useSWR from 'swr'
 import { StatusBar } from 'expo-status-bar'
-import { Api } from '@bichos-id/app/lib/api'
+import { Api, ASSETS_BASE_URL } from '@bichos-id/app/lib/api'
 import { NativeStackNavigationOptions } from '@react-navigation/native-stack'
+import { LinearGradient } from 'expo-linear-gradient'
 
 type Props = {
   fallbackData?: any[]
@@ -39,26 +40,38 @@ function DiscoverScreen({ fallbackData }: Props) {
               {
                 flex: 1,
                 height: 200,
-                borderWidth: 1,
                 width: '100%',
                 overflow: 'hidden',
               } as any
             }
             href={`/explore/${item.id}`}
           >
-            <Text
-              lineBreakMode="middle"
-              style={{
-                color: 'white',
-                fontSize: 20,
-                flexWrap: 'wrap',
-                width: '100%',
-              }}
+            <ImageBackground
+              source={{ uri: `${ASSETS_BASE_URL}/${item.image_key}` }}
+              style={{ flex: 1 }}
+              resizeMode="cover"
             >
-              {item.identification.commonName} (
-              {item.identification.scientificClassification.genus}{' '}
-              {item.identification.scientificClassification.species})
-            </Text>
+              <LinearGradient
+                colors={['transparent', 'rgba(0,0,0,0.7)']}
+                style={{ flex: 1, justifyContent: 'flex-end', padding: 10 }}
+              >
+                <Text
+                  lineBreakMode="middle"
+                  style={{
+                    color: 'white',
+                    fontSize: 18,
+                    fontWeight: '700',
+                    flexWrap: 'wrap',
+                    width: '100%',
+                  }}
+                >
+                  {item.commonName}
+                </Text>
+                <Text style={{ color: 'white', fontSize: 14 }}>
+                  ({item.classification?.genus} {item.classification?.species})
+                </Text>
+              </LinearGradient>
+            </ImageBackground>
           </Link>
         )}
         numColumns={2}

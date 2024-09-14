@@ -9,14 +9,15 @@ const projectRoot = __dirname
 // This can be replaced with `find-yarn-workspace-root`
 const monorepoRoot = path.resolve(projectRoot, '../..')
 
-const config = getDefaultConfig(projectRoot)
+const defaultConfig = getDefaultConfig(projectRoot)
 
 // 1. Watch all files within the monorepo
-config.watchFolders = [monorepoRoot]
+defaultConfig.watchFolders = [monorepoRoot]
 // 2. Let Metro know where to resolve packages and in what order
-config.resolver.nodeModulesPaths = [
+defaultConfig.resolver.nodeModulesPaths = [
   path.resolve(projectRoot, 'node_modules'),
   path.resolve(monorepoRoot, 'node_modules'),
 ]
+defaultConfig.resolver.sourceExts.push('cjs')
 
-module.exports = config
+module.exports = defaultConfig

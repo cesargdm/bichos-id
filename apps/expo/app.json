@@ -8,14 +8,24 @@
     "platforms": ["ios", "android"],
     "orientation": "portrait",
     "ios": {
+      "googleServicesFile": "./GoogleService-Info.plist",
       "usesAppleSignIn": true,
       "bundleIdentifier": "com.fucesa.bichos-id",
       "infoPlist": {
         "NSCameraUsageDescription": "$(PRODUCT_NAME) needs access to your Camera."
       }
     },
+    "android": {
+      "permissions": ["android.permission.CAMERA"],
+      "googleServicesFile": "./google-services.json",
+      "package": "com.fucesa.bichos_id"
+    },
     "plugins": [
-      "expo-apple-authentication",
+      "@react-native-firebase/app",
+      "@react-native-firebase/auth",
+      "@react-native-firebase/crashlytics",
+      "expo-secure-store",
+      ["expo-build-properties", { "ios": { "useFrameworks": "static" } }],
       [
         "react-native-vision-camera",
         {
@@ -25,14 +35,10 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "The app accesses your photos to let you share them with your friends."
+          "photosPermission": "This app needs access to your photos so you can upload them."
         }
       ]
     ],
-    "android": {
-      "permissions": ["android.permission.CAMERA"],
-      "package": "com.fucesa.bichos_id"
-    },
     "extra": {
       "eas": {
         "projectId": "1a55a13f-ac76-44fa-b40f-10125fd7e4bf"

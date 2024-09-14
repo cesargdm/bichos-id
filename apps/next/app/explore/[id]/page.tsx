@@ -22,8 +22,8 @@ export async function generateMetadata({ params }: Props) {
   }
 
   return {
-    title: organism.identification.commonName,
-    description: organism.identification.description,
+    title: organism.commonName,
+    description: organism.description,
   }
 }
 

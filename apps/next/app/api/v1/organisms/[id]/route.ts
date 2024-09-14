@@ -16,9 +16,11 @@ export async function GET(
 
     const id = params.id
 
+    const images_path = `scans/${id.replaceAll('-', '/')}`
+
     const [organism, images] = await Promise.all([
       db
-        .selectFrom('organism')
+        .selectFrom('organisms')
         .where('id', '=', id)
         .selectAll()
         .executeTakeFirst(),
@@ -26,7 +28,7 @@ export async function GET(
         .send(
           new ListObjectsCommand({
             Bucket: R2_BUCKET_NAME,
-            Prefix: `organisms/${id}`,
+            Prefix: images_path,
           }),
         )
         .catch(() => ({ Contents: [] }))

@@ -2,10 +2,30 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler'
 
 import { NavigationProvider } from './navigation'
 
-export function Provider({ children }: { children: React.ReactNode }) {
+type AuthState = any
+
+function AuthProvider({
+  state,
+  children,
+}: {
+  state: AuthState
+  children: React.ReactNode
+}) {
+  return children
+}
+
+export function Provider({
+  children,
+  state,
+}: {
+  state: AuthState
+  children: React.ReactNode
+}) {
   return (
-    <NavigationProvider>
-      <GestureHandlerRootView>{children}</GestureHandlerRootView>
-    </NavigationProvider>
+    <AuthProvider state={state}>
+      <NavigationProvider>
+        <GestureHandlerRootView>{children}</GestureHandlerRootView>
+      </NavigationProvider>
+    </AuthProvider>
   )
 }

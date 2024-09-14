@@ -12,7 +12,7 @@ const origin = process.env.NEXT_PUBLIC_ORIGIN
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const db = createKysely<Database>()
 
-  const organisms = await db.selectFrom('organism').selectAll().execute()
+  const organisms = await db.selectFrom('organisms').selectAll().execute()
 
   return [
     {

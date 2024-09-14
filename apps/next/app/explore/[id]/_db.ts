@@ -6,7 +6,7 @@ export function getOrganism(id: string) {
   const db = createKysely<Database>()
 
   return db
-    .selectFrom('organism')
+    .selectFrom('organisms')
     .where('id', '=', id)
     .selectAll()
     .executeTakeFirst()

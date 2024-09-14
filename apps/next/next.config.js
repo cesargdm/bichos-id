@@ -11,7 +11,7 @@ const nextConfig = {
   transpilePackages: [
     'react-native',
     'expo-modules-core',
-    'expo-apple-authentication',
+    'expo-linear-gradient',
     'react-native-web',
     'solito',
     'app',

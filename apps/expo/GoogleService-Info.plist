@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>850488147623-ueu6pjb58546c0mu15fcmegfibpfai3j.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.850488147623-ueu6pjb58546c0mu15fcmegfibpfai3j</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>850488147623-98mq9jmhqvfsma3ttmkc81079780k6ov.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyAXF2yyLRuDmleoW59qdQ2kMNbofo5n5i0</string>
+	<key>GCM_SENDER_ID</key>
+	<string>850488147623</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.fucesa.bichos-id</string>
+	<key>PROJECT_ID</key>
+	<string>bichos-id</string>
+	<key>STORAGE_BUCKET</key>
+	<string>bichos-id.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:850488147623:ios:06375cc2272cfde3b5e582</string>
+</dict>
+</plist>

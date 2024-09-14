@@ -1,9 +1,7 @@
 'use client'
 
-import { useEffect } from 'react'
 import { Text, View, ScrollView, FlatList, Image } from 'react-native'
 import useSWR from 'swr'
-import { TextLink } from 'solito/link'
 import { useParams } from 'solito/navigation'
 import { StatusBar } from 'expo-status-bar'
 
@@ -12,18 +10,30 @@ import { NativeStackNavigationOptions } from '@react-navigation/native-stack'
 
 const useUserParams = useParams<{ id: string }>
 
-type Props = {
-  fallbackData?: {
-    id: string
-    images?: `${typeof ASSETS_BASE_URL}/${string}`[]
-    identification: {
-      commonName: string
-      scientificClassification: {
-        genus: string
-        species?: string
-      }
+type OrganismData = {
+  id: string
+  images?: `${typeof ASSETS_BASE_URL}/${string}`[]
+  commonName: string
+  description?: string
+  habitat?: string
+  metadata: {
+    venomous: {
+      type?: string
+      level: 'NON_VENOMOUS' | 'VENOMOUS' | 'HIGHLY_VENOMOUS'
     }
   }
+  classification: {
+    phylum: string
+    class: string
+    order: string
+    family: string
+    genus: string
+    species?: string
+  }
+}
+
+type Props = {
+  fallbackData?: OrganismData
 }
 
 const fetcher = (url: string) => fetch(url).then((response) => response.json())
@@ -31,11 +41,11 @@ const fetcher = (url: string) => fetch(url).then((response) => response.json())
 function getVenomousLabel(level: string) {
   switch (level) {
     case 'HIGHLY_VENOMOUS':
-      return '🚨 De importancia médica'
+      return '🚨  De importancia médica'
     case 'VENOMOUS':
-      return '⚠️ Puede causar alergias'
+      return '⚠️  Puede causar alergias'
     case 'NON_VENOMOUS':
-      return '✅ Sin importancia médica'
+      return '✅  Sin importancia médica'
     default:
       return level
   }
@@ -56,13 +66,11 @@ function getVenomousColor(level: string) {
 function DiscoverDetailScreen({ fallbackData }: Props) {
   const params = useUserParams()
 
-  const { data, error, isLoading } = useSWR<any>(
+  const { data, error, isLoading } = useSWR<OrganismData>(
     Api.getOrganismKey(params.id),
     fetcher,
     { fallbackData },
   )
-
-  useEffect(() => {}, [data])
 
   if (!data) {
     if (isLoading) {
@@ -82,7 +90,7 @@ function DiscoverDetailScreen({ fallbackData }: Props) {
           style={{ width: '100%' }}
           renderItem={({ item }) => (
             <Image
-              alt={`${data.identification?.commonName} - ${data.identification?.scientificClassification.genus} ${data.identification?.scientificClassification.species}`}
+              alt={`${data?.commonName} - ${data.classification?.genus} ${data.classification?.species}`}
               style={{ width: 200, height: 200, objectFit: 'cover' }}
               source={{ uri: item }}
             />
@@ -90,28 +98,31 @@ function DiscoverDetailScreen({ fallbackData }: Props) {
         />
 
         <View style={{ gap: 24, padding: 10 }}>
-          <Text
-            style={{ fontSize: 32, fontWeight: '800', color: 'white' }}
-            role="heading"
-            aria-level={1}
-          >
-            {data.identification?.commonName} (
-            {data.identification?.scientificClassification.genus}{' '}
-            {data.identification?.scientificClassification.species})
-          </Text>
+          <View>
+            <Text
+              style={{ fontSize: 32, fontWeight: '800', color: 'white' }}
+              role="heading"
+              aria-level={1}
+            >
+              {data?.commonName}
+            </Text>
 
-          {data.identification?.venomous?.level ? (
+            <Text style={{ fontSize: 16, color: 'white' }}>
+              Nombre científico: {data?.classification?.genus}{' '}
+              {data?.classification.species}
+            </Text>
+          </View>
+
+          {data?.metadata?.venomous?.level ? (
             <View
               style={{
                 padding: 16,
                 borderRadius: 8,
-                backgroundColor: getVenomousColor(
-                  data.identification.venomous.level,
-                ),
+                backgroundColor: getVenomousColor(data.metadata.venomous.level),
               }}
             >
               <Text style={{ color: 'white', fontWeight: '700' }}>
-                {getVenomousLabel(data.identification.venomous.level)}
+                {getVenomousLabel(data.metadata.venomous.level)}
               </Text>
             </View>
           ) : null}
@@ -125,13 +136,17 @@ function DiscoverDetailScreen({ fallbackData }: Props) {
               Taxonomía
             </Text>
             <Text style={{ color: 'white', lineHeight: 28, fontSize: 16 }}>
-              Familia: {data.identification?.scientificClassification.family}
-            </Text>
-            <Text style={{ color: 'white', lineHeight: 28, fontSize: 16 }}>
-              Género: {data.identification?.scientificClassification.genus}
-            </Text>
-            <Text style={{ color: 'white', lineHeight: 28, fontSize: 16 }}>
-              Especie: {data.identification?.scientificClassification.species}
+              Filo: {data?.classification.phylum}
+              {'\n'}
+              Clase: {data?.classification.class}
+              {'\n'}
+              Orden: {data?.classification.order}
+              {'\n'}
+              Familia: {data?.classification.family}
+              {'\n'}
+              Género: {data?.classification.genus}
+              {'\n'}
+              Especie: {data?.classification.species}
             </Text>
           </View>
 
@@ -144,24 +159,21 @@ function DiscoverDetailScreen({ fallbackData }: Props) {
               Descripción
             </Text>
             <Text style={{ color: 'white', lineHeight: 28, fontSize: 16 }}>
-              {data.identification?.description}
+              {data?.description}
             </Text>
           </View>
 
-          <View>
+          <View style={{ gap: 8 }}>
             <Text
               style={{ color: 'white', fontWeight: '800', fontSize: 18 }}
               role="heading"
               aria-level="2"
             >
-              Links
+              Hábitat
             </Text>
-            <TextLink
-              style={{ color: 'white', fontSize: 16 }}
-              href={`https://google.com/search?q=${data.identification?.scientificClassification.genus} ${data.identification?.scientificClassification.species}`}
-            >
-              Google It
-            </TextLink>
+            <Text style={{ color: 'white', lineHeight: 28, fontSize: 16 }}>
+              {data?.habitat}
+            </Text>
           </View>
         </View>
       </ScrollView>

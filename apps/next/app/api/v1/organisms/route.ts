@@ -7,7 +7,7 @@ export async function GET() {
   try {
     const db = createKysely<Database>()
 
-    const organisms = await db.selectFrom('organism').selectAll().execute()
+    const organisms = await db.selectFrom('organisms').selectAll().execute()
 
     return NextResponse.json(organisms)
   } catch {

@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "850488147623",
+    "project_id": "bichos-id",
+    "storage_bucket": "bichos-id.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:850488147623:android:1288f5de1febfdc2b5e582",
+        "android_client_info": {
+          "package_name": "com.fucesa.bichos_id"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "850488147623-98mq9jmhqvfsma3ttmkc81079780k6ov.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.fucesa.bichos_id",
+            "certificate_hash": "bf83a002055da41cef11a65dbb8ac14ceeb4b4f5"
+          }
+        },
+        {
+          "client_id": "850488147623-1jmtfjbqug3h5e8m610utg4ebu0n8mlo.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBSBqAPg99SKgoJ965k0pYb5Y1tXgRXC24"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "850488147623-1jmtfjbqug3h5e8m610utg4ebu0n8mlo.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "850488147623-ueu6pjb58546c0mu15fcmegfibpfai3j.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.fucesa.bichos-id"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
