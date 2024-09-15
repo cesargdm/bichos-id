@@ -10,7 +10,6 @@ const nextConfig = {
 	// https://github.com/nandorojo/moti/issues/224
 	// once that gets fixed, set this back to true
 	reactStrictMode: false,
-	swcMinify: true,
 	transpilePackages: [
 		'react-native',
 		'moti',
@@ -24,18 +23,6 @@ const nextConfig = {
 		'@expo/html-elements',
 		'react-native-gesture-handler',
 	],
-	experimental: {
-		forceSwcTransforms: true,
-	},
-	webpack: (config) => {
-		config.resolve.alias = {
-			...(config.resolve.alias || {}),
-			'react-native$': 'react-native-web',
-			'react-native-linear-gradient': 'react-native-web-linear-gradient',
-		}
-
-		return config
-	},
 }
 
 module.exports = withSentryConfig(withExpo(nextConfig), {

@@ -12,8 +12,6 @@ export const config = {
 }
 
 export async function middleware(request: NextRequest) {
-	console.log('middleware')
-
 	if (request.method !== 'POST') {
 		return NextResponse.next()
 	}
