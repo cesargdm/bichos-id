@@ -17,6 +17,7 @@ function App() {
 			try {
 				const credential = await auth().signInAnonymously()
 
+				Sentry.setUser({ id: credential.user.uid })
 				setUser(credential.user)
 			} catch (error) {
 				Sentry.captureException(error)
