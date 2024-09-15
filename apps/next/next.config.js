@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 const { withExpo } = require('@expo/next-adapter')
 const { withSentryConfig } = require('@sentry/nextjs')
-const withFonts = require('next-fonts')
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -17,7 +16,6 @@ const nextConfig = {
 		'moti',
 		'expo-modules-core',
 		'expo-linear-gradient',
-		'react-native-vector-icons',
 		'@react-native/assets-registry',
 		'react-native-web',
 		'solito',
@@ -40,18 +38,16 @@ const nextConfig = {
 	},
 }
 
-module.exports = withSentryConfig(
-	withFonts(withExpo(nextConfig), {
-		org: 'fucesa',
-		project: 'bichos-id-web',
-		silent: !process.env.CI,
-		widenClientFileUpload: true,
-		reactComponentAnnotation: {
-			enabled: true,
-		},
-		tunnelRoute: '/monitoring',
-		hideSourceMaps: true,
-		disableLogger: true,
-		automaticVercelMonitors: true,
-	}),
-)
+module.exports = withSentryConfig(withExpo(nextConfig), {
+	org: 'fucesa',
+	project: 'bichos-id-web',
+	silent: !process.env.CI,
+	widenClientFileUpload: true,
+	reactComponentAnnotation: {
+		enabled: true,
+	},
+	tunnelRoute: '/monitoring',
+	hideSourceMaps: true,
+	disableLogger: true,
+	automaticVercelMonitors: true,
+})

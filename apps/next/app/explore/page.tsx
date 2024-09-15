@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 }
 
 export default function ExplorePage() {
-	const organisms = [] as any[]
+	const organisms = [] as never[]
 
 	return (
 		<Suspense fallback={null}>

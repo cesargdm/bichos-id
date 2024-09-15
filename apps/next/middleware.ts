@@ -2,11 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import { Ratelimit } from '@upstash/ratelimit'
 import { kv } from '@vercel/kv'
 
-const getRateLimit = new Ratelimit({
-	redis: kv,
-	limiter: Ratelimit.slidingWindow(60, '60 s'),
-})
-
 const rateLimit = new Ratelimit({
 	redis: kv,
 	limiter: Ratelimit.slidingWindow(3, '24 h'),

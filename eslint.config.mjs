@@ -35,4 +35,7 @@ export default [
 		files: ['**/*.js'],
 		...tseslint.configs.disableTypeChecked,
 	},
+	{
+		ignores: ['**/.next'],
+	},
 ]

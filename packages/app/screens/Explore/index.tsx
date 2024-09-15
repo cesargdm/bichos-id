@@ -82,7 +82,7 @@ function DiscoverScreen({ fallbackData }: Props) {
 						/>
 					) : undefined
 				}
-				renderItem={({ item }) => (
+				renderItem={({ item: organism }) => (
 					<Link
 						viewProps={
 							{
@@ -92,10 +92,10 @@ function DiscoverScreen({ fallbackData }: Props) {
 								overflow: 'hidden',
 							} as object
 						}
-						href={`/explore/${item.id}`}
+						href={`/explore/${organism.id}`}
 					>
 						<ImageBackground
-							source={{ uri: `${ASSETS_BASE_URL}/${item.image_key}` }}
+							source={{ uri: `${ASSETS_BASE_URL}/${organism.image_key}` }}
 							style={{ flex: 1 }}
 							resizeMode="cover"
 						>
@@ -113,10 +113,11 @@ function DiscoverScreen({ fallbackData }: Props) {
 										width: '100%',
 									}}
 								>
-									{item.commonName}
+									{organism.commonName}
 								</Text>
 								<Text style={{ color: 'white', fontSize: 14 }}>
-									({item.classification?.genus} {item.classification?.species})
+									({organism.classification?.genus}{' '}
+									{organism.classification?.species})
 								</Text>
 							</LinearGradient>
 						</ImageBackground>
