@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 const { withExpo } = require('@expo/next-adapter')
-const { withSentryConfig } = require('@sentry/nextjs')
+// const { withSentryConfig } = require('@sentry/nextjs')
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -12,30 +12,37 @@ const nextConfig = {
 	reactStrictMode: false,
 	transpilePackages: [
 		'react-native',
+		'react-native-web',
+		'expo',
+
 		'moti',
+		'solito',
+
 		'expo-modules-core',
 		'expo-linear-gradient',
-		'react-native-web',
-		'solito',
-		'app',
-		'react-native-reanimated',
 		'@expo/html-elements',
+
+		'react-native-reanimated',
 		'react-native-gesture-handler',
+
+		'@bichos-id/app',
 	],
 }
 
-module.exports = withExpo(
-	withSentryConfig(nextConfig, {
-		org: 'fucesa',
-		project: 'bichos-id-web',
-		silent: !process.env.CI,
-		widenClientFileUpload: true,
-		reactComponentAnnotation: {
-			enabled: true,
-		},
-		tunnelRoute: '/monitoring',
-		hideSourceMaps: true,
-		disableLogger: true,
-		automaticVercelMonitors: true,
-	}),
-)
+module.exports = withExpo(nextConfig)
+
+// module.exports = withExpo(
+// 	withSentryConfig(nextConfig, {
+// 		org: 'fucesa',
+// 		project: 'bichos-id-web',
+// 		silent: !process.env.CI,
+// 		widenClientFileUpload: true,
+// 		reactComponentAnnotation: {
+// 			enabled: true,
+// 		},
+// 		tunnelRoute: '/monitoring',
+// 		hideSourceMaps: true,
+// 		disableLogger: true,
+// 		automaticVercelMonitors: true,
+// 	}),
+// )

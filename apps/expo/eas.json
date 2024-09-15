@@ -8,7 +8,7 @@
 		"common": {
 			"env": {
 				"SENTRY_ORG": "fucesa",
-				"SENTRY_PROJECT": "bichos-id"
+				"SENTRY_PROJECT": "bichos-id-native"
 			},
 			"ios": {
 				"cocoapods": "1.15.2"
