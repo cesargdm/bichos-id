@@ -1679,7 +1679,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/preset-flow@npm:^7.13.13, @babel/preset-flow@npm:~7.24.7":
+"@babel/preset-flow@npm:^7.13.13":
   version: 7.24.7
   resolution: "@babel/preset-flow@npm:7.24.7"
   dependencies:
@@ -10258,7 +10258,6 @@ __metadata:
   dependencies:
     "@babel/core": "npm:~7.25.2"
     "@babel/plugin-transform-private-methods": "npm:~7.25.4"
-    "@babel/preset-flow": "npm:~7.24.7"
     "@expo/ngrok": "npm:^4.1.3"
     "@react-native-firebase/app": "npm:20.5.0"
     "@react-native-firebase/app-check": "npm:20.5.0"
