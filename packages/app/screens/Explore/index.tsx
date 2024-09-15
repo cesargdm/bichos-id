@@ -1,7 +1,14 @@
 'use client'
 
 import { Link, TextLink } from 'solito/link'
-import { View, ImageBackground, FlatList, Text } from 'react-native'
+import {
+	View,
+	RefreshControl,
+	ImageBackground,
+	FlatList,
+	Platform,
+	Text,
+} from 'react-native'
 import useSWR from 'swr'
 import { StatusBar } from 'expo-status-bar'
 import { Api, ASSETS_BASE_URL, fetcher } from '@bichos-id/app/lib/api'
@@ -22,11 +29,10 @@ type Props = {
 }
 
 function DiscoverScreen({ fallbackData }: Props) {
-	const { data, error, isLoading } = useSWR<Props['fallbackData'], Error>(
-		Api.getOrganismsKey(),
-		fetcher,
-		{ fallbackData },
-	)
+	const { data, error, isLoading, mutate } = useSWR<
+		Props['fallbackData'],
+		Error
+	>(Api.getOrganismsKey(), fetcher, { fallbackData })
 
 	if (!data) {
 		if (isLoading) {
@@ -46,6 +52,14 @@ function DiscoverScreen({ fallbackData }: Props) {
 			<FlatList
 				style={{ flex: 1, width: '100%' }}
 				data={data}
+				refreshControl={
+					Platform.OS !== 'web' ? (
+						<RefreshControl
+							refreshing={isLoading}
+							onRefresh={() => void mutate()}
+						/>
+					) : undefined
+				}
 				renderItem={({ item }) => (
 					<Link
 						viewProps={

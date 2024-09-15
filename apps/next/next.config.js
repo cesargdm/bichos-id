@@ -16,6 +16,7 @@ const nextConfig = {
 		'expo-modules-core',
 		'expo-linear-gradient',
 		'react-native-vector-icons',
+		'@react-native/assets-registry',
 		'@expo/vector-icons',
 		'react-native-web',
 		'solito',
