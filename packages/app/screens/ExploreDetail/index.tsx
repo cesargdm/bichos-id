@@ -15,7 +15,6 @@ import { LinearGradient } from 'expo-linear-gradient'
 
 import { Api, ASSETS_BASE_URL, fetcher } from '@bichos-id/app/lib/api'
 import { NativeStackNavigationOptions } from '@react-navigation/native-stack'
-import { Ionicons } from '@expo/vector-icons'
 
 const useUserParams = useParams<{ id: string }>
 
@@ -183,11 +182,11 @@ function DiscoverDetailScreen({ fallbackData }: Props) {
 							</View>
 						) : null}
 						<View style={styles.tagContainer}>
-							<Ionicons size={15} color="white" name="eye" />
+							{/* <Ionicons size={15} color="white" name="eye" /> */}
 							<Text style={{ color: 'white' }}>{data.scansCount}</Text>
 						</View>
 						<View style={styles.tagContainer}>
-							<Ionicons size={15} color="white" name="library" />
+							{/* <Ionicons size={15} color="white" name="library" /> */}
 							<Text style={{ color: 'white' }}>
 								{getTaxonomyLabel(data.taxonomy)}
 							</Text>
