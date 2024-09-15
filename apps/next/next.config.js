@@ -35,7 +35,6 @@ const nextConfig = {
 			'react-native$': 'react-native-web',
 			'react-native-linear-gradient': 'react-native-web-linear-gradient',
 			'@expo/vector-icons': 'react-native-vector-icons',
-			'@expo/vector-icons/Ionicons': 'react-native-vector-icons/Ionicons',
 		}
 
 		return config

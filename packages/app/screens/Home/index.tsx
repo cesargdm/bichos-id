@@ -11,7 +11,7 @@ import {
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useRouter } from 'solito/navigation'
-import Ionicons from '@expo/vector-icons/Ionicons'
+import { Ionicons } from '@expo/vector-icons'
 import { StatusBar } from 'expo-status-bar'
 import { launchImageLibraryAsync, MediaTypeOptions } from 'expo-image-picker'
 import { manipulateAsync, SaveFormat } from 'expo-image-manipulator'

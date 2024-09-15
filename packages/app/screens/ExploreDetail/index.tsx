@@ -15,7 +15,7 @@ import { LinearGradient } from 'expo-linear-gradient'
 
 import { Api, ASSETS_BASE_URL, fetcher } from '@bichos-id/app/lib/api'
 import { NativeStackNavigationOptions } from '@react-navigation/native-stack'
-import Ionicons from '@expo/vector-icons/Ionicons'
+import { Ionicons } from '@expo/vector-icons'
 
 const useUserParams = useParams<{ id: string }>
 
