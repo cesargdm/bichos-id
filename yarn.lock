@@ -3821,7 +3821,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@native-base/next-adapter@npm:^2.3.0":
+"@native-base/next-adapter@npm:2.3.0":
   version: 2.3.0
   resolution: "@native-base/next-adapter@npm:2.3.0"
   dependencies:
@@ -7599,7 +7599,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react-native@npm:^0.73.0, @types/react-native@npm:~0.73.0":
+"@types/react-native@npm:0.73.0, @types/react-native@npm:~0.73.0":
   version: 0.73.0
   resolution: "@types/react-native@npm:0.73.0"
   dependencies:
@@ -14120,11 +14120,11 @@ __metadata:
   dependencies:
     "@aws-sdk/client-s3": "npm:3.651.1"
     "@expo/next-adapter": "npm:6.0.0"
-    "@native-base/next-adapter": "npm:^2.3.0"
+    "@native-base/next-adapter": "npm:2.3.0"
     "@sentry/nextjs": "npm:8.30.0"
     "@types/node": "npm:~22.5.4"
     "@types/react-dom": "npm:^18"
-    "@types/react-native": "npm:^0.73.0"
+    "@types/react-native": "npm:0.73.0"
     "@upstash/ratelimit": "npm:2.0.2"
     "@vercel/blob": "npm:0.23.4"
     "@vercel/kv": "npm:2.0.0"
@@ -14139,7 +14139,7 @@ __metadata:
     react-dom: "npm:18.3.1"
     react-native: "npm:0.74.5"
     react-native-web: "npm:^0.19.12"
-    react-native-web-linear-gradient: "npm:^1.1.2"
+    react-native-web-linear-gradient: "npm:1.1.2"
     setimmediate: "npm:1.0.5"
     zod: "npm:3.23.8"
   languageName: unknown
@@ -15530,7 +15530,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-web-linear-gradient@npm:^1.1.2":
+"react-native-web-linear-gradient@npm:1.1.2":
   version: 1.1.2
   resolution: "react-native-web-linear-gradient@npm:1.1.2"
   peerDependencies:
