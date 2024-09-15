@@ -2,11 +2,11 @@
 
 import { Link, TextLink } from 'solito/link'
 import {
-	View,
 	RefreshControl,
 	ImageBackground,
 	FlatList,
 	Platform,
+	StyleSheet,
 	Text,
 } from 'react-native'
 import useSWR from 'swr'
@@ -14,6 +14,8 @@ import { StatusBar } from 'expo-status-bar'
 import { Api, ASSETS_BASE_URL, fetcher } from '@bichos-id/app/lib/api'
 import { NativeStackNavigationOptions } from '@react-navigation/native-stack'
 import { LinearGradient } from 'expo-linear-gradient'
+import { MotiView } from 'moti'
+import { Skeleton } from 'moti/skeleton'
 
 import ErrorScreen from '../Error'
 
@@ -28,6 +30,24 @@ type Props = {
 	fallbackData?: Data[]
 }
 
+const styles = StyleSheet.create({
+	shape: {
+		justifyContent: 'center',
+		height: 250,
+		width: 250,
+		borderRadius: 25,
+		marginRight: 10,
+		backgroundColor: 'white',
+	},
+	container: {
+		flex: 1,
+		justifyContent: 'center',
+	},
+	padded: {
+		padding: 16,
+	},
+})
+
 function DiscoverScreen({ fallbackData }: Props) {
 	const { data, error, isLoading, mutate } = useSWR<
 		Props['fallbackData'],
@@ -37,9 +57,11 @@ function DiscoverScreen({ fallbackData }: Props) {
 	if (!data) {
 		if (isLoading) {
 			return (
-				<View style={{ flex: 1 }}>
-					<Text style={{ color: 'white' }}>Cargando...</Text>
-				</View>
+				<MotiView transition={{ type: 'timing' }} style={styles.container}>
+					<Skeleton colorMode="dark" width="100%" height={200} />
+					<Skeleton colorMode="dark" width="100%" height={200} />
+					<Skeleton colorMode="dark" width="100%" height={200} />
+				</MotiView>
 			)
 		}
 
