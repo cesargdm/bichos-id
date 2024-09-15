@@ -5,7 +5,7 @@ import DiscoveryDetailScreen from '@bichos-id/app/screens/ExploreDetail'
 import { getOrganism } from './_db'
 
 type Props = {
-  params: { id: string }
+	params: { id: string }
 }
 
 export const dynamic = 'force-dynamic'
@@ -13,28 +13,28 @@ export const dynamic = 'force-dynamic'
 export const revalidate = 60 * 60 * 24 // 1 day
 
 export async function generateMetadata({ params }: Props) {
-  const id = params.id
+	const id = params.id
 
-  const organism = await getOrganism(id)
+	const organism = await getOrganism(id)
 
-  if (!organism) {
-    return notFound()
-  }
+	if (!organism) {
+		return notFound()
+	}
 
-  return {
-    title: organism.commonName,
-    description: organism.description,
-  }
+	return {
+		title: organism.commonName,
+		description: organism.description,
+	}
 }
 
 export default async function DiscoveryDetailPage({ params }: Props) {
-  const id = params.id
+	const id = params.id
 
-  const organism = await getOrganism(id)
+	const organism = await getOrganism(id)
 
-  return (
-    <Suspense fallback={null}>
-      <DiscoveryDetailScreen fallbackData={organism} />
-    </Suspense>
-  )
+	return (
+		<Suspense fallback={null}>
+			<DiscoveryDetailScreen fallbackData={organism} />
+		</Suspense>
+	)
 }

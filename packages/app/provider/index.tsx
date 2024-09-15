@@ -5,27 +5,26 @@ import { NavigationProvider } from './navigation'
 type AuthState = any
 
 function AuthProvider({
-  state,
-  children,
+	children,
 }: {
-  state: AuthState
-  children: React.ReactNode
+	state: AuthState
+	children: React.ReactNode
 }) {
-  return children
+	return children
 }
 
 export function Provider({
-  children,
-  state,
+	children,
+	state,
 }: {
-  state: AuthState
-  children: React.ReactNode
+	state: AuthState
+	children: React.ReactNode
 }) {
-  return (
-    <AuthProvider state={state}>
-      <NavigationProvider>
-        <GestureHandlerRootView>{children}</GestureHandlerRootView>
-      </NavigationProvider>
-    </AuthProvider>
-  )
+	return (
+		<AuthProvider state={state}>
+			<NavigationProvider>
+				<GestureHandlerRootView>{children}</GestureHandlerRootView>
+			</NavigationProvider>
+		</AuthProvider>
+	)
 }

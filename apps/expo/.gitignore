@@ -127,3 +127,4 @@ dist/
 .expo
 dist/
 web-build/
+.env.local

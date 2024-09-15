@@ -1,32 +1,40 @@
+import { routingInstrumentation } from '@bichos-id/app/lib/sentry'
 import { DarkTheme, NavigationContainer } from '@react-navigation/native'
 import * as Linking from 'expo-linking'
-import { useMemo } from 'react'
+import { useCallback, useActionState, useMemo, useRef } from 'react'
 
-export function NavigationProvider({
-  children,
-}: {
-  children: React.ReactNode
-}) {
-  return (
-    <NavigationContainer
-      theme={DarkTheme}
-      linking={useMemo(
-        () => ({
-          prefixes: [Linking.createURL('/')],
-          config: {
-            initialRouteName: 'home',
-            screens: {
-              home: '',
-              settings: 'settings',
-              explore: 'explore',
-              'explore-detail': 'explore/:id',
-            },
-          },
-        }),
-        [],
-      )}
-    >
-      {children}
-    </NavigationContainer>
-  )
+type Props = {
+	children: React.ReactNode
+}
+
+export function NavigationProvider({ children }: Props) {
+	const navigation = useRef()
+
+	const handleOnReady = useCallback(() => {
+		routingInstrumentation.registerNavigationContainer(navigation)
+	}, [])
+
+	return (
+		<NavigationContainer
+			onReady={handleOnReady}
+			theme={DarkTheme}
+			linking={useMemo(
+				() => ({
+					prefixes: [Linking.createURL('/')],
+					config: {
+						initialRouteName: 'home',
+						screens: {
+							home: '',
+							settings: 'settings',
+							explore: 'explore',
+							'explore-detail': 'explore/:id',
+						},
+					},
+				}),
+				[],
+			)}
+		>
+			{children}
+		</NavigationContainer>
+	)
 }

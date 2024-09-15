@@ -8,42 +8,42 @@ import { getR2Client, R2_BUCKET_NAME } from '../../_r2'
 export const revalidate = 60 * 60 * 1 // 1 hour
 
 export async function GET(
-  _request: Request,
-  { params }: { params: { id: string } },
+	_request: Request,
+	{ params }: { params: { id: string } },
 ) {
-  try {
-    const db = createKysely<Database>()
+	try {
+		const db = createKysely<Database>()
 
-    const id = params.id
+		const id = params.id
 
-    const images_path = `scans/${id.replaceAll('-', '/')}`
+		const images_path = `scans/${id.replaceAll('-', '/')}`
 
-    const [organism, images] = await Promise.all([
-      db
-        .selectFrom('organisms')
-        .where('id', '=', id)
-        .selectAll()
-        .executeTakeFirst(),
-      await getR2Client()
-        .send(
-          new ListObjectsCommand({
-            Bucket: R2_BUCKET_NAME,
-            Prefix: images_path,
-          }),
-        )
-        .catch(() => ({ Contents: [] }))
-        .then(({ Contents = [] }) =>
-          Contents.map(
-            ({ Key }) => `https://bichos-id.assets.fucesa.com/${Key}`,
-          ),
-        ),
-    ])
+		const [organism, images] = await Promise.all([
+			db
+				.selectFrom('organisms')
+				.where('id', '=', id)
+				.selectAll()
+				.executeTakeFirst(),
+			await getR2Client()
+				.send(
+					new ListObjectsCommand({
+						Bucket: R2_BUCKET_NAME,
+						Prefix: images_path,
+					}),
+				)
+				.catch(() => ({ Contents: [] }))
+				.then(({ Contents = [] }) =>
+					Contents.map(
+						({ Key }) => `https://bichos-id.assets.fucesa.com/${Key}`,
+					),
+				),
+		])
 
-    return NextResponse.json({ ...organism, images })
-  } catch {
-    return NextResponse.json(
-      { error: 'Failed to connect to database' },
-      { status: 500 },
-    )
-  }
+		return NextResponse.json({ ...organism, images })
+	} catch {
+		return NextResponse.json(
+			{ error: 'Failed to connect to database' },
+			{ status: 500 },
+		)
+	}
 }

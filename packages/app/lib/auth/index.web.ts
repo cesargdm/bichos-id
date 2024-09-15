@@ -1,3 +1,3 @@
 export function getIdToken() {
-  return undefined
+	return undefined
 }

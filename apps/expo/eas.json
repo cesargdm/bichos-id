@@ -1,35 +1,35 @@
 {
-  "cli": {
-    "version": ">= 12.1.0",
-    "appVersionSource": "remote",
-    "promptToConfigurePushNotifications": false
-  },
-  "build": {
-    "common": {
-      "env": {
-        "SENTRY_ORG": "fucesa",
-        "SENTRY_PROJECT": "bichos-id"
-      },
-      "ios": {
-        "cocoapods": "1.15.2"
-      }
-    },
-    "development": {
-      "developmentClient": true,
-      "distribution": "internal",
-      "extends": "common"
-    },
-    "preview": {
-      "distribution": "internal",
-      "extends": "common"
-    },
-    "production": {
-      "autoIncrement": true,
-      "extends": "common",
-      "distribution": "store"
-    }
-  },
-  "submit": {
-    "production": {}
-  }
+	"cli": {
+		"version": ">= 12.1.0",
+		"appVersionSource": "remote",
+		"promptToConfigurePushNotifications": false
+	},
+	"build": {
+		"common": {
+			"env": {
+				"SENTRY_ORG": "fucesa",
+				"SENTRY_PROJECT": "bichos-id"
+			},
+			"ios": {
+				"cocoapods": "1.15.2"
+			}
+		},
+		"development": {
+			"developmentClient": true,
+			"distribution": "internal",
+			"extends": "common"
+		},
+		"preview": {
+			"distribution": "internal",
+			"extends": "common"
+		},
+		"production": {
+			"autoIncrement": true,
+			"extends": "common",
+			"distribution": "store"
+		}
+	},
+	"submit": {
+		"production": {}
+	}
 }

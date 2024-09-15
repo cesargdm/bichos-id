@@ -6,37 +6,37 @@ import DiscoverScreen from '@bichos-id/app/screens/Explore'
 import SettingsScreen from '@bichos-id/app/screens/Settings'
 
 const Stack = createNativeStackNavigator<{
-  home: undefined
-  settings: undefined
-  explore: undefined
-  'explore-detail': {
-    id: string
-  }
+	home: undefined
+	settings: undefined
+	explore: undefined
+	'explore-detail': {
+		id: string
+	}
 }>()
 
 export function NativeNavigation() {
-  return (
-    <Stack.Navigator>
-      <Stack.Screen
-        name="home"
-        component={HomeScreen}
-        options={HomeScreen.options}
-      />
-      <Stack.Screen
-        name="settings"
-        component={SettingsScreen}
-        options={SettingsScreen.options}
-      />
-      <Stack.Screen
-        name="explore"
-        component={DiscoverScreen}
-        options={DiscoverScreen.options}
-      />
-      <Stack.Screen
-        name="explore-detail"
-        component={DiscoverDetailScreen}
-        options={DiscoverDetailScreen.options}
-      />
-    </Stack.Navigator>
-  )
+	return (
+		<Stack.Navigator>
+			<Stack.Screen
+				name="home"
+				component={HomeScreen}
+				options={HomeScreen.options}
+			/>
+			<Stack.Screen
+				name="settings"
+				component={SettingsScreen}
+				options={SettingsScreen.options}
+			/>
+			<Stack.Screen
+				name="explore"
+				component={DiscoverScreen}
+				options={DiscoverScreen.options}
+			/>
+			<Stack.Screen
+				name="explore-detail"
+				component={DiscoverDetailScreen}
+				options={DiscoverDetailScreen.options}
+			/>
+		</Stack.Navigator>
+	)
 }

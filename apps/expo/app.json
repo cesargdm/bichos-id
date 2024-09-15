@@ -1,48 +1,63 @@
 {
-  "expo": {
-    "name": "Bichos ID",
-    "slug": "bichos-id",
-    "version": "1.0.0",
-    "scheme": "bichos-id",
-    "icon": "./assets/icon.png",
-    "platforms": ["ios", "android"],
-    "orientation": "portrait",
-    "ios": {
-      "googleServicesFile": "./GoogleService-Info.plist",
-      "usesAppleSignIn": true,
-      "bundleIdentifier": "com.fucesa.bichos-id",
-      "infoPlist": {
-        "NSCameraUsageDescription": "$(PRODUCT_NAME) needs access to your Camera."
-      }
-    },
-    "android": {
-      "permissions": ["android.permission.CAMERA"],
-      "googleServicesFile": "./google-services.json",
-      "package": "com.fucesa.bichos_id"
-    },
-    "plugins": [
-      "@react-native-firebase/app",
-      "@react-native-firebase/auth",
-      "@react-native-firebase/crashlytics",
-      "expo-secure-store",
-      ["expo-build-properties", { "ios": { "useFrameworks": "static" } }],
-      [
-        "react-native-vision-camera",
-        {
-          "cameraPermissionText": "$(PRODUCT_NAME) needs access to your Camera."
-        }
-      ],
-      [
-        "expo-image-picker",
-        {
-          "photosPermission": "This app needs access to your photos so you can upload them."
-        }
-      ]
-    ],
-    "extra": {
-      "eas": {
-        "projectId": "1a55a13f-ac76-44fa-b40f-10125fd7e4bf"
-      }
-    }
-  }
+	"expo": {
+		"name": "Bichos ID",
+		"slug": "bichos-id",
+		"version": "1.0.0",
+		"scheme": "bichos-id",
+		"icon": "./assets/icon.png",
+		"platforms": ["ios", "android"],
+		"orientation": "portrait",
+		"ios": {
+			"googleServicesFile": "./GoogleService-Info.plist",
+			"usesAppleSignIn": true,
+			"bundleIdentifier": "com.fucesa.bichos-id",
+			"infoPlist": {
+				"NSCameraUsageDescription": "$(PRODUCT_NAME) needs access to your Camera."
+			}
+		},
+		"android": {
+			"permissions": ["android.permission.CAMERA"],
+			"googleServicesFile": "./google-services.json",
+			"package": "com.fucesa.bichos_id"
+		},
+		"plugins": [
+			"@react-native-firebase/app",
+			"@react-native-firebase/auth",
+			"@react-native-firebase/crashlytics",
+			"expo-secure-store",
+			[
+				"expo-build-properties",
+				{
+					"ios": {
+						"useFrameworks": "static"
+					}
+				}
+			],
+			[
+				"react-native-vision-camera",
+				{
+					"cameraPermissionText": "$(PRODUCT_NAME) needs access to your Camera."
+				}
+			],
+			[
+				"expo-image-picker",
+				{
+					"photosPermission": "This app needs access to your photos so you can upload them."
+				}
+			],
+			[
+				"@sentry/react-native/expo",
+				{
+					"url": "https://sentry.io/",
+					"project": "bichos-id-native",
+					"organization": "fucesa"
+				}
+			]
+		],
+		"extra": {
+			"eas": {
+				"projectId": "1a55a13f-ac76-44fa-b40f-10125fd7e4bf"
+			}
+		}
+	}
 }

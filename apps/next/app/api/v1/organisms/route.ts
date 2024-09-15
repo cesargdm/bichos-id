@@ -4,16 +4,16 @@ import { NextResponse } from 'next/server'
 import { Database } from '../_db'
 
 export async function GET() {
-  try {
-    const db = createKysely<Database>()
+	try {
+		const db = createKysely<Database>()
 
-    const organisms = await db.selectFrom('organisms').selectAll().execute()
+		const organisms = await db.selectFrom('organisms').selectAll().execute()
 
-    return NextResponse.json(organisms)
-  } catch {
-    return NextResponse.json(
-      { error: 'Failed to connect to database' },
-      { status: 500 },
-    )
-  }
+		return NextResponse.json(organisms)
+	} catch {
+		return NextResponse.json(
+			{ error: 'Failed to connect to database' },
+			{ status: 500 },
+		)
+	}
 }

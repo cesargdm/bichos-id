@@ -1,36 +1,38 @@
 import { NativeNavigation } from '@bichos-id/app/navigation/native'
 import { Provider } from '@bichos-id/app/provider'
-import auth from '@react-native-firebase/auth'
+import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth'
 import { useEffect, useState } from 'react'
 import * as SplashScreen from 'expo-splash-screen'
-import crashlytics from '@react-native-firebase/crashlytics'
+import Sentry from '@bichos-id/app/lib/sentry'
 
 SplashScreen.preventAutoHideAsync()
 
-export default function App() {
-  const [user, setUser] = useState(null)
+function App() {
+	const [user, setUser] = useState<
+		FirebaseAuthTypes.UserCredential['user'] | null
+	>(null)
 
-  useEffect(() => {
-    async function signIn() {
-      try {
-        const res = await auth().signInAnonymously()
+	useEffect(() => {
+		async function signIn() {
+			try {
+				const credential = await auth().signInAnonymously()
 
-        console.log({ res })
-      } catch (error) {
-        crashlytics().recordError(error)
-        console.error(error)
-        //
-      } finally {
-        SplashScreen.hideAsync()
-      }
-    }
+				setUser(credential.user)
+			} catch (error) {
+				Sentry.captureException(error)
+			} finally {
+				SplashScreen.hideAsync()
+			}
+		}
 
-    signIn()
-  }, [])
+		signIn()
+	}, [])
 
-  return (
-    <Provider state={{ user }}>
-      <NativeNavigation />
-    </Provider>
-  )
+	return (
+		<Provider state={{ user }}>
+			<NativeNavigation />
+		</Provider>
+	)
 }
+
+export default Sentry.wrap(App)
