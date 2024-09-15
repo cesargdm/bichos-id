@@ -1,8 +1,8 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 
-import HomeScreen from '@bichos-id/app/screens/home'
-import DiscoverDetailScreen from '@bichos-id/app/screens/ExploreDetail'
-import DiscoverScreen from '@bichos-id/app/screens/Explore'
+import HomeScreen from '@bichos-id/app/screens/Home'
+import ExploreScreen from '@bichos-id/app/screens/Explore'
+import ExploreDetailScreen from '@bichos-id/app/screens/ExploreDetail'
 import SettingsScreen from '@bichos-id/app/screens/Settings'
 
 const Stack = createNativeStackNavigator<{
@@ -29,13 +29,13 @@ export function NativeNavigation() {
 			/>
 			<Stack.Screen
 				name="explore"
-				component={DiscoverScreen}
-				options={DiscoverScreen.options}
+				component={ExploreScreen}
+				options={ExploreScreen.options}
 			/>
 			<Stack.Screen
 				name="explore-detail"
-				component={DiscoverDetailScreen}
-				options={DiscoverDetailScreen.options}
+				component={ExploreDetailScreen}
+				options={ExploreDetailScreen.options}
 			/>
 		</Stack.Navigator>
 	)

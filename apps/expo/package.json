@@ -8,7 +8,8 @@
 		"android": "expo run:android",
 		"ios": "expo run:ios",
 		"prebuild": "expo prebuild --clean",
-		"format": "prettier --write ."
+		"format": "prettier --write .",
+		"lint": "eslint . --max-warnings=0"
 	},
 	"dependencies": {
 		"@expo/ngrok": "^4.1.3",

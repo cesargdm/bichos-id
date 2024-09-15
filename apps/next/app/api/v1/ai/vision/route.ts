@@ -5,7 +5,7 @@ import { zodResponseFormat } from 'openai/helpers/zod'
 import { createKysely } from '@vercel/postgres-kysely'
 import { GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3'
 import * as crypto from 'node:crypto'
-import { initializeApp, cert, getApp } from 'firebase-admin/app'
+import { initializeApp, cert } from 'firebase-admin/app'
 import { getAuth } from 'firebase-admin/auth'
 
 import { Database, IdentificationSchema, OrganismSchema } from '../../_db'
@@ -52,8 +52,8 @@ export async function POST(request: NextRequest) {
 		}
 
 		const idToken = request.headers.get('Authorization')?.split(' ').at(1)
-		const isVerified = idToken && getAuth().verifyIdToken(idToken)
-		if (!isVerified) {
+		const decodedToken = idToken && (await getAuth().verifyIdToken(idToken))
+		if (!decodedToken) {
 			return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 		}
 
@@ -64,21 +64,23 @@ export async function POST(request: NextRequest) {
 		const openai = new OpenAI()
 		const db = createKysely<Database>()
 
-		let data = await request.json()
-		data = requestBodySchema.parse(data)
+		const rawData: unknown = await request.json()
+		const data = requestBodySchema.parse(rawData)
+
+		const model = 'gpt-4o-mini'
 
 		const identificationResponse = await openai.beta.chat.completions.parse({
-			model: 'gpt-4o-mini',
+			model,
 			messages: [
 				{
 					role: 'system',
-					content: `You are an expert entomologist that will recognize organisms accurately appearing in a photo uploaded by a user.
+					content: `You are an expert entomologist that will recognize organisms accurately appearing in a photo uploaded by a user. Be as accurate as possible.
 
 Instructions:
 - Use shapes, colors, surroundings and metadata to get the best identification.
 - Photos are likely to be recently taken with a mobile phone.
 - Do not return any information if the photo is inappropriate, blurry or simply unrelated with arthropods.
-- In the species field, if it's unknown or not sure, use 'sp'.
+- In the species or genus field if it's unknown or not sure, return empty string ('').
 - Review the image quality rating in a scale from 0 to 10, consider composition, quality, lighting and sharpness.
 - In the species field, only return the species name avoid the genus.
 ${
@@ -145,9 +147,11 @@ ${
 			.insertInto('organism_scans')
 			.values({
 				id: getRandomId(),
+				model,
 				image_key: imageKey,
 				image_quality_rating: _imageQualityRating,
 				organism_id: organismId,
+				created_by: decodedToken.sub,
 				created_at: new Date().toISOString(),
 				updated_at: new Date().toISOString(),
 			})
@@ -183,8 +187,10 @@ ${
 						CacheControl: 'max-age=31536000, immutable',
 					}),
 				)
-				.catch(() => undefined),
+				.catch(() => false),
 		])
+
+		console.log({ existing })
 
 		if (!existing) {
 			const organismResponse = await openai.beta.chat.completions.parse({
@@ -212,19 +218,27 @@ Instructions:
 				response_format: zodResponseFormat(OrganismSchema, 'event'),
 			})
 
-			const newInformation = organismResponse.choices[0].message?.parsed
+			const parsedOrganismInfo = organismResponse.choices[0].message?.parsed
 
-			if (!newInformation) {
+			if (!parsedOrganismInfo) {
 				throw new Error('No response from AI')
 			}
+
+			console.log(parsedOrganismInfo)
 
 			await db
 				.insertInto('organisms')
 				.values({
 					id: organismId,
 					...identification,
-					...newInformation,
+					...parsedOrganismInfo,
+					taxonomy: identification.classification.species
+						? 'SPECIES'
+						: identification.classification.genus
+							? 'GENUS'
+							: 'FAMILY',
 					image_key: imageKey,
+					created_by: decodedToken.sub,
 					image_quality_rating: _imageQualityRating,
 					created_at: new Date().toISOString(),
 					updated_at: new Date().toISOString(),

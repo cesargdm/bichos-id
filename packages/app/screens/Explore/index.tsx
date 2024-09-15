@@ -1,21 +1,28 @@
 'use client'
 
 import { Link, TextLink } from 'solito/link'
-import { ImageBackground, FlatList, Text } from 'react-native'
+import { View, ImageBackground, FlatList, Text } from 'react-native'
 import useSWR from 'swr'
 import { StatusBar } from 'expo-status-bar'
-import { Api, ASSETS_BASE_URL } from '@bichos-id/app/lib/api'
+import { Api, ASSETS_BASE_URL, fetcher } from '@bichos-id/app/lib/api'
 import { NativeStackNavigationOptions } from '@react-navigation/native-stack'
 import { LinearGradient } from 'expo-linear-gradient'
 
-type Props = {
-	fallbackData?: any[]
+import ErrorScreen from '../Error'
+
+type Data = {
+	id: string
+	image_key: string
+	commonName: string
+	classification: { genus: string; species: string }
 }
 
-const fetcher = (url: string) => fetch(url).then((response) => response.json())
+type Props = {
+	fallbackData?: Data[]
+}
 
 function DiscoverScreen({ fallbackData }: Props) {
-	const { data, error, isLoading } = useSWR<any>(
+	const { data, error, isLoading } = useSWR<Props['fallbackData'], Error>(
 		Api.getOrganismsKey(),
 		fetcher,
 		{ fallbackData },
@@ -23,9 +30,14 @@ function DiscoverScreen({ fallbackData }: Props) {
 
 	if (!data) {
 		if (isLoading) {
-			return <Text>Cargando...</Text>
+			return (
+				<View style={{ flex: 1 }}>
+					<Text style={{ color: 'white' }}>Cargando...</Text>
+				</View>
+			)
 		}
-		return <Text>Error {JSON.stringify(error, null, 2)}</Text>
+
+		return <ErrorScreen error={error} />
 	}
 
 	return (
@@ -42,7 +54,7 @@ function DiscoverScreen({ fallbackData }: Props) {
 								height: 200,
 								width: '100%',
 								overflow: 'hidden',
-							} as any
+							} as object
 						}
 						href={`/explore/${item.id}`}
 					>

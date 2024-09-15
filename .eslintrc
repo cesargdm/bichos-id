@@ -1,9 +1,0 @@
-{
-	"extends": ["next", "eslint-config-cretia"],
-	"settings": {
-		"next": {
-			"rootDir": "apps/next/"
-		}
-	},
-	"root": true
-}

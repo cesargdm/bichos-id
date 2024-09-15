@@ -7,7 +7,7 @@ export const IdentificationSchema = z.object({
 		class: z.string(),
 		order: z.string(),
 		family: z.string(),
-		genus: z.string(),
+		genus: z.string().optional(),
 		species: z.string().optional(),
 	}),
 	_imageQualityRating: z.number(),
@@ -29,8 +29,11 @@ export interface Organism {
 	id: string
 	commonName: string
 	classification: {
+		phylum: string
+		class: string
+		order: string
 		family: string
-		genus: string
+		genus?: string
 		species?: string
 	}
 	description?: string
@@ -40,19 +43,23 @@ export interface Organism {
 			level: 'NON_VENOMOUS' | 'VENOMOUS' | 'HIGHLY_VENOMOUS'
 		}
 	}
+	taxonomy: 'SPECIES' | 'GENUS' | 'FAMILY'
 	image_quality_rating: number
 	image_key: string
 	created_at: string
 	updated_at: string
+	created_by: string
 }
 
 export interface OrganismScan {
 	id: string
 	image_key: string
 	organism_id: string
+	model: 'gpt-4o-mini'
 	image_quality_rating: number
 	created_at: string
 	updated_at: string
+	created_by: string
 }
 
 export interface Database {

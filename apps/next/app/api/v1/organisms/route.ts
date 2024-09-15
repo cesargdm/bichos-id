@@ -11,6 +11,8 @@ export async function GET() {
 
 		return NextResponse.json(organisms)
 	} catch {
+		console.log('Failed to connect to database')
+
 		return NextResponse.json(
 			{ error: 'Failed to connect to database' },
 			{ status: 500 },

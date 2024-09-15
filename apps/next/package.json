@@ -6,14 +6,16 @@
 		"dev": "next dev",
 		"build": "next build",
 		"start": "next start",
-		"lint": "next lint",
-		"format": "prettier --write ."
+		"lint": "eslint .",
+		"format": "prettier --write . --max-warnings=0"
 	},
 	"dependencies": {
 		"@aws-sdk/client-s3": "3.651.1",
 		"@expo/next-adapter": "6.0.0",
 		"@sentry/nextjs": "8.30.0",
+		"@upstash/ratelimit": "2.0.2",
 		"@vercel/blob": "0.23.4",
+		"@vercel/kv": "2.0.0",
 		"@vercel/og": "0.6.2",
 		"@vercel/postgres-kysely": "0.9.0",
 		"firebase-admin": "12.5.0",
@@ -30,7 +32,6 @@
 	"devDependencies": {
 		"@types/node": "~22.5.4",
 		"@types/react-dom": "^18",
-		"@types/react-native": "^0.73.0",
-		"eslint-config-next": "~14.2.11"
+		"@types/react-native": "^0.73.0"
 	}
 }

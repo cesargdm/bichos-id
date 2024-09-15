@@ -90,6 +90,23 @@ function HomeScreen() {
 
 	const isCameraActive = hasPermission && isFocused
 
+	const identifyImage = useCallback(async (base64Image: string) => {
+		try {
+			const data = await Api.identify(`data:image/jpeg;base64,${base64Image}`)
+
+			if (data.error) {
+				return Alert.alert('Error', data.error)
+			}
+
+			router.push(`/explore/${data.id}`)
+		} catch (error) {
+			const message =
+				error instanceof Error ? error.message : 'Error al capturar la imagen'
+
+			Alert.alert('Error', message)
+		}
+	}, [])
+
 	const handleCapture = useCallback(async () => {
 		setIsLoading(true)
 
@@ -114,10 +131,7 @@ function HomeScreen() {
 				photo.path,
 				[
 					{
-						resize: {
-							width: PHOTO_WIDTH,
-							height: PHOTO_HEIGHT,
-						},
+						resize: { width: PHOTO_WIDTH, height: PHOTO_HEIGHT },
 					},
 					{
 						crop: {
@@ -131,15 +145,14 @@ function HomeScreen() {
 				{ compress: 0.666, format: SaveFormat.JPEG, base64: true },
 			).then((result) => result.base64)
 
-			const data = await Api.identify(`data:image/jpeg;base64,${base64Image}`)
+			if (!base64Image) throw new Error('No image taken')
 
-			if (!data.id) {
-				throw new Error('No data returned')
-			}
+			return identifyImage(base64Image)
+		} catch (error: unknown) {
+			const message =
+				error instanceof Error ? error.message : 'Error al capturar la imagen'
 
-			router.push(`/explore/${data.id}`)
-		} catch (error: any) {
-			Alert.alert('Error', error?.message ?? 'No se pudo identificar la imagen')
+			Alert.alert('Error', message)
 		} finally {
 			setIsLoading(false)
 		}
@@ -165,19 +178,18 @@ function HomeScreen() {
 
 			const image = result.assets[0]
 
-			if (!image) {
+			if (!image?.base64) {
 				throw new Error('No image selected')
 			}
 
-			const data = await Api.identify(`data:image/jpeg;base64,${image.base64}`)
+			return identifyImage(image.base64)
+		} catch (error: unknown) {
+			const message =
+				error instanceof Error
+					? error.message
+					: 'Error al seleccionar la imagen'
 
-			if (!data.id) {
-				throw new Error('No data returned')
-			}
-
-			router.push(`/explore/${data.id}`)
-		} catch (error: any) {
-			Alert.alert('Error', error?.message ?? 'No se pudo identificar la imagen')
+			Alert.alert('Error', message)
 			//
 		} finally {
 			setIsLoading(false)
@@ -186,7 +198,7 @@ function HomeScreen() {
 
 	const focus = useCallback((point: Point) => {
 		if (cameraRef.current == null) return
-		cameraRef.current.focus(point)
+		void cameraRef.current.focus(point)
 	}, [])
 
 	const gesture = Gesture.Tap().onEnd(({ x, y }) => {

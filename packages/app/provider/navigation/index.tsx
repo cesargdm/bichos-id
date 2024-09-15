@@ -1,7 +1,7 @@
 import { routingInstrumentation } from '@bichos-id/app/lib/sentry'
 import { DarkTheme, NavigationContainer } from '@react-navigation/native'
 import * as Linking from 'expo-linking'
-import { useCallback, useActionState, useMemo, useRef } from 'react'
+import { useCallback, useMemo, useRef } from 'react'
 
 type Props = {
 	children: React.ReactNode

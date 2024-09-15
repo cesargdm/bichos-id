@@ -18,12 +18,17 @@ export async function GET(
 
 		const images_path = `scans/${id.replaceAll('-', '/')}`
 
-		const [organism, images] = await Promise.all([
+		const [organism, organismScans, images] = await Promise.all([
 			db
 				.selectFrom('organisms')
 				.where('id', '=', id)
 				.selectAll()
 				.executeTakeFirst(),
+			db
+				.selectFrom('organism_scans')
+				.where('organism_id', '=', id)
+				.selectAll()
+				.execute(),
 			await getR2Client()
 				.send(
 					new ListObjectsCommand({
@@ -39,7 +44,11 @@ export async function GET(
 				),
 		])
 
-		return NextResponse.json({ ...organism, images })
+		return NextResponse.json({
+			...organism,
+			scansCount: organismScans.length,
+			images,
+		})
 	} catch {
 		return NextResponse.json(
 			{ error: 'Failed to connect to database' },
