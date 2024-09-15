@@ -1,7 +1,7 @@
 import { Platform } from 'react-native'
 import { getIdToken } from './auth'
 
-const USE_LOCAL_API = false
+const USE_LOCAL_API = process.env.NODE_ENV === 'development'
 
 export const API_BASE_URL = USE_LOCAL_API
 	? 'http://localhost:3000/api/v1'

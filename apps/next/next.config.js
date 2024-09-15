@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 const { withExpo } = require('@expo/next-adapter')
 const { withSentryConfig } = require('@sentry/nextjs')
 
@@ -13,6 +14,7 @@ const nextConfig = {
 		'react-native',
 		'expo-modules-core',
 		'expo-linear-gradient',
+		'react-native-vector-icons',
 		'react-native-web',
 		'solito',
 		'app',

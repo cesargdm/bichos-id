@@ -7,7 +7,7 @@ const getRateLimit = new Ratelimit({
 	limiter: Ratelimit.slidingWindow(60, '60 s'),
 })
 
-const postRateLimit = new Ratelimit({
+const rateLimit = new Ratelimit({
 	redis: kv,
 	limiter: Ratelimit.slidingWindow(3, '24 h'),
 })
@@ -19,14 +19,16 @@ export const config = {
 export async function middleware(request: NextRequest) {
 	console.log('middleware')
 
-	const rateLimitToUse =
-		request.method === 'POST' ? postRateLimit : getRateLimit
+	if (request.method !== 'POST') {
+		return NextResponse.next()
+	}
 
 	let waitUntil = Date.now()
+
 	try {
 		const ip = request.ip ?? '127.0.0.1'
 
-		const { success, reset } = await rateLimitToUse.limit(ip)
+		const { success, reset } = await rateLimit.limit(ip)
 
 		if (!success) {
 			waitUntil = reset

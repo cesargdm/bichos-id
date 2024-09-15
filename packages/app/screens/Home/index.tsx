@@ -17,7 +17,6 @@ import { launchImageLibraryAsync, MediaTypeOptions } from 'expo-image-picker'
 import { manipulateAsync, SaveFormat } from 'expo-image-manipulator'
 import { runOnJS } from 'react-native-reanimated'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
-import { Link } from 'solito/link'
 import MaskedView from '@react-native-masked-view/masked-view'
 import {
 	Camera,
@@ -249,9 +248,10 @@ function HomeScreen() {
 						<Pressable onPress={handleToggleTorch} style={{ padding: 16 }}>
 							<Ionicons size={24} color="white" name="flashlight" />
 						</Pressable>
-						<Link href="/settings" style={{ padding: 16 }}>
+						<View aria-hidden />
+						{/* <Link href="/settings" style={{ padding: 16 }}>
 							<Ionicons size={24} color="white" name="settings" />
-						</Link>
+						</Link> */}
 					</View>
 				</SafeAreaView>
 

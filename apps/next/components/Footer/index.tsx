@@ -20,12 +20,12 @@ export default function Footer() {
 				<ul>
 					<li>
 						<a href="https://apps.apple.com">
-							<Image src={appStore} alt="App Store" />
+							<Image src={appStore as string} alt="App Store" />
 						</a>
 					</li>
 					<li>
 						<a href="https://play.google.com">
-							<Image src={googlePlay} alt="Google Play" />
+							<Image src={googlePlay as string} alt="Google Play" />
 						</a>
 					</li>
 				</ul>
