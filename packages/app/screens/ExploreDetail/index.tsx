@@ -37,7 +37,7 @@ type OrganismData = {
 		class: string
 		order: string
 		family: string
-		genus: string
+		genus?: string
 		species?: string
 	}
 }
