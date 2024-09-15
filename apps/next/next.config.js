@@ -15,7 +15,6 @@ const nextConfig = {
 		'moti',
 		'expo-modules-core',
 		'expo-linear-gradient',
-		'@react-native/assets-registry',
 		'react-native-web',
 		'solito',
 		'app',
@@ -25,16 +24,18 @@ const nextConfig = {
 	],
 }
 
-module.exports = withSentryConfig(withExpo(nextConfig), {
-	org: 'fucesa',
-	project: 'bichos-id-web',
-	silent: !process.env.CI,
-	widenClientFileUpload: true,
-	reactComponentAnnotation: {
-		enabled: true,
-	},
-	tunnelRoute: '/monitoring',
-	hideSourceMaps: true,
-	disableLogger: true,
-	automaticVercelMonitors: true,
-})
+module.exports = withExpo(
+	withSentryConfig(nextConfig, {
+		org: 'fucesa',
+		project: 'bichos-id-web',
+		silent: !process.env.CI,
+		widenClientFileUpload: true,
+		reactComponentAnnotation: {
+			enabled: true,
+		},
+		tunnelRoute: '/monitoring',
+		hideSourceMaps: true,
+		disableLogger: true,
+		automaticVercelMonitors: true,
+	}),
+)
