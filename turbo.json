@@ -9,6 +9,9 @@
 		},
 		"format": {
 			"dependsOn": ["^format"]
+		},
+		"clean": {
+			"dependsOn": ["^clean"]
 		}
 	}
 }

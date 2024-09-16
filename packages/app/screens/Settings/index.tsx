@@ -18,9 +18,9 @@ function SettingsScreen() {
 }
 
 SettingsScreen.options = {
-	title: 'Ajustes',
 	headerTintColor: 'white',
 	headerBackTitleVisible: false,
+	presentation: 'modal',
 } as NativeStackNavigationOptions
 
 export default SettingsScreen

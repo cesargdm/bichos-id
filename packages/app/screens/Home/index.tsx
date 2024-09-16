@@ -1,14 +1,7 @@
 'use client'
 
-import { useCallback, useRef, useState } from 'react'
-import {
-	StyleSheet,
-	Text,
-	ActivityIndicator,
-	View,
-	Alert,
-	Pressable,
-} from 'react-native'
+import { useCallback, useRef, useState, useEffect } from 'react'
+import { StyleSheet, Text, View, Alert, Image, Pressable } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useRouter } from 'solito/navigation'
 import { Ionicons } from '@expo/vector-icons'
@@ -18,6 +11,7 @@ import { manipulateAsync, SaveFormat } from 'expo-image-manipulator'
 import { runOnJS } from 'react-native-reanimated'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import MaskedView from '@react-native-masked-view/masked-view'
+import { NativeStackNavigationOptions } from '@react-navigation/native-stack'
 import {
 	Camera,
 	useCameraPermission,
@@ -27,7 +21,7 @@ import {
 import { useIsFocused } from '@react-navigation/native'
 
 import { Api } from '@bichos-id/app/lib/api'
-import { NativeStackNavigationOptions } from '@react-navigation/native-stack'
+import { useItem } from '@bichos-id/app/lib/hooks'
 
 const CAPTURABLE_WIDTH_PERCENTAGE = 0.6
 const CAPTURABLE_HEIGHT_PERCENTAGE = 0.4
@@ -81,16 +75,24 @@ function HomeScreen() {
 	const [isLoading, setIsLoading] = useState(false)
 	const device = useCameraDevice('back')
 
+	const [base64Image, setBase64Image] = useState<string | null>(null)
 	const [isTorchEnabled, setIsTorchEnabled] = useState<'on' | 'off'>('off')
 	const router = useRouter()
 	const cameraRef = useRef<Camera>(null)
-
 	const isFocused = useIsFocused()
+
+	const [onboarding, setOnboarding] = useItem<'completed'>(
+		'@bichos-id/onboarding',
+	)
 
 	const isCameraActive = hasPermission && isFocused
 
 	const identifyImage = useCallback(async (base64Image: string) => {
 		try {
+			setBase64Image(base64Image)
+
+			await new Promise((resolve) => setTimeout(resolve, 5000))
+
 			const data = await Api.identify(`data:image/jpeg;base64,${base64Image}`)
 
 			if (data.error) {
@@ -103,8 +105,19 @@ function HomeScreen() {
 				error instanceof Error ? error.message : 'Error al capturar la imagen'
 
 			Alert.alert('Error', message)
+		} finally {
+			setBase64Image(null)
 		}
 	}, [])
+
+	useEffect(() => {
+		if (!isFocused) return
+		if (onboarding === 'completed') return
+
+		router.push('/settings')
+
+		// setOnboarding('completed')
+	}, [isFocused])
 
 	const handleCapture = useCallback(async () => {
 		setIsLoading(true)
@@ -146,7 +159,7 @@ function HomeScreen() {
 
 			if (!base64Image) throw new Error('No image taken')
 
-			return identifyImage(base64Image)
+			await identifyImage(base64Image)
 		} catch (error: unknown) {
 			const message =
 				error instanceof Error ? error.message : 'Error al capturar la imagen'
@@ -181,7 +194,7 @@ function HomeScreen() {
 				throw new Error('No image selected')
 			}
 
-			return identifyImage(image.base64)
+			await identifyImage(image.base64)
 		} catch (error: unknown) {
 			const message =
 				error instanceof Error
@@ -240,6 +253,25 @@ function HomeScreen() {
 					</GestureDetector>
 				</MaskedView>
 
+				{base64Image ? (
+					<View
+						style={{
+							position: 'absolute',
+							width: '100%',
+							height: '100%',
+							justifyContent: 'center',
+							alignItems: 'center',
+						}}
+					>
+						<Image
+							style={styles.mask}
+							source={{
+								uri: `data:image/jpeg;base64,${base64Image}`,
+							}}
+						/>
+					</View>
+				) : null}
+
 				<SafeAreaView
 					style={styles.topActionsContainer}
 					edges={['top', 'left', 'right']}
@@ -267,21 +299,27 @@ function HomeScreen() {
 							width: '100%',
 						}}
 					>
-						<Pressable onPress={handlePickImage} style={{ padding: 16 }}>
+						<Pressable
+							onPress={handlePickImage}
+							style={(state) => ({
+								opacity: isLoading || state.pressed ? 0.5 : 1,
+								padding: 16,
+							})}
+						>
 							<Ionicons size={32} color="white" name="images-outline" />
 						</Pressable>
 						<Pressable
 							disabled={isLoading}
 							onPress={handleCapture}
-							style={{
-								opacity: isLoading ? 0.5 : 1,
+							style={(state) => ({
+								opacity: isLoading || state.pressed ? 0.5 : 1,
 								borderWidth: 3,
 								borderColor: 'white',
 								width: 70,
 								height: 70,
 								borderRadius: 999,
 								padding: 3,
-							}}
+							})}
 						>
 							<View
 								style={{
@@ -293,9 +331,7 @@ function HomeScreen() {
 									alignItems: 'center',
 									alignContent: 'center',
 								}}
-							>
-								{isLoading ? <ActivityIndicator /> : null}
-							</View>
+							/>
 						</Pressable>
 						<Pressable style={{ padding: 16 }} onPress={handleExplore}>
 							<Ionicons size={32} color="white" name="compass-outline" />

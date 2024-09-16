@@ -41,7 +41,8 @@ const styles = StyleSheet.create({
 	},
 	container: {
 		flex: 1,
-		justifyContent: 'center',
+		padding: 1,
+		gap: 1,
 	},
 	padded: {
 		padding: 16,
@@ -57,10 +58,14 @@ function DiscoverScreen({ fallbackData }: Props) {
 	if (!data) {
 		if (isLoading) {
 			return (
-				<MotiView transition={{ type: 'timing' }} style={styles.container}>
-					<Skeleton colorMode="dark" width="100%" height={200} />
-					<Skeleton colorMode="dark" width="100%" height={200} />
-					<Skeleton colorMode="dark" width="100%" height={200} />
+				<MotiView
+					transition={{ type: 'timing', delay: 1 }}
+					style={styles.container}
+				>
+					<Skeleton radius={0} colorMode="dark" width="100%" height={200} />
+					<Skeleton radius={0} colorMode="dark" width="100%" height={200} />
+					<Skeleton radius={0} colorMode="dark" width="100%" height={200} />
+					<Skeleton radius={0} colorMode="dark" width="100%" height={200} />
 				</MotiView>
 			)
 		}

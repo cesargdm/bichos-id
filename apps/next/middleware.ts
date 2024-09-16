@@ -30,10 +30,8 @@ export async function middleware(request: NextRequest) {
 
 		return NextResponse.next()
 	} catch {
-		console.log('rate limit exceeded')
-
 		return NextResponse.json(
-			{ error: `Rate limit exceeded` },
+			{ error: `Límite alcanzado` },
 			{
 				status: 429,
 				headers: {

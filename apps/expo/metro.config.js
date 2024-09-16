@@ -4,7 +4,7 @@ const { getSentryExpoConfig } = require('@sentry/react-native/metro')
 
 // Find the project and workspace directories
 const projectRoot = __dirname
-// This can be replaced with `find-yarn-workspace-root`
+
 const monorepoRoot = path.resolve(projectRoot, '../..')
 
 const defaultConfig = getSentryExpoConfig(projectRoot)

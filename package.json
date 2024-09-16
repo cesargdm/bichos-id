@@ -2,31 +2,17 @@
 	"name": "bichos-id",
 	"private": true,
 	"scripts": {
-		"native": "cd apps/expo && yarn start",
-		"web": "cd apps/next && yarn next",
-		"prebuild": "cd apps/expo && yarn prebuild",
+		"native": "cd apps/expo && bun run start",
+		"web": "cd apps/next && bun run next",
+		"prebuild": "cd apps/expo && bun run prebuild",
 		"lint": "turbo lint",
-		"format": "turbo format"
+		"format": "turbo format",
+		"clean": "turbo clean"
 	},
-	"workspaces": [
-		"apps/*",
-		"packages/*"
-	],
-	"devDependencies": {
-		"@eslint/js": "^9.10.0",
-		"@types/react": "~18.2.79",
-		"eslint": "^9.10.0",
-		"eslint-plugin-import": "^2.30.0",
-		"eslint-plugin-react": "^7.36.1",
-		"globals": "^15.9.0",
-		"prettier": "~3.3.3",
-		"prettier-config-cretia": "^3.0.0",
-		"turbo": "~2.1.2",
-		"typescript": "~5.3.3",
-		"typescript-eslint": "^8.5.0"
-	},
-	"packageManager": "yarn@4.4.1",
-	"resolutions": {
-		"react-native": "0.74.5"
+	"workspaces": {
+		"packages": [
+			"apps/*",
+			"packages/*"
+		]
 	}
 }
