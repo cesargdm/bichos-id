@@ -26,6 +26,10 @@ const styles = StyleSheet.create({
 })
 
 function getIsOnboardingComplete() {
+	if (Platform.OS === 'web') {
+		return true
+	}
+
 	const storage = new MMKV()
 	return storage.getBoolean('@bichos-id/onboarding-complete') ?? false
 }
