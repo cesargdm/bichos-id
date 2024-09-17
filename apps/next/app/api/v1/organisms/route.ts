@@ -1,22 +1,24 @@
+import type { NextRequest} from 'next/server';
+
 import { createKysely } from '@vercel/postgres-kysely'
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { z } from 'zod'
 
-import { Database } from '../_db'
+import type { Database } from '../_db'
 
 const paramsSchema = z.object({
+	direction: z.enum(['asc', 'desc']).default('asc'),
+	limit: z.number().min(1).max(100).default(50),
 	sortBy: z
 		.enum(['scan_count', 'created_at', 'common_name'])
 		.default('common_name'),
-	limit: z.number().min(1).max(100).default(50),
-	direction: z.enum(['asc', 'desc']).default('asc'),
 })
 
 export async function GET(request: NextRequest) {
 	try {
 		const db = createKysely<Database>()
 
-		const { sortBy, limit, direction } = paramsSchema.parse(
+		const { direction, limit, sortBy } = paramsSchema.parse(
 			Object.fromEntries(request.nextUrl.searchParams),
 		)
 

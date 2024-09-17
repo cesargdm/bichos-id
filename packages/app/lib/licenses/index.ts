@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 export type License = {
 	department: string
 	relatedTo: string
@@ -13,7 +14,7 @@ export type License = {
 }
 
 export const licenses = {
+	app: require('./app.json') as License[],
 	core: require('./core.json') as License[],
 	web: require('./web.json') as License[],
-	app: require('./app.json') as License[],
 } as const

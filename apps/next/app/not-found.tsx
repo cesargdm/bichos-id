@@ -4,12 +4,12 @@ export default function NotFound() {
 	return (
 		<div
 			style={{
-				flexDirection: 'column',
-				display: 'flex',
-				minHeight: '100%',
-				justifyContent: 'center',
 				alignItems: 'center',
+				display: 'flex',
+				flexDirection: 'column',
 				gap: 15,
+				justifyContent: 'center',
+				minHeight: '100%',
 			}}
 		>
 			<h1>No Encontrado</h1>

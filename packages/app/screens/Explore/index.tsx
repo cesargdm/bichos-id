@@ -1,6 +1,11 @@
 'use client'
 
-import { Link, TextLink } from 'solito/link'
+import type { NativeStackNavigationOptions } from '@react-navigation/native-stack'
+
+import { LinearGradient } from 'expo-linear-gradient'
+import { StatusBar } from 'expo-status-bar'
+import { MotiView } from 'moti'
+import { Skeleton } from 'moti/skeleton'
 import {
 	RefreshControl,
 	ImageBackground,
@@ -9,13 +14,10 @@ import {
 	StyleSheet,
 	Text,
 } from 'react-native'
+import { Link, TextLink } from 'solito/link'
 import useSWR from 'swr'
-import { StatusBar } from 'expo-status-bar'
+
 import { Api, ASSETS_BASE_URL, fetcher } from '@bichos-id/app/lib/api'
-import { NativeStackNavigationOptions } from '@react-navigation/native-stack'
-import { LinearGradient } from 'expo-linear-gradient'
-import { MotiView } from 'moti'
-import { Skeleton } from 'moti/skeleton'
 
 import ErrorScreen from '../Error'
 
@@ -31,21 +33,21 @@ type Props = {
 }
 
 const styles = StyleSheet.create({
-	shape: {
-		justifyContent: 'center',
-		height: 250,
-		width: 250,
-		borderRadius: 25,
-		marginRight: 10,
-		backgroundColor: 'white',
-	},
 	container: {
 		flex: 1,
-		padding: 1,
 		gap: 1,
+		padding: 1,
 	},
 	padded: {
 		padding: 16,
+	},
+	shape: {
+		backgroundColor: 'white',
+		borderRadius: 25,
+		height: 250,
+		justifyContent: 'center',
+		marginRight: 10,
+		width: 250,
 	},
 })
 
@@ -59,7 +61,7 @@ function DiscoverScreen({ fallbackData }: Props) {
 		if (isLoading) {
 			return (
 				<MotiView
-					transition={{ type: 'timing', delay: 1 }}
+					transition={{ delay: 1, type: 'timing' }}
 					style={styles.container}
 				>
 					<Skeleton radius={0} colorMode="dark" width="100%" height={200} />
@@ -93,8 +95,8 @@ function DiscoverScreen({ fallbackData }: Props) {
 							{
 								flex: 1,
 								height: 200,
-								width: '100%',
 								overflow: 'hidden',
+								width: '100%',
 							} as object
 						}
 						href={`/explore/${organism.id}`}
@@ -112,9 +114,9 @@ function DiscoverScreen({ fallbackData }: Props) {
 									lineBreakMode="middle"
 									style={{
 										color: 'white',
+										flexWrap: 'wrap',
 										fontSize: 18,
 										fontWeight: '700',
-										flexWrap: 'wrap',
 										width: '100%',
 									}}
 								>
@@ -136,9 +138,9 @@ function DiscoverScreen({ fallbackData }: Props) {
 }
 
 DiscoverScreen.options = {
-	title: 'Explorar',
-	headerTintColor: 'white',
 	headerBackTitleVisible: false,
+	headerTintColor: 'white',
+	title: 'Explorar',
 } as NativeStackNavigationOptions
 
 export default DiscoverScreen

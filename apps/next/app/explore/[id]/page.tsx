@@ -1,7 +1,8 @@
-import { Suspense } from 'react'
 import { notFound } from 'next/navigation'
+import { Suspense } from 'react'
 
 import DiscoveryDetailScreen from '@bichos-id/app/screens/ExploreDetail'
+
 import { getOrganism } from './_db'
 
 type Props = {
@@ -22,8 +23,8 @@ export async function generateMetadata({ params }: Props) {
 	}
 
 	return {
-		title: organism.common_name,
 		description: organism.description,
+		title: organism.common_name,
 	}
 }
 

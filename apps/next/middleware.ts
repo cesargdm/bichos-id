@@ -1,10 +1,12 @@
-import { NextRequest, NextResponse } from 'next/server'
+import type { NextRequest} from 'next/server';
+
 import { Ratelimit } from '@upstash/ratelimit'
 import { kv } from '@vercel/kv'
+import { NextResponse } from 'next/server'
 
 const rateLimit = new Ratelimit({
-	redis: kv,
 	limiter: Ratelimit.slidingWindow(3, '24 h'),
+	redis: kv,
 })
 
 export const config = {
@@ -21,7 +23,7 @@ export async function middleware(request: NextRequest) {
 	try {
 		const ip = request.ip ?? '127.0.0.1'
 
-		const { success, reset } = await rateLimit.limit(ip)
+		const { reset, success } = await rateLimit.limit(ip)
 
 		if (!success) {
 			waitUntil = reset
@@ -33,10 +35,10 @@ export async function middleware(request: NextRequest) {
 		return NextResponse.json(
 			{ error: `Límite alcanzado` },
 			{
-				status: 429,
 				headers: {
 					'Retry-After': Math.floor((waitUntil - Date.now()) / 1000).toString(),
 				},
+				status: 429,
 			},
 		)
 	}

@@ -1,14 +1,18 @@
+/* eslint-disable @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-assignment */
 'use client'
 
+import type { NativeStackNavigationOptions } from '@react-navigation/native-stack'
+
+import { LinearGradient } from 'expo-linear-gradient'
+import { StatusBar } from 'expo-status-bar'
 import { Text, View, ScrollView, FlatList, StyleSheet } from 'react-native'
-import useSWR from 'swr'
 import { SolitoImage } from 'solito/image'
 import { useParams } from 'solito/navigation'
-import { StatusBar } from 'expo-status-bar'
-import { LinearGradient } from 'expo-linear-gradient'
+import useSWR from 'swr'
 
-import { Api, ASSETS_BASE_URL, fetcher } from '@bichos-id/app/lib/api'
-import { NativeStackNavigationOptions } from '@react-navigation/native-stack'
+import type { ASSETS_BASE_URL } from '@bichos-id/app/lib/api'
+
+import { Api, fetcher } from '@bichos-id/app/lib/api'
 
 const useUserParams = useParams<{ id: string }>
 
@@ -66,22 +70,22 @@ function getVenomousColor(level: string) {
 
 const styles = StyleSheet.create({
 	tagContainer: {
-		padding: 10,
-		paddingHorizontal: 15,
+		alignItems: 'center',
 		backgroundColor: 'rgba(255,255,255,0.1)',
 		borderRadius: 999,
-		overflow: 'hidden',
 		flexDirection: 'row',
-		alignItems: 'center',
 		gap: 5,
+		overflow: 'hidden',
+		padding: 10,
+		paddingHorizontal: 15,
 	},
 })
 
 function getTaxonomyLabel(data: OrganismData['taxonomy']) {
 	return {
-		SPECIES: 'Especie',
-		GENUS: 'Género',
 		FAMILY: 'Familia',
+		GENUS: 'Género',
+		SPECIES: 'Especie',
 	}[data]
 }
 
@@ -108,9 +112,9 @@ function DiscoverDetailScreen({ fallbackData }: Props) {
 				colors={['rgba(0,0,0,0.9)', 'rgba(0,0,0,0)']}
 				style={{
 					height: 100,
-					width: '100%',
 					position: 'absolute',
 					top: 0,
+					width: '100%',
 					zIndex: 999,
 				}}
 			/>
@@ -140,20 +144,20 @@ function DiscoverDetailScreen({ fallbackData }: Props) {
 				<View style={{ gap: 24, padding: 10 }}>
 					<View>
 						<Text
-							style={{ fontSize: 40, fontWeight: '600', color: 'white' }}
+							style={{ color: 'white', fontSize: 40, fontWeight: '600' }}
 							role="heading"
 							aria-level={1}
 						>
 							{data?.common_name}
 						</Text>
 
-						<Text style={{ fontSize: 16, color: 'white' }}>
+						<Text style={{ color: 'white', fontSize: 16 }}>
 							Nombre científico: {data?.classification?.genus}{' '}
 							{data?.classification?.species}
 						</Text>
 					</View>
 
-					<View style={{ height: 1, width: '100%', backgroundColor: '#333' }} />
+					<View style={{ backgroundColor: '#333', height: 1, width: '100%' }} />
 
 					<ScrollView
 						contentContainerStyle={{ gap: 10, paddingHorizontal: 20 }}
@@ -165,20 +169,20 @@ function DiscoverDetailScreen({ fallbackData }: Props) {
 						{data?.metadata?.venomous?.level ? (
 							<View
 								style={{
-									padding: 10,
-									paddingHorizontal: 15,
-									borderRadius: 999,
-									flexDirection: 'row',
 									alignItems: 'center',
-									gap: 5,
 									backgroundColor: getVenomousColor(
 										data.metadata.venomous.level,
 									),
+									borderRadius: 999,
+									flexDirection: 'row',
+									gap: 5,
+									padding: 10,
+									paddingHorizontal: 15,
 								}}
 							>
 								<SolitoImage
 									alt=""
-									style={{ width: 15, height: 15 }}
+									style={{ height: 15, width: 15 }}
 									src={require('./medical-cross.png')}
 								/>
 								<Text style={{ color: 'white', fontWeight: '700' }}>
@@ -189,7 +193,7 @@ function DiscoverDetailScreen({ fallbackData }: Props) {
 						<View style={styles.tagContainer}>
 							<SolitoImage
 								alt=""
-								style={{ width: 15, height: 15 }}
+								style={{ height: 15, width: 15 }}
 								src={require('./eye.png')}
 							/>
 							<Text style={{ color: 'white' }}>{data.scansCount}</Text>
@@ -197,7 +201,7 @@ function DiscoverDetailScreen({ fallbackData }: Props) {
 						<View style={styles.tagContainer}>
 							<SolitoImage
 								alt=""
-								style={{ width: 15, height: 15 }}
+								style={{ height: 15, width: 15 }}
 								src={require('./dna.png')}
 							/>
 							<Text style={{ color: 'white' }}>
@@ -206,47 +210,47 @@ function DiscoverDetailScreen({ fallbackData }: Props) {
 						</View>
 					</ScrollView>
 
-					<View style={{ height: 1, width: '100%', backgroundColor: '#333' }} />
+					<View style={{ backgroundColor: '#333', height: 1, width: '100%' }} />
 
 					<View style={{ gap: 8 }}>
 						<Text
-							style={{ color: 'white', fontWeight: '800', fontSize: 18 }}
+							style={{ color: 'white', fontSize: 18, fontWeight: '800' }}
 							role="heading"
 							aria-level="2"
 						>
 							Descripción
 						</Text>
-						<Text style={{ color: 'white', lineHeight: 28, fontSize: 16 }}>
+						<Text style={{ color: 'white', fontSize: 16, lineHeight: 28 }}>
 							{data?.description}
 						</Text>
 					</View>
 
-					<View style={{ height: 1, width: '100%', backgroundColor: '#333' }} />
+					<View style={{ backgroundColor: '#333', height: 1, width: '100%' }} />
 
 					<View style={{ gap: 8 }}>
 						<Text
-							style={{ color: 'white', fontWeight: '800', fontSize: 18 }}
+							style={{ color: 'white', fontSize: 18, fontWeight: '800' }}
 							role="heading"
 							aria-level="2"
 						>
 							Hábitat
 						</Text>
-						<Text style={{ color: 'white', lineHeight: 28, fontSize: 16 }}>
+						<Text style={{ color: 'white', fontSize: 16, lineHeight: 28 }}>
 							{data?.habitat}
 						</Text>
 					</View>
 
-					<View style={{ height: 1, width: '100%', backgroundColor: '#333' }} />
+					<View style={{ backgroundColor: '#333', height: 1, width: '100%' }} />
 
 					<View style={{ gap: 8 }}>
 						<Text
-							style={{ color: 'white', fontWeight: '800', fontSize: 18 }}
+							style={{ color: 'white', fontSize: 18, fontWeight: '800' }}
 							role="heading"
 							aria-level="2"
 						>
 							Taxonomía
 						</Text>
-						<Text style={{ color: 'white', lineHeight: 28, fontSize: 16 }}>
+						<Text style={{ color: 'white', fontSize: 16, lineHeight: 28 }}>
 							{`Filo: ${data?.classification?.phylum}
   Clase: ${data?.classification?.class}
     Orden: ${data?.classification?.order}
@@ -262,10 +266,10 @@ function DiscoverDetailScreen({ fallbackData }: Props) {
 }
 
 DiscoverDetailScreen.options = {
-	headerTransparent: true,
 	headerBackTitleVisible: false,
-	title: '',
 	headerTintColor: 'white',
+	headerTransparent: true,
+	title: '',
 } as NativeStackNavigationOptions
 
 export default DiscoverDetailScreen

@@ -9,7 +9,8 @@
 		"orientation": "portrait",
 		"ios": {
 			"googleServicesFile": "./GoogleService-Info.plist",
-			"bundleIdentifier": "com.fucesa.bichos-id"
+			"bundleIdentifier": "com.fucesa.bichos-id",
+			"config": { "usesNonExemptEncryption": false }
 		},
 		"android": {
 			"permissions": ["android.permission.CAMERA"],
@@ -21,14 +22,7 @@
 			"@react-native-firebase/auth",
 			"@react-native-firebase/crashlytics",
 			"expo-secure-store",
-			[
-				"expo-build-properties",
-				{
-					"ios": {
-						"useFrameworks": "static"
-					}
-				}
-			],
+			["expo-build-properties", { "ios": { "useFrameworks": "static" } }],
 			[
 				"react-native-vision-camera",
 				{
@@ -59,7 +53,8 @@
 			"policy": "appVersion"
 		},
 		"updates": {
-			"url": "https://u.expo.dev/1a55a13f-ac76-44fa-b40f-10125fd7e4bf"
+			"url": "https://u.expo.dev/1a55a13f-ac76-44fa-b40f-10125fd7e4bf",
+			"fallbackToCacheTimeout": 3000
 		}
 	}
 }

@@ -1,7 +1,8 @@
-import { routingInstrumentation } from '@bichos-id/app/lib/sentry'
 import { DarkTheme, NavigationContainer } from '@react-navigation/native'
 import * as Linking from 'expo-linking'
 import { useCallback, useMemo, useRef } from 'react'
+
+import { routingInstrumentation } from '@bichos-id/app/lib/sentry'
 
 type Props = {
 	children: React.ReactNode
@@ -20,16 +21,16 @@ export function NavigationProvider({ children }: Props) {
 			theme={DarkTheme}
 			linking={useMemo(
 				() => ({
-					prefixes: [Linking.createURL('/'), 'https://bichos-id.fucesa.com'],
 					config: {
 						initialRouteName: 'home',
 						screens: {
-							home: '',
-							settings: 'settings',
 							explore: 'explore',
 							'explore-detail': 'explore/:id',
+							home: '',
+							settings: 'settings',
 						},
 					},
+					prefixes: [Linking.createURL('/'), 'https://bichos-id.fucesa.com'],
 				}),
 				[],
 			)}

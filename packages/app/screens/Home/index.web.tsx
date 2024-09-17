@@ -15,20 +15,20 @@ export default function HomeScreen() {
 
 			<form
 				style={{
+					alignItems: 'center',
 					display: 'flex',
 					gap: 10,
 					margin: 'auto',
-					alignItems: 'center',
 				}}
 				action=""
 			>
 				<input
 					style={{
-						padding: 16,
-						fontSize: 16,
-						borderRadius: 8,
-						border: '1px solid #ddd',
 						backgroundColor: 'transparent',
+						border: '1px solid #ddd',
+						borderRadius: 8,
+						fontSize: 16,
+						padding: 16,
 					}}
 					placeholder="Buscar bicho..."
 					type="search"
@@ -36,10 +36,10 @@ export default function HomeScreen() {
 				<button
 					type="submit"
 					style={{
-						padding: 16,
 						backgroundColor: '#ddd',
 						border: 'none',
 						borderRadius: 8,
+						padding: 16,
 					}}
 				>
 					Buscar

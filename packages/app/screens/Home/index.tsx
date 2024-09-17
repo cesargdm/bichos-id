@@ -1,88 +1,118 @@
 'use client'
 
+import type { NativeStackNavigationOptions } from '@react-navigation/native-stack'
+import type { Point } from 'react-native-vision-camera'
+
+import { Ionicons } from '@expo/vector-icons'
+import MaskedView from '@react-native-masked-view/masked-view'
+import { useIsFocused } from '@react-navigation/native'
+import { manipulateAsync, SaveFormat } from 'expo-image-manipulator'
+import { launchImageLibraryAsync, MediaTypeOptions } from 'expo-image-picker'
+import { StatusBar } from 'expo-status-bar'
 import { useCallback, useRef, useState, useEffect } from 'react'
 import { StyleSheet, Text, View, Alert, Image, Pressable } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { useRouter } from 'solito/navigation'
-import { Ionicons } from '@expo/vector-icons'
-import { StatusBar } from 'expo-status-bar'
-import { launchImageLibraryAsync, MediaTypeOptions } from 'expo-image-picker'
-import { manipulateAsync, SaveFormat } from 'expo-image-manipulator'
-import { runOnJS } from 'react-native-reanimated'
-import { Link } from 'solito/link'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
-import MaskedView from '@react-native-masked-view/masked-view'
-import { NativeStackNavigationOptions } from '@react-navigation/native-stack'
+import { useMMKVBoolean } from 'react-native-mmkv'
+import { runOnJS } from 'react-native-reanimated'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import {
 	Camera,
 	useCameraPermission,
 	useCameraDevice,
-	Point,
 } from 'react-native-vision-camera'
-import { useIsFocused } from '@react-navigation/native'
+import { Link } from 'solito/link'
+import { useRouter } from 'solito/navigation'
 
 import { Api } from '@bichos-id/app/lib/api'
-import { useItem } from '@bichos-id/app/lib/hooks'
 
 const CAPTURABLE_WIDTH_PERCENTAGE = 0.6
 const CAPTURABLE_HEIGHT_PERCENTAGE = 0.4
 
 const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		backgroundColor: 'black',
+	bottomActionsContainer: {
 		justifyContent: 'space-between',
+		width: '100%',
 	},
-	camera: {
-		flex: 1,
-		justifyContent: 'flex-end',
+	bottomActionsContent: {
 		alignItems: 'center',
-		position: 'relative',
-	},
-	maskContainer: {
-		flex: 1,
-		backgroundColor: 'rgba(0, 0, 0, 0.5)',
-		justifyContent: 'center',
-		alignItems: 'center',
-	},
-	mask: {
-		width: `${CAPTURABLE_WIDTH_PERCENTAGE * 100}%`,
-		height: `${CAPTURABLE_HEIGHT_PERCENTAGE * 100}%`,
-		borderRadius: 16,
-		backgroundColor: 'black',
-	},
-	maskedView: {
-		position: 'absolute',
-		width: '100%',
-		height: '100%',
-	},
-	topActionsContainer: {
-		width: '100%',
-		justifyContent: 'space-between',
-	},
-	topActionsContent: {
-		width: '100%',
 		flexDirection: 'row',
 		justifyContent: 'space-between',
-	},
-	bottomActionsContainer: {
 		width: '100%',
+	},
+	camera: {
+		alignItems: 'center',
+		flex: 1,
+		justifyContent: 'flex-end',
+		position: 'relative',
+	},
+	container: {
+		backgroundColor: 'black',
+		flex: 1,
 		justifyContent: 'space-between',
+	},
+	loadingContainer: {
+		alignItems: 'center',
+		height: '100%',
+		justifyContent: 'center',
+		position: 'absolute',
+		width: '100%',
+	},
+	mask: {
+		backgroundColor: 'black',
+		borderRadius: 16,
+		height: `${CAPTURABLE_HEIGHT_PERCENTAGE * 100}%`,
+		width: `${CAPTURABLE_WIDTH_PERCENTAGE * 100}%`,
+	},
+	maskContainer: {
+		alignItems: 'center',
+		backgroundColor: 'rgba(0, 0, 0, 0.5)',
+		flex: 1,
+		justifyContent: 'center',
+	},
+	maskedView: {
+		height: '100%',
+		position: 'absolute',
+		width: '100%',
+	},
+	permissionContainer: {
+		alignItems: 'center',
+		flex: 1,
+		justifyContent: 'center',
+	},
+	shutterInnerCircle: {
+		alignContent: 'center',
+		alignItems: 'center',
+		backgroundColor: 'white',
+		borderRadius: 999,
+		height: '100%',
+		justifyContent: 'center',
+		width: '100%',
+	},
+	topActionsContainer: {
+		justifyContent: 'space-between',
+		width: '100%',
+	},
+	topActionsContent: {
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		width: '100%',
 	},
 })
 
 function HomeScreen() {
-	const { hasPermission } = useCameraPermission()
-	const [isLoading, setIsLoading] = useState(false)
-	const device = useCameraDevice('back')
-
-	const [base64Image, setBase64Image] = useState<string | null>(null)
-	const [isTorchEnabled, setIsTorchEnabled] = useState<'on' | 'off'>('off')
 	const router = useRouter()
 	const cameraRef = useRef<Camera>(null)
 	const isFocused = useIsFocused()
+	const { hasPermission, requestPermission } = useCameraPermission()
+	const [isOnboardingComplete] = useMMKVBoolean(
+		'@bichos-id/onboarding-complete',
+	)
+	const [isCameraInitialized, setIsCameraInitialized] = useState(false)
 
-	const [onboarding] = useItem<'completed'>('@bichos-id/onboarding')
+	const device = useCameraDevice('back')
+	const [isLoading, setIsLoading] = useState(false)
+	const [base64Image, setBase64Image] = useState<string | null>(null)
+	const [isTorchEnabled, setIsTorchEnabled] = useState<'on' | 'off'>('off')
 
 	const isCameraActive = hasPermission && isFocused
 
@@ -111,12 +141,14 @@ function HomeScreen() {
 
 	useEffect(() => {
 		if (!isFocused) return
-		if (onboarding === 'completed') return
+		if (isOnboardingComplete) return
 
 		router.push('/settings')
-
-		// setOnboarding('completed')
 	}, [isFocused])
+
+	const handleCameraInitialized = useCallback(() => {
+		setIsCameraInitialized(true)
+	}, [])
 
 	const handleCapture = useCallback(async () => {
 		setIsLoading(true)
@@ -142,18 +174,18 @@ function HomeScreen() {
 				photo.path,
 				[
 					{
-						resize: { width: PHOTO_WIDTH, height: PHOTO_HEIGHT },
+						resize: { height: PHOTO_HEIGHT, width: PHOTO_WIDTH },
 					},
 					{
 						crop: {
-							width: PHOTO_WIDTH * CAPTURABLE_WIDTH_PERCENTAGE,
 							height: PHOTO_HEIGHT * CAPTURABLE_HEIGHT_PERCENTAGE,
 							originX: PHOTO_WIDTH * ((1 - CAPTURABLE_WIDTH_PERCENTAGE) / 2),
 							originY: PHOTO_HEIGHT * ((1 - CAPTURABLE_HEIGHT_PERCENTAGE) / 2),
+							width: PHOTO_WIDTH * CAPTURABLE_WIDTH_PERCENTAGE,
 						},
 					},
 				],
-				{ compress: 0.666, format: SaveFormat.JPEG, base64: true },
+				{ base64: true, compress: 0.666, format: SaveFormat.JPEG },
 			).then((result) => result.base64)
 
 			if (!base64Image) throw new Error('No image taken')
@@ -178,9 +210,9 @@ function HomeScreen() {
 			setIsLoading(true)
 
 			const result = await launchImageLibraryAsync({
+				base64: true,
 				mediaTypes: MediaTypeOptions.Images,
 				quality: 0.3,
-				base64: true,
 			})
 
 			if (result.canceled) {
@@ -238,6 +270,7 @@ function HomeScreen() {
 								torch={isTorchEnabled}
 								ref={cameraRef}
 								device={device}
+								onInitialized={handleCameraInitialized}
 								isActive={isCameraActive}
 								outputOrientation="preview"
 								photoQualityBalance="balanced"
@@ -247,26 +280,29 @@ function HomeScreen() {
 								style={styles.camera}
 							/>
 						) : (
-							<Text>Sin camara</Text>
+							<View style={styles.permissionContainer}>
+								{hasPermission ? (
+									<Text style={{ color: 'white' }}>Cargando...</Text>
+								) : (
+									<Pressable
+										onPress={requestPermission}
+										style={{ padding: 20 }}
+									>
+										<Text style={{ color: 'white' }}>
+											Permitir acceso a la cámara
+										</Text>
+									</Pressable>
+								)}
+							</View>
 						)}
 					</GestureDetector>
 				</MaskedView>
 
 				{base64Image ? (
-					<View
-						style={{
-							position: 'absolute',
-							width: '100%',
-							height: '100%',
-							justifyContent: 'center',
-							alignItems: 'center',
-						}}
-					>
+					<View style={styles.loadingContainer}>
 						<Image
 							style={styles.mask}
-							source={{
-								uri: `data:image/jpeg;base64,${base64Image}`,
-							}}
+							source={{ uri: `data:image/jpeg;base64,${base64Image}` }}
 						/>
 					</View>
 				) : null}
@@ -290,14 +326,7 @@ function HomeScreen() {
 					style={styles.bottomActionsContainer}
 					edges={['bottom', 'left', 'right']}
 				>
-					<View
-						style={{
-							flexDirection: 'row',
-							justifyContent: 'space-between',
-							alignItems: 'center',
-							width: '100%',
-						}}
-					>
+					<View style={styles.bottomActionsContent}>
 						<Pressable
 							onPress={handlePickImage}
 							style={(state) => ({
@@ -308,29 +337,20 @@ function HomeScreen() {
 							<Ionicons size={35} color="white" name="images-outline" />
 						</Pressable>
 						<Pressable
-							disabled={isLoading}
+							disabled={isLoading || !isCameraInitialized}
 							onPress={handleCapture}
 							style={(state) => ({
-								opacity: isLoading || state.pressed ? 0.5 : 1,
-								borderWidth: 3,
 								borderColor: 'white',
-								width: 70,
-								height: 70,
 								borderRadius: 999,
+								borderWidth: 3,
+								height: 70,
+								opacity:
+									!isCameraInitialized || isLoading || state.pressed ? 0.5 : 1,
 								padding: 3,
+								width: 70,
 							})}
 						>
-							<View
-								style={{
-									width: '100%',
-									height: '100%',
-									backgroundColor: 'white',
-									borderRadius: 999,
-									justifyContent: 'center',
-									alignItems: 'center',
-									alignContent: 'center',
-								}}
-							/>
+							<View style={styles.shutterInnerCircle} />
 						</Pressable>
 						<Pressable style={{ padding: 20 }} onPress={handleExplore}>
 							<Ionicons size={35} color="white" name="compass-outline" />
@@ -343,9 +363,9 @@ function HomeScreen() {
 }
 
 HomeScreen.options = {
-	title: 'Home',
-	headerTintColor: 'white',
 	headerShown: false,
+	headerTintColor: 'white',
+	title: 'Home',
 } as NativeStackNavigationOptions
 
 export default HomeScreen

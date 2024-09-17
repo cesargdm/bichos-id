@@ -1,12 +1,15 @@
 'use client'
 
 import useSWR from 'swr'
+
 import { fetcher } from '@bichos-id/app/lib/api'
+
+import type { Organism as OrganismT } from '../../../../../apps/next/app/api/v1/_db'
 
 import Organism from './Organism'
 
 export default function FeaturedOrganisms() {
-	const { data } = useSWR<any[]>('/api/v1/organisms', fetcher, {
+	const { data } = useSWR<OrganismT[]>('/api/v1/organisms', fetcher, {
 		fallbackData: [],
 		suspense: true,
 	})
@@ -16,10 +19,10 @@ export default function FeaturedOrganisms() {
 			style={{
 				display: 'flex',
 				flexDirection: 'row',
-				width: '100%',
+				gap: 5,
 				overflowX: 'auto',
 				paddingBottom: 20,
-				gap: 5,
+				width: '100%',
 			}}
 		>
 			{data?.map((organism) => <Organism key={organism.id} data={organism} />)}

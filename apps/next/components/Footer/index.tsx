@@ -3,7 +3,6 @@ import Link from 'next/link'
 
 import appStore from './app-store.svg'
 import googlePlay from './google-play.svg'
-
 import './styles.css'
 
 export default function Footer() {

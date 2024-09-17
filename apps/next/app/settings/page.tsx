@@ -1,12 +1,13 @@
+import type { Metadata } from 'next'
+
 import { Suspense } from 'react'
-import { Metadata } from 'next'
 
 import SettingsScreen from '@bichos-id/app/screens/Settings'
 
 export const metadata: Metadata = {
-	title: 'Ajustes - Bichos ID - Fucesa',
 	description:
 		'Descubre insectos, arácnidos y otros bichos con Bichos ID usando inteligencia artificial.',
+	title: 'Ajustes - Bichos ID - Fucesa',
 }
 
 export default function SettingsPage() {

@@ -1,6 +1,6 @@
 import { createKysely } from '@vercel/postgres-kysely'
 
-import { Database } from '../../api/v1/_db'
+import type { Database } from '../../api/v1/_db'
 
 export function getOrganism(id: string) {
 	const db = createKysely<Database>()

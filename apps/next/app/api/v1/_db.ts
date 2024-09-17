@@ -1,26 +1,26 @@
 import { z } from 'zod'
 
 export const IdentificationSchema = z.object({
-	common_name: z.string(),
+	_imageQualityRating: z.number(),
 	classification: z.object({
-		phylum: z.string(),
 		class: z.string(),
-		order: z.string(),
 		family: z.string(),
 		genus: z.string().optional(),
+		order: z.string(),
+		phylum: z.string(),
 		species: z.string().optional(),
 	}),
-	_imageQualityRating: z.number(),
+	common_name: z.string(),
 })
 
 export const OrganismSchema = z.object({
+	common_name: z.string(),
 	description: z.string(),
 	habitat: z.string(),
-	common_name: z.string(),
 	metadata: z.object({
 		venomous: z.object({
-			type: z.string(),
 			level: z.enum(['NON_VENOMOUS', 'VENOMOUS', 'HIGHLY_VENOMOUS']),
+			type: z.string(),
 		}),
 	}),
 })

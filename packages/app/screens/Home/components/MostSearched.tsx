@@ -7,7 +7,7 @@ import { fetcher } from '@bichos-id/app/lib/api'
 import Organism from './Organism'
 
 export default function MostSearched() {
-	const { data } = useSWR<any[]>(
+	const { data } = useSWR<{ id: string }[]>(
 		'/api/v1/organisms?sortBy=scan_count&direction=desc',
 		fetcher,
 		{ fallbackData: [], suspense: true },
@@ -18,10 +18,10 @@ export default function MostSearched() {
 			style={{
 				display: 'flex',
 				flexDirection: 'row',
-				overflowX: 'auto',
-				width: '100%',
-				paddingBottom: 20,
 				gap: 5,
+				overflowX: 'auto',
+				paddingBottom: 20,
+				width: '100%',
 			}}
 		>
 			{data?.map((organism) => <Organism key={organism.id} data={organism} />)}

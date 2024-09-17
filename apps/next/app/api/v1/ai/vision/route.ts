@@ -1,14 +1,18 @@
-import { NextRequest, NextResponse } from 'next/server'
-import OpenAI from 'openai'
-import { z } from 'zod'
-import { zodResponseFormat } from 'openai/helpers/zod'
-import { createKysely } from '@vercel/postgres-kysely'
+import type { NextRequest} from 'next/server';
+
 import { GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3'
-import * as crypto from 'node:crypto'
+import { createKysely } from '@vercel/postgres-kysely'
 import { initializeApp, cert } from 'firebase-admin/app'
 import { getAuth } from 'firebase-admin/auth'
+import { NextResponse } from 'next/server'
+import * as crypto from 'node:crypto'
+import OpenAI from 'openai'
+import { zodResponseFormat } from 'openai/helpers/zod'
+import { z } from 'zod'
 
-import { Database, IdentificationSchema, OrganismSchema } from '../../_db'
+import type { Database} from '../../_db';
+
+import { IdentificationSchema, OrganismSchema } from '../../_db'
 import { getR2Client, R2_BUCKET_NAME } from '../../_r2'
 
 const requestBodySchema = z.object({
@@ -26,12 +30,15 @@ function slugify(text: string) {
 		.replace(/[^a-z0-9-]/g, '')
 }
 
-async function initializeFirebase() {
+function initializeFirebase() {
 	try {
-		await initializeApp({
+		initializeApp({
 			credential: cert({
 				clientEmail: process.env.FIREBASE_CLIENT_EMAIL as string,
-				privateKey: (process.env.FIREBASE_PRIVATE_KEY as string).replace(/\\n/gm, "\n"),
+				privateKey: (process.env.FIREBASE_PRIVATE_KEY as string).replace(
+					/\\n/gm,
+					'\n',
+				),
 				projectId: 'bichos-id',
 			}),
 		})
@@ -55,7 +62,9 @@ export async function POST(request: NextRequest) {
 		}
 
 		const idToken = request.headers.get('Authorization')?.split(' ').at(1)
-		await initializeFirebase()
+
+		initializeFirebase()
+
 		const decodedToken = idToken && (await getAuth().verifyIdToken(idToken))
 		if (!decodedToken) {
 			return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -74,10 +83,8 @@ export async function POST(request: NextRequest) {
 		const model = 'gpt-4o-mini'
 
 		const identificationResponse = await openai.beta.chat.completions.parse({
-			model,
 			messages: [
 				{
-					role: 'system',
 					content: `You are an expert entomologist that will recognize organisms accurately appearing in a photo uploaded by a user. Be as accurate as possible.
 
 Instructions:
@@ -92,24 +99,26 @@ ${
 		? `- The user's geo data is, country: '${request.geo?.country}', region: '${request.geo?.region}'.`
 		: ''
 }`,
+					role: 'system',
 				},
 				{
-					role: 'user',
 					content: [
 						{
-							type: 'text',
 							text: `The given photo is:`,
+							type: 'text',
 						},
 						{
-							type: 'image_url',
 							image_url: { url: data.base64Image },
+							type: 'image_url',
 						},
 					],
+					role: 'user',
 				},
 			],
+			model,
+			response_format: zodResponseFormat(IdentificationSchema, 'event'),
 			temperature: 0.3,
 			user: idToken,
-			response_format: zodResponseFormat(IdentificationSchema, 'event'),
 		})
 
 		const parsedIdentification =
@@ -150,13 +159,13 @@ ${
 		void (await db
 			.insertInto('organism_scans')
 			.values({
+				created_at: new Date().toISOString(),
+				created_by: decodedToken.sub,
 				id: getRandomId(),
-				model,
 				image_key: imageKey,
 				image_quality_rating: _imageQualityRating,
+				model,
 				organism_id: organismId,
-				created_by: decodedToken.sub,
-				created_at: new Date().toISOString(),
 				updated_at: new Date().toISOString(),
 			})
 			.execute())
@@ -177,18 +186,18 @@ ${
 			getR2Client()
 				.send(
 					new PutObjectCommand({
-						Bucket: R2_BUCKET_NAME,
-						Key: imageKey,
 						Body: Buffer.from(
 							data.base64Image.replace(/^data:image\/\w+;base64,/, ''),
 							'base64',
 						),
+						Bucket: R2_BUCKET_NAME,
+						CacheControl: 'max-age=31536000, immutable',
+						ContentEncoding: 'base64',
+						ContentType: `image/${imageExtension}`,
+						Key: imageKey,
 						Metadata: {
 							'X-Image-Sha256': imageSha256,
 						},
-						ContentType: `image/${imageExtension}`,
-						ContentEncoding: 'base64',
-						CacheControl: 'max-age=31536000, immutable',
 					}),
 				)
 				.catch(() => false),
@@ -196,10 +205,8 @@ ${
 
 		if (!existing) {
 			const organismResponse = await openai.beta.chat.completions.parse({
-				model: 'gpt-4o-2024-08-06',
 				messages: [
 					{
-						role: 'system',
 						content: `You are an expert entomologist with extensive knowledge of arthropods, particularly insects and arachnids.
 
 Instructions:
@@ -207,16 +214,18 @@ Instructions:
 - Provide a detailed description of the organism, focusing on its physical characteristics, behavior, and habitat in Spanish (Mexico).
 - Use language suitable for a non-expert audience, avoiding technical jargon where possible in Spanish (Mexico).
 - IMPORTANT: Translate the common name and description to SPANISH (MEXICO).`,
+						role: 'system',
 					},
 					{
-						role: 'user',
 						content: `The organism is ${
 							parsedIdentification.classification.family
 						} ${parsedIdentification.classification.genus} ${
 							parsedIdentification.classification.species || 'sp'
 						}.`,
+						role: 'user',
 					},
 				],
+				model: 'gpt-4o-2024-08-06',
 				response_format: zodResponseFormat(OrganismSchema, 'event'),
 			})
 
@@ -232,16 +241,16 @@ Instructions:
 					id: organismId,
 					...identification,
 					...parsedOrganismInfo,
+					created_at: new Date().toISOString(),
+					created_by: decodedToken.sub,
+					image_key: imageKey,
+					image_quality_rating: _imageQualityRating,
 					scan_count: 0,
 					taxonomy: identification.classification.species
 						? 'SPECIES'
 						: identification.classification.genus
 							? 'GENUS'
 							: 'FAMILY',
-					image_key: imageKey,
-					created_by: decodedToken.sub,
-					image_quality_rating: _imageQualityRating,
-					created_at: new Date().toISOString(),
 					updated_at: new Date().toISOString(),
 				})
 				.execute()
@@ -251,8 +260,8 @@ Instructions:
 				.where('id', '=', organismId)
 				.set((eb) => ({
 					image_key: imageKey,
-					scan_count: eb('scan_count', '+', 1),
 					image_quality_rating: _imageQualityRating,
+					scan_count: eb('scan_count', '+', 1),
 				}))
 				.execute()
 		}

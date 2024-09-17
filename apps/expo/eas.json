@@ -30,6 +30,13 @@
 		}
 	},
 	"submit": {
-		"production": {}
+		"production": {
+			"android": {
+				"track": "production"
+			},
+			"ios": {
+				"appleTeamId": "AUR7UR6M72"
+			}
+		}
 	}
 }

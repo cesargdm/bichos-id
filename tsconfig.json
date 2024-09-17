@@ -6,5 +6,6 @@
 			"@bichos-id/app/*": ["./packages/app/*"]
 		}
 	},
+	"include": ["eslint.config.mjs", "packages/**/*", "apps/**/*"],
 	"extends": "expo/tsconfig.base"
 }

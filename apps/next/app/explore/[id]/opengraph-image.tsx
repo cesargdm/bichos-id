@@ -12,8 +12,8 @@ type Props = {
 export const runtime = 'edge'
 
 export const size = {
-	width: 1200,
 	height: 630,
+	width: 1200,
 }
 
 export const contentType = 'image/png'
@@ -33,36 +33,36 @@ export default async function Image({ params }: Props) {
 				style={{
 					display: 'flex',
 					flexDirection: 'column',
-					width: '100%',
 					height: '100%',
+					width: '100%',
 				}}
 			>
 				<img
 					src={`${ASSETS_BASE_URL}/${organism.image_key}`}
 					style={{
+						height: '100%',
+						left: 0,
+						objectFit: 'cover',
 						position: 'absolute',
 						top: 0,
-						left: 0,
-						height: '100%',
 						width: '100%',
-						objectFit: 'cover',
 					}}
 				/>
 				<div
 					style={{
+						background:
+							'linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0))',
+						color: 'white',
 						display: 'flex',
 						flexDirection: 'column',
 						fontSize: 50,
 						fontWeight: '600',
-						background:
-							'linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0))',
-						width: '100%',
 						height: '100%',
-						padding: 20,
-						paddingRight: 100,
-						paddingLeft: 100,
-						color: 'white',
 						justifyContent: 'flex-end',
+						padding: 20,
+						paddingLeft: 100,
+						paddingRight: 100,
+						width: '100%',
 					}}
 				>
 					<p

@@ -1,9 +1,12 @@
+import type { FirebaseAuthTypes } from '@react-native-firebase/auth'
+
+import auth from '@react-native-firebase/auth'
+import * as SplashScreen from 'expo-splash-screen'
+import { useEffect, useState } from 'react'
+
+import Sentry from '@bichos-id/app/lib/sentry'
 import { NativeNavigation } from '@bichos-id/app/navigation/native'
 import { Provider } from '@bichos-id/app/provider'
-import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth'
-import { useEffect, useState } from 'react'
-import Sentry from '@bichos-id/app/lib/sentry'
-import * as SplashScreen from 'expo-splash-screen'
 
 void SplashScreen.preventAutoHideAsync()
 

@@ -1,5 +1,7 @@
 import { Platform } from 'react-native'
+
 import Sentry from '@bichos-id/app/lib/sentry'
+
 import { getIdToken } from './auth'
 
 function getBaseUrl() {
@@ -25,8 +27,8 @@ export function fetcher<TData, TKey extends string = string>(
 ) {
 	return fetch(url, options)
 		.then((response) => response.json() as TData)
-		.catch((error) => {
-			Sentry.captureException(error)
+		.catch((error: unknown) => {
+			Sentry.captureException(error, { data: { error } })
 			throw error
 		})
 }
@@ -38,13 +40,13 @@ export class Api {
 		return fetcher<{ id?: string; error?: string }>(
 			`${API_BASE_URL}/ai/vision`,
 			{
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-					Authorization: `Bearer ${idToken}`,
-					'Accept-Language': 'es',
-				},
 				body: JSON.stringify({ base64Image }),
+				headers: {
+					'Accept-Language': 'es',
+					Authorization: `Bearer ${idToken}`,
+					'Content-Type': 'application/json',
+				},
+				method: 'POST',
 			},
 		)
 	}

@@ -1,6 +1,7 @@
 import Image from 'next/image'
-import './styles.css'
 import Link from 'next/link'
+
+import './styles.css'
 
 export default function Nav() {
 	return (

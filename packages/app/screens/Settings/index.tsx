@@ -1,41 +1,43 @@
+/* eslint-disable @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-assignment */
 'use client'
 
+import type { NativeStackNavigationOptions } from '@react-navigation/native-stack'
+
+import { StatusBar } from 'expo-status-bar'
 import { useCallback } from 'react'
 import { View, Pressable, Text, Platform, StyleSheet } from 'react-native'
+import { useMMKVBoolean } from 'react-native-mmkv'
 import { SolitoImage } from 'solito/image'
-import { StatusBar } from 'expo-status-bar'
-import { NativeStackNavigationOptions } from '@react-navigation/native-stack'
-import { useItem } from '@bichos-id/app/lib/hooks'
-import { useRouter } from 'solito/navigation'
 import { Link } from 'solito/link'
+import { useRouter } from 'solito/navigation'
 
 const styles = StyleSheet.create({
 	container: {
+		flex: 1,
 		gap: 30,
 		padding: 30,
-		flex: 1,
 	},
 	title: {
-		textAlign: 'center',
+		color: 'white',
 		fontSize: 20,
 		fontWeight: 'bold',
-		color: 'white',
+		textAlign: 'center',
 	},
 })
 
 function SettingsScreen() {
-	const [onboarding, setOnboarding] = useItem<'completed'>(
-		'@bichos-id/onboarding',
+	const [isOnboardingComplete, setIsOnboardingComplete] = useMMKVBoolean(
+		'@bichos-id/onboarding-complete',
 	)
 	const router = useRouter()
 
-	const handleDismiss = useCallback(async () => {
-		await setOnboarding('completed')
+	const handleDismiss = useCallback(() => {
+		setIsOnboardingComplete(true)
 
 		router.back()
-	}, [setOnboarding, router])
+	}, [setIsOnboardingComplete, router])
 
-	if (onboarding === 'completed' || Platform.OS === 'web') {
+	if (isOnboardingComplete || Platform.OS === 'web') {
 		return (
 			<>
 				<StatusBar style="light" />
@@ -90,9 +92,9 @@ function SettingsScreen() {
 				</Text>
 				<View
 					style={{
+						alignItems: 'center',
 						flexDirection: 'row',
 						gap: 10,
-						alignItems: 'center',
 					}}
 				>
 					<SolitoImage
@@ -115,9 +117,9 @@ function SettingsScreen() {
 				</View>
 				<View
 					style={{
+						alignItems: 'center',
 						flexDirection: 'row',
 						gap: 10,
-						alignItems: 'center',
 					}}
 				>
 					<SolitoImage
@@ -140,8 +142,8 @@ function SettingsScreen() {
 				<Text
 					style={{
 						color: 'white',
-						textAlign: 'center',
 						marginTop: 'auto',
+						textAlign: 'center',
 					}}
 				>
 					Si aceptas los términos y condiciones, puedes continuar.
@@ -149,12 +151,12 @@ function SettingsScreen() {
 				<Pressable
 					onPress={handleDismiss}
 					style={{
-						padding: 10,
-						backgroundColor: 'white',
-						justifyContent: 'center',
 						alignItems: 'center',
+						backgroundColor: 'white',
 						borderRadius: 10,
+						justifyContent: 'center',
 						marginBottom: 30,
+						padding: 10,
 					}}
 				>
 					<Text style={{ fontSize: 15 }}>Entendido</Text>
@@ -165,10 +167,10 @@ function SettingsScreen() {
 }
 
 SettingsScreen.options = {
-	headerTintColor: 'white',
 	headerBackTitleVisible: false,
-	presentation: 'modal',
 	headerShown: false,
+	headerTintColor: 'white',
+	presentation: 'modal',
 } as NativeStackNavigationOptions
 
 export default SettingsScreen

@@ -1,31 +1,56 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-// @ts-check
-
-import globals from 'globals'
 import pluginJs from '@eslint/js'
-import tseslint from 'typescript-eslint'
+import perfectionist from 'eslint-plugin-perfectionist'
 import react from 'eslint-plugin-react'
+import tseslint from 'typescript-eslint'
 
 export default [
 	{
-		plugins: {
-			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-			react,
-		},
 		languageOptions: {
 			parserOptions: {
-				projectService: true,
-				// @ts-ignore
-				tsconfigRootDir: import.meta.dirname,
 				ecmaFeatures: {
 					jsx: true,
 				},
+				projectService: true,
+				tsconfigRootDir: import.meta.dirname,
 			},
 		},
-	},
-	{
-		languageOptions: {
-			globals: { ...globals.browser, ...globals.node },
+		plugins: {
+			perfectionist,
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+			react,
+		},
+		rules: {
+			'@typescript-eslint/consistent-type-imports': [
+				'warn',
+				{
+					fixStyle: 'separate-type-imports',
+					prefer: 'type-imports',
+				},
+			],
+			'@typescript-eslint/no-misused-promises': [
+				'warn',
+				{ checksVoidReturn: false },
+			],
+			'@typescript-eslint/no-require-imports': 'off',
+			'perfectionist/sort-imports': [
+				'warn',
+				{
+					groups: [
+						'type',
+						['builtin', 'external'],
+						'internal-type',
+						'internal',
+						['parent-type', 'sibling-type', 'index-type'],
+						['parent', 'sibling', 'index'],
+						'object',
+						'unknown',
+					],
+					internalPattern: ['@bichos-id/**'],
+					order: 'asc',
+					type: 'alphabetical',
+				},
+			],
+			'perfectionist/sort-objects': 'warn',
 		},
 	},
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
