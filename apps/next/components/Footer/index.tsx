@@ -38,12 +38,12 @@ export default function Footer() {
 
 				<ul>
 					<li>
-						<a href="https://apps.apple.com">
+						<a href="https://apps.apple.com/app/bichos-id/id6689492259">
 							<Image src={appStore as string} alt="App Store" />
 						</a>
 					</li>
 					<li>
-						<a href="https://play.google.com">
+						<a href="https://play.google.com/store/apps/details?id=com.fucesa.bichos_id">
 							<Image src={googlePlay as string} alt="Google Play" />
 						</a>
 					</li>

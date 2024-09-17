@@ -9,11 +9,7 @@
 		"orientation": "portrait",
 		"ios": {
 			"googleServicesFile": "./GoogleService-Info.plist",
-			"usesAppleSignIn": true,
-			"bundleIdentifier": "com.fucesa.bichos-id",
-			"infoPlist": {
-				"NSCameraUsageDescription": "$(PRODUCT_NAME) needs access to your Camera."
-			}
+			"bundleIdentifier": "com.fucesa.bichos-id"
 		},
 		"android": {
 			"permissions": ["android.permission.CAMERA"],
@@ -36,13 +32,13 @@
 			[
 				"react-native-vision-camera",
 				{
-					"cameraPermissionText": "$(PRODUCT_NAME) needs access to your Camera."
+					"cameraPermissionText": "Esto permitirá que puedas tomar e identificar fotografías."
 				}
 			],
 			[
 				"expo-image-picker",
 				{
-					"photosPermission": "This app needs access to your photos so you can upload them."
+					"photosPermission": "Esto permitirá que puedas seleccionar e identificar imágenes de tus fotos."
 				}
 			],
 			[
@@ -58,6 +54,12 @@
 			"eas": {
 				"projectId": "1a55a13f-ac76-44fa-b40f-10125fd7e4bf"
 			}
+		},
+		"runtimeVersion": {
+			"policy": "appVersion"
+		},
+		"updates": {
+			"url": "https://u.expo.dev/1a55a13f-ac76-44fa-b40f-10125fd7e4bf"
 		}
 	}
 }

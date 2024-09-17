@@ -1,6 +1,6 @@
 {
 	"name": "expo-app",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"private": true,
 	"main": "index.js",
 	"license": "MIT",
@@ -36,6 +36,7 @@
 		"expo-secure-store": "~13.0.2",
 		"expo-splash-screen": "~0.27.5",
 		"expo-status-bar": "~1.12.1",
+		"expo-updates": "~0.25.24",
 		"firebase": "^10.13.1",
 		"react": "18.2.0",
 		"react-dom": "18.2.0",

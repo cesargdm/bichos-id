@@ -41,6 +41,7 @@ export default function Layout({ children }: Props) {
 				sizes="16x16"
 				href="/favicon-16x16.png"
 			/>
+			<meta name="apple-itunes-app" content="app-id=6689492259" />
 			<link rel="icon" href="/favicon.svg" />
 			<link rel="manifest" href="/site.webmanifest" />
 			<body>

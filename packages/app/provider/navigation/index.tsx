@@ -20,7 +20,7 @@ export function NavigationProvider({ children }: Props) {
 			theme={DarkTheme}
 			linking={useMemo(
 				() => ({
-					prefixes: [Linking.createURL('/')],
+					prefixes: [Linking.createURL('/'), 'https://bichos-id.fucesa.com'],
 					config: {
 						initialRouteName: 'home',
 						screens: {

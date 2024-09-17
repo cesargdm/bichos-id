@@ -1,13 +1,17 @@
 import { Platform } from 'react-native'
+import Sentry from '@bichos-id/app/lib/sentry'
 import { getIdToken } from './auth'
 
-const USE_LOCAL_API = process.env.NODE_ENV === 'development'
+function getBaseUrl() {
+	const isDevelopment = process.env.NODE_ENV === 'development'
+	if (isDevelopment) return 'http://localhost:3000/api/v1'
 
-export const API_BASE_URL = USE_LOCAL_API
-	? 'http://localhost:3000/api/v1'
-	: Platform.OS === 'web'
-		? '/api/v1'
-		: 'https://bichos-id.fucesa.com/api/v1'
+	if (Platform.OS === 'web') return '/api/v1'
+
+	return 'https://bichos-id.fucesa.com/api/v1'
+}
+
+export const API_BASE_URL = getBaseUrl()
 
 export const ASSETS_BASE_URL = 'https://bichos-id.assets.fucesa.com'
 
@@ -15,32 +19,41 @@ export function getImageUrl(imageKey: string) {
 	return `${ASSETS_BASE_URL}/${imageKey}`
 }
 
-export function fetcher<TData, TKey extends string>(url: TKey) {
-	return fetch(url).then((response) => response.json() as TData)
+export function fetcher<TData, TKey extends string = string>(
+	url: TKey,
+	options?: RequestInit,
+) {
+	return fetch(url, options)
+		.then((response) => response.json() as TData)
+		.catch((error) => {
+			Sentry.captureException(error)
+			throw error
+		})
 }
 
 export class Api {
 	static async identify(base64Image: string) {
 		const idToken = await getIdToken()
 
-		return fetch(`${API_BASE_URL}/ai/vision`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				Authorization: `Bearer ${idToken}`,
-				'Accept-Language': 'es',
+		return fetcher<{ id?: string; error?: string }>(
+			`${API_BASE_URL}/ai/vision`,
+			{
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${idToken}`,
+					'Accept-Language': 'es',
+				},
+				body: JSON.stringify({ base64Image }),
 			},
-			body: JSON.stringify({ base64Image }),
-		}).then(
-			(response) => response.json() as Promise<{ id?: string; error?: string }>,
 		)
 	}
 
 	static getOrganismKey(id: string) {
-		return `${API_BASE_URL}/organisms/${id}`
+		return `${API_BASE_URL}/organisms/${id}` as const
 	}
 
 	static getOrganismsKey() {
-		return `${API_BASE_URL}/organisms`
+		return `${API_BASE_URL}/organisms` as const
 	}
 }
