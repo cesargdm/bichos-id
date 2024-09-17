@@ -4,9 +4,9 @@
 import type { NativeStackNavigationOptions } from '@react-navigation/native-stack'
 
 import { StatusBar } from 'expo-status-bar'
-import { useCallback } from 'react'
+import { useState, useCallback } from 'react'
 import { View, Pressable, Text, Platform, StyleSheet } from 'react-native'
-import { useMMKVBoolean } from 'react-native-mmkv'
+import { MMKV } from 'react-native-mmkv'
 import { SolitoImage } from 'solito/image'
 import { Link } from 'solito/link'
 import { useRouter } from 'solito/navigation'
@@ -25,17 +25,21 @@ const styles = StyleSheet.create({
 	},
 })
 
+function getIsOnboardingComplete() {
+	const storage = new MMKV()
+	return storage.getBoolean('@bichos-id/onboarding-complete') ?? false
+}
+
 function SettingsScreen() {
-	const [isOnboardingComplete, setIsOnboardingComplete] = useMMKVBoolean(
-		'@bichos-id/onboarding-complete',
-	)
+	const [isOnboardingComplete] = useState<boolean>(getIsOnboardingComplete)
 	const router = useRouter()
 
 	const handleDismiss = useCallback(() => {
-		setIsOnboardingComplete(true)
+		const storage = new MMKV()
+		storage.set('@bichos-id/onboarding-complete', true)
 
 		router.back()
-	}, [setIsOnboardingComplete, router])
+	}, [router])
 
 	if (isOnboardingComplete || Platform.OS === 'web') {
 		return (
