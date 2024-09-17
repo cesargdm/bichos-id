@@ -7,7 +7,8 @@
 		"prebuild": "cd apps/expo && bun run prebuild",
 		"lint": "turbo lint",
 		"format": "turbo format",
-		"clean": "turbo clean"
+		"clean": "turbo clean",
+		"licenses": "turbo licenses"
 	},
 	"packageManager": "bun@1.1.27",
 	"workspaces": {

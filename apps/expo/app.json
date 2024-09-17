@@ -18,23 +18,23 @@
 			"package": "com.fucesa.bichos_id"
 		},
 		"plugins": [
-			"@react-native-firebase/app",
-			"@react-native-firebase/auth",
-			"@react-native-firebase/crashlytics",
 			"expo-secure-store",
+			"expo-tracking-transparency",
 			["expo-build-properties", { "ios": { "useFrameworks": "static" } }],
 			[
-				"react-native-vision-camera",
-				{
-					"cameraPermissionText": "Esto permitirá que puedas tomar e identificar fotografías."
-				}
-			],
-			[
 				"expo-image-picker",
-				{
-					"photosPermission": "Esto permitirá que puedas seleccionar e identificar imágenes de tus fotos."
-				}
+				{ "photosPermission": "Identifica de tu librería de fotos." }
 			],
+
+			"@react-native-firebase/app",
+			"@react-native-firebase/auth",
+			"@react-native-firebase/analytics",
+
+			[
+				"react-native-vision-camera",
+				{ "cameraPermissionText": "Captura e identifica nuevas fotos." }
+			],
+
 			[
 				"@sentry/react-native/expo",
 				{

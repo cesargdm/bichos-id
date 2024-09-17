@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import type { ReactNode } from 'react'
 
+import { GoogleAnalytics } from '@next/third-parties/google'
+
 import Footer from '../components/Footer'
 import Nav from '../components/Nav'
 import './globals.css'
@@ -42,6 +44,7 @@ export default function Layout({ children }: Props) {
 			<meta name="apple-itunes-app" content="app-id=6689492259" />
 			<link rel="icon" href="/favicon.svg" />
 			<link rel="manifest" href="/site.webmanifest" />
+			<GoogleAnalytics gaId="G-7ZFZPVBYYF" />
 			<body>
 				<Nav />
 				<StylesProvider>
