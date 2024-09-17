@@ -26,16 +26,18 @@ function slugify(text: string) {
 		.replace(/[^a-z0-9-]/g, '')
 }
 
-try {
-	initializeApp({
-		credential: cert({
-			clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-			privateKey: process.env.FIREBASE_PRIVATE_KEY,
-			projectId: 'bichos-id',
-		}),
-	})
-} catch {
-	console.log('initializeApp failed')
+async function initializeFirebase() {
+	try {
+		await initializeApp({
+			credential: cert({
+				clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+				privateKey: process.env.FIREBASE_PRIVATE_KEY,
+				projectId: 'bichos-id',
+			}),
+		})
+	} catch {
+		console.log('initializeApp failed')
+	}
 }
 
 function getRandomId() {
@@ -52,6 +54,7 @@ export async function POST(request: NextRequest) {
 		}
 
 		const idToken = request.headers.get('Authorization')?.split(' ').at(1)
+		await initializeFirebase()
 		const decodedToken = idToken && (await getAuth().verifyIdToken(idToken))
 		if (!decodedToken) {
 			return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
