@@ -19,10 +19,9 @@ export const metadata: Metadata = {
 
 type Props = {
 	children: ReactNode
-	settings: ReactNode
 }
 
-export default function RootLayout({ children, settings }: Props) {
+export default function RootLayout({ children }: Props) {
 	return (
 		<html lang="en">
 			<link
@@ -50,7 +49,6 @@ export default function RootLayout({ children, settings }: Props) {
 					<main>{children}</main>
 				</StylesProvider>
 				<Footer />
-				{settings}
 			</body>
 		</html>
 	)

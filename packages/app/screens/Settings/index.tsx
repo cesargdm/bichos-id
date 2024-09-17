@@ -1,14 +1,8 @@
 'use client'
 
 import { useCallback } from 'react'
-import {
-	Image,
-	View,
-	Pressable,
-	Text,
-	Platform,
-	StyleSheet,
-} from 'react-native'
+import { View, Pressable, Text, Platform, StyleSheet } from 'react-native'
+import { SolitoImage } from 'solito/image'
 import { StatusBar } from 'expo-status-bar'
 import { NativeStackNavigationOptions } from '@react-navigation/native-stack'
 import { useItem } from '@bichos-id/app/lib/hooks'
@@ -101,7 +95,13 @@ function SettingsScreen() {
 						alignItems: 'center',
 					}}
 				>
-					<Image style={{ width: 75, height: 75, backgroundColor: 'white' }} />
+					<SolitoImage
+						width={75}
+						height={75}
+						style={{ backgroundColor: 'white' }}
+						alt=""
+						src=""
+					/>
 					<View style={{ flex: 1 }}>
 						<Text style={{ color: 'white', fontWeight: 'bold' }}>
 							Podemos cometer errores
@@ -121,7 +121,13 @@ function SettingsScreen() {
 						alignItems: 'center',
 					}}
 				>
-					<Image style={{ width: 75, height: 75, backgroundColor: 'white' }} />
+					<SolitoImage
+						width={75}
+						height={75}
+						style={{ backgroundColor: 'white' }}
+						alt=""
+						src=""
+					/>
 					<View style={{ flex: 1 }}>
 						<Text style={{ color: 'white', fontWeight: 'bold' }}>
 							Pólitica de uso justo
