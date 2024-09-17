@@ -9,6 +9,7 @@ Sentry.init({
 	tracesSampleRate: 1.0,
 	integrations: [
 		Sentry.reactNativeTracingIntegration({ routingInstrumentation }),
+		Sentry.mobileReplayIntegration(),
 	],
 	tracePropagationTargets: ["https://bichos-id.fucesa.com", /^\/api\//],
 	_experiments: {
