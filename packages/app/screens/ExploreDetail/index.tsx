@@ -129,7 +129,7 @@ function DiscoverDetailScreen({ fallbackData }: Props) {
 					renderItem={({ item }) => (
 						<SolitoImage
 							alt={`${data?.common_name} - ${data.classification?.genus} ${data.classification?.species}`}
-							style={{ objectFit: 'cover' }}
+							contentFit="cover"
 							width={200}
 							height={300}
 							src={item}

@@ -96,11 +96,10 @@ function SettingsScreen() {
 					}}
 				>
 					<SolitoImage
-						width={75}
-						height={75}
-						style={{ backgroundColor: 'white' }}
+						width={50}
+						height={50}
 						alt=""
-						src=""
+						src={require('./alert.png')}
 					/>
 					<View style={{ flex: 1 }}>
 						<Text style={{ color: 'white', fontWeight: 'bold' }}>
@@ -122,11 +121,10 @@ function SettingsScreen() {
 					}}
 				>
 					<SolitoImage
-						width={75}
-						height={75}
-						style={{ backgroundColor: 'white' }}
+						width={50}
+						height={50}
 						alt=""
-						src=""
+						src={require('./hands.png')}
 					/>
 					<View style={{ flex: 1 }}>
 						<Text style={{ color: 'white', fontWeight: 'bold' }}>
