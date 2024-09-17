@@ -35,8 +35,9 @@ async function initializeFirebase() {
 				projectId: 'bichos-id',
 			}),
 		})
-	} catch {
-		console.log('initializeApp failed')
+	} catch (error) {
+		console.log('initializeApp() failed')
+		console.log(error)
 	}
 }
 
