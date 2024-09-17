@@ -5,6 +5,7 @@ jobs:
   update:
     name: EAS Update
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Check for EXPO_TOKEN
         run: |
@@ -29,6 +30,7 @@ jobs:
       - name: Setup EAS
         uses: expo/expo-github-action@v8
         with:
+          packager: bun
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
 
@@ -37,9 +39,11 @@ jobs:
         working-directory: ./apps/expo
 
       - name: Publish update
-        run: eas update --auto
+        run: eas update --auto --non-interactive
         working-directory: ./apps/expo
 
       - name: Upload sourcemaps
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
         run: bunx sentry-expo-upload-sourcemaps dist
         working-directory: ./apps/expo
