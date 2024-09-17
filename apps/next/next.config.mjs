@@ -1,7 +1,5 @@
-/* eslint-disable no-undef */
-/* eslint-disable @typescript-eslint/no-require-imports */
-const { withExpo } = require('@expo/next-adapter')
-// const { withSentryConfig } = require('@sentry/nextjs')
+import { withExpo } from '@expo/next-adapter'
+import { withSentryConfig } from '@sentry/nextjs'
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -35,20 +33,20 @@ const nextConfig = {
 	],
 }
 
-module.exports = withExpo(nextConfig)
+/** @type {import('@sentry/nextjs').SentryBuildOptions} */
+const sentryConfig = {
+	automaticVercelMonitors: true,
+	disableLogger: true,
+	hideSourceMaps: true,
+	org: 'fucesa',
+	project: 'bichos-id-web',
+	reactComponentAnnotation: {
+		enabled: true,
+	},
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+	silent: !import.meta.env.CI,
+	tunnelRoute: '/monitoring',
+	widenClientFileUpload: true,
+}
 
-// module.exports = withExpo(
-// 	withSentryConfig(nextConfig, {
-// 		org: 'fucesa',
-// 		project: 'bichos-id-web',
-// 		silent: !process.env.CI,
-// 		widenClientFileUpload: true,
-// 		reactComponentAnnotation: {
-// 			enabled: true,
-// 		},
-// 		tunnelRoute: '/monitoring',
-// 		hideSourceMaps: true,
-// 		disableLogger: true,
-// 		automaticVercelMonitors: true,
-// 	}),
-// )
+export default withSentryConfig(withExpo(nextConfig), sentryConfig)
