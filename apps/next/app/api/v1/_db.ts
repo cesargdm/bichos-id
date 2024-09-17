@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 export const IdentificationSchema = z.object({
-	commonName: z.string(),
+	common_name: z.string(),
 	classification: z.object({
 		phylum: z.string(),
 		class: z.string(),
@@ -16,7 +16,7 @@ export const IdentificationSchema = z.object({
 export const OrganismSchema = z.object({
 	description: z.string(),
 	habitat: z.string(),
-	commonName: z.string(),
+	common_name: z.string(),
 	metadata: z.object({
 		venomous: z.object({
 			type: z.string(),
@@ -27,7 +27,7 @@ export const OrganismSchema = z.object({
 
 export interface Organism {
 	id: string
-	commonName: string
+	common_name: string
 	classification: {
 		phylum: string
 		class: string
@@ -43,6 +43,7 @@ export interface Organism {
 			level: 'NON_VENOMOUS' | 'VENOMOUS' | 'HIGHLY_VENOMOUS'
 		}
 	}
+	scan_count: number
 	taxonomy: 'SPECIES' | 'GENUS' | 'FAMILY'
 	image_quality_rating: number
 	image_key: string

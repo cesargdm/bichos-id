@@ -22,7 +22,7 @@ import ErrorScreen from '../Error'
 type Data = {
 	id: string
 	image_key: string
-	commonName: string
+	common_name: string
 	classification: { genus: string; species: string }
 }
 
@@ -118,7 +118,7 @@ function DiscoverScreen({ fallbackData }: Props) {
 										width: '100%',
 									}}
 								>
-									{organism.commonName}
+									{organism.common_name}
 								</Text>
 								<Text style={{ color: 'white', fontSize: 14 }}>
 									({organism.classification?.genus}{' '}

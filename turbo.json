@@ -12,6 +12,9 @@
 		},
 		"clean": {
 			"dependsOn": ["^clean"]
+		},
+		"licenses": {
+			"dependsOn": ["^licenses"]
 		}
 	}
 }

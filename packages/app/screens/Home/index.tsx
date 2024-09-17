@@ -9,6 +9,7 @@ import { StatusBar } from 'expo-status-bar'
 import { launchImageLibraryAsync, MediaTypeOptions } from 'expo-image-picker'
 import { manipulateAsync, SaveFormat } from 'expo-image-manipulator'
 import { runOnJS } from 'react-native-reanimated'
+import { Link } from 'solito/link'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 import MaskedView from '@react-native-masked-view/masked-view'
 import { NativeStackNavigationOptions } from '@react-navigation/native-stack'
@@ -81,9 +82,7 @@ function HomeScreen() {
 	const cameraRef = useRef<Camera>(null)
 	const isFocused = useIsFocused()
 
-	const [onboarding, setOnboarding] = useItem<'completed'>(
-		'@bichos-id/onboarding',
-	)
+	const [onboarding] = useItem<'completed'>('@bichos-id/onboarding')
 
 	const isCameraActive = hasPermission && isFocused
 
@@ -277,13 +276,13 @@ function HomeScreen() {
 					edges={['top', 'left', 'right']}
 				>
 					<View style={styles.topActionsContent}>
-						<Pressable onPress={handleToggleTorch} style={{ padding: 16 }}>
-							<Ionicons size={24} color="white" name="flashlight" />
+						<Pressable onPress={handleToggleTorch} style={{ padding: 20 }}>
+							<Ionicons size={30} color="white" name="flashlight" />
 						</Pressable>
 						<View aria-hidden />
-						{/* <Link href="/settings" style={{ padding: 16 }}>
-							<Ionicons size={24} color="white" name="settings" />
-						</Link> */}
+						<Link href="/settings" viewProps={{ style: { padding: 20 } }}>
+							<Ionicons size={30} color="white" name="settings" />
+						</Link>
 					</View>
 				</SafeAreaView>
 
@@ -303,10 +302,10 @@ function HomeScreen() {
 							onPress={handlePickImage}
 							style={(state) => ({
 								opacity: isLoading || state.pressed ? 0.5 : 1,
-								padding: 16,
+								padding: 20,
 							})}
 						>
-							<Ionicons size={32} color="white" name="images-outline" />
+							<Ionicons size={35} color="white" name="images-outline" />
 						</Pressable>
 						<Pressable
 							disabled={isLoading}
@@ -333,8 +332,8 @@ function HomeScreen() {
 								}}
 							/>
 						</Pressable>
-						<Pressable style={{ padding: 16 }} onPress={handleExplore}>
-							<Ionicons size={32} color="white" name="compass-outline" />
+						<Pressable style={{ padding: 20 }} onPress={handleExplore}>
+							<Ionicons size={35} color="white" name="compass-outline" />
 						</Pressable>
 					</View>
 				</SafeAreaView>

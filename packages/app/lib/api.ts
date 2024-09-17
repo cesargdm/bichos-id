@@ -11,6 +11,10 @@ export const API_BASE_URL = USE_LOCAL_API
 
 export const ASSETS_BASE_URL = 'https://bichos-id.assets.fucesa.com'
 
+export function getImageUrl(imageKey: string) {
+	return `${ASSETS_BASE_URL}/${imageKey}`
+}
+
 export function fetcher<TData, TKey extends string>(url: TKey) {
 	return fetch(url).then((response) => response.json() as TData)
 }

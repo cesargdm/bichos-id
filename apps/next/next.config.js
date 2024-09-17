@@ -4,6 +4,9 @@ const { withExpo } = require('@expo/next-adapter')
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+	images: {
+		remotePatterns: [{ hostname: 'bichos-id.assets.fucesa.com' }],
+	},
 	// reanimated (and thus, Moti) doesn't work with strict mode currently...
 	// https://github.com/nandorojo/moti/issues/224
 	// https://github.com/necolas/react-native-web/pull/2330

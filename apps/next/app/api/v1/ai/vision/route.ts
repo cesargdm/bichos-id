@@ -190,8 +190,6 @@ ${
 				.catch(() => false),
 		])
 
-		console.log({ existing })
-
 		if (!existing) {
 			const organismResponse = await openai.beta.chat.completions.parse({
 				model: 'gpt-4o-2024-08-06',
@@ -224,14 +222,13 @@ Instructions:
 				throw new Error('No response from AI')
 			}
 
-			console.log(parsedOrganismInfo)
-
 			await db
 				.insertInto('organisms')
 				.values({
 					id: organismId,
 					...identification,
 					...parsedOrganismInfo,
+					scan_count: 0,
 					taxonomy: identification.classification.species
 						? 'SPECIES'
 						: identification.classification.genus
@@ -248,10 +245,11 @@ Instructions:
 			await db
 				.updateTable('organisms')
 				.where('id', '=', organismId)
-				.set({
+				.set((eb) => ({
 					image_key: imageKey,
+					scan_count: eb('scan_count', '+', 1),
 					image_quality_rating: _imageQualityRating,
-				})
+				}))
 				.execute()
 		}
 

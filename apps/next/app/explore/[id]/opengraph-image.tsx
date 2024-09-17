@@ -71,7 +71,7 @@ export default async function Image({ params }: Props) {
 							margin: 0,
 						}}
 					>
-						{organism.commonName}
+						{organism.common_name}
 					</p>
 				</div>
 			</div>

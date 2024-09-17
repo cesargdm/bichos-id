@@ -1,14 +1,8 @@
 'use client'
 
-import {
-	Text,
-	View,
-	ScrollView,
-	FlatList,
-	Image,
-	StyleSheet,
-} from 'react-native'
+import { Text, View, ScrollView, FlatList, StyleSheet } from 'react-native'
 import useSWR from 'swr'
+import { SolitoImage } from 'solito/image'
 import { useParams } from 'solito/navigation'
 import { StatusBar } from 'expo-status-bar'
 import { LinearGradient } from 'expo-linear-gradient'
@@ -21,7 +15,7 @@ const useUserParams = useParams<{ id: string }>
 type OrganismData = {
 	id: string
 	images?: `${typeof ASSETS_BASE_URL}/${string}`[]
-	commonName: string
+	common_name: string
 	description?: string
 	habitat?: string
 	scansCount?: number
@@ -133,10 +127,12 @@ function DiscoverDetailScreen({ fallbackData }: Props) {
 					showsHorizontalScrollIndicator={false}
 					style={{ width: '100%' }}
 					renderItem={({ item }) => (
-						<Image
-							alt={`${data?.commonName} - ${data.classification?.genus} ${data.classification?.species}`}
-							style={{ width: 200, height: 300, objectFit: 'cover' }}
-							source={{ uri: item }}
+						<SolitoImage
+							alt={`${data?.common_name} - ${data.classification?.genus} ${data.classification?.species}`}
+							style={{ objectFit: 'cover' }}
+							width={200}
+							height={300}
+							src={item}
 						/>
 					)}
 				/>
@@ -148,7 +144,7 @@ function DiscoverDetailScreen({ fallbackData }: Props) {
 							role="heading"
 							aria-level={1}
 						>
-							{data?.commonName}
+							{data?.common_name}
 						</Text>
 
 						<Text style={{ fontSize: 16, color: 'white' }}>
@@ -160,10 +156,11 @@ function DiscoverDetailScreen({ fallbackData }: Props) {
 					<View style={{ height: 1, width: '100%', backgroundColor: '#333' }} />
 
 					<ScrollView
-						contentContainerStyle={{ gap: 10 }}
-						style={{ flexDirection: 'row' }}
+						contentContainerStyle={{ gap: 10, paddingHorizontal: 20 }}
+						style={{ flexDirection: 'row', marginHorizontal: -20 }}
 						horizontal
 						bounces={false}
+						showsHorizontalScrollIndicator={false}
 					>
 						{data?.metadata?.venomous?.level ? (
 							<View
@@ -171,22 +168,38 @@ function DiscoverDetailScreen({ fallbackData }: Props) {
 									padding: 10,
 									paddingHorizontal: 15,
 									borderRadius: 999,
+									flexDirection: 'row',
+									alignItems: 'center',
+									gap: 5,
 									backgroundColor: getVenomousColor(
 										data.metadata.venomous.level,
 									),
 								}}
 							>
+								<SolitoImage
+									alt=""
+									style={{ width: 15, height: 15 }}
+									src={require('./medical-cross.png')}
+								/>
 								<Text style={{ color: 'white', fontWeight: '700' }}>
 									{getVenomousLabel(data.metadata.venomous.level)}
 								</Text>
 							</View>
 						) : null}
 						<View style={styles.tagContainer}>
-							{/* <Ionicons size={15} color="white" name="eye" /> */}
+							<SolitoImage
+								alt=""
+								style={{ width: 15, height: 15 }}
+								src={require('./eye.png')}
+							/>
 							<Text style={{ color: 'white' }}>{data.scansCount}</Text>
 						</View>
 						<View style={styles.tagContainer}>
-							{/* <Ionicons size={15} color="white" name="library" /> */}
+							<SolitoImage
+								alt=""
+								style={{ width: 15, height: 15 }}
+								src={require('./dna.png')}
+							/>
 							<Text style={{ color: 'white' }}>
 								{getTaxonomyLabel(data.taxonomy)}
 							</Text>

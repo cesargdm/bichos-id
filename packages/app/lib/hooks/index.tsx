@@ -1,8 +1,13 @@
 import { useEffect, useMemo, useState, useCallback } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
-export function useItem<ValueT extends string>(key: string) {
-	const [itemValue, setItemValue] = useState<ValueT | null>(null)
+type AsyncStorageKey = '@bichos-id/onboarding'
+
+export function useItem<ValueT extends string>(
+	key: AsyncStorageKey,
+	defaultValue: ValueT | null = null,
+) {
+	const [itemValue, setItemValue] = useState<ValueT | null>(defaultValue)
 
 	useEffect(() => {
 		void AsyncStorage.getItem(key).then((value) =>
@@ -12,7 +17,7 @@ export function useItem<ValueT extends string>(key: string) {
 
 	const setItem = useCallback(
 		(value: ValueT) => {
-			void AsyncStorage.setItem(key, value).then(() => setItemValue(value))
+			return AsyncStorage.setItem(key, value).then(() => setItemValue(value))
 		},
 		[key],
 	)

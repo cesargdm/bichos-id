@@ -8,15 +8,34 @@ export default function Footer() {
 	return (
 		<footer>
 			<div className="content">
-				<p>
-					Esta herramienta por ser preeliminar se ofrece tal cual, sin ninguna
-					garantía. No nos hacemos responsables de cualquier daño causado por su
-					uso.
-				</p>
-				<p>
-					© {new Date().getFullYear()} Bichos ID de{' '}
-					<a href="https://fucesa.com">Fucesa</a>
-				</p>
+				<div>
+					<p>
+						La información es solo informativa y puede presentar errores.
+						Contenido compartido bajo{' '}
+						<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>
+						.
+					</p>
+					<p>
+						© {new Date().getFullYear()} Bichos ID de{' '}
+						<a href="https://fucesa.com">Fucesa</a>
+					</p>
+				</div>
+
+				<ul>
+					<li>
+						<a href="/terms">Términos y Condiciones</a>
+					</li>
+					<li>
+						<a href="/privacy">Política de Privacidad</a>
+					</li>
+					<li>
+						<a href="/settings">Ajustes</a>
+					</li>
+					<li>
+						<a href="/licenses">Licencias</a>
+					</li>
+				</ul>
+
 				<ul>
 					<li>
 						<a href="https://apps.apple.com">

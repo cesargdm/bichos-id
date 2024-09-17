@@ -8,7 +8,8 @@
 		"start": "next start",
 		"lint": "eslint .",
 		"format": "prettier --write . --max-warnings=0",
-		"clean": "rm -rf node_modules .next"
+		"clean": "rm -rf node_modules .next",
+		"licenses": "bunx license-report > ../../packages/app/lib/licenses/web.json"
 	},
 	"dependencies": {
 		"@aws-sdk/client-s3": "3.651.1",

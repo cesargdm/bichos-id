@@ -1,4 +1,8 @@
-'use client'
+import { Suspense } from 'react'
+
+import FeaturedOrganisms from './components/FeaturedOrganisms'
+import LatestDiscoveries from './components/LatestDiscoveries'
+import MostSearched from './components/MostSearched'
 
 export default function HomeScreen() {
 	return (
@@ -47,6 +51,9 @@ export default function HomeScreen() {
 				Descubre los bichos más buscados por la comunidad de Bicho ID. ¿Ya los
 				has encontrado?
 			</p>
+			<Suspense fallback={<div>Cargando...</div>}>
+				<MostSearched />
+			</Suspense>
 
 			<h2>Nuevos descubrimientos</h2>
 			<p>
@@ -54,9 +61,15 @@ export default function HomeScreen() {
 				Cada día se identifican nuevas especies y se amplía nuestro conocimiento
 				sobre el fascinante mundo de los artrópodos.
 			</p>
+			<Suspense fallback={<div>Cargando...</div>}>
+				<LatestDiscoveries />
+			</Suspense>
 
 			<h2>Destacados</h2>
-			<p>Descripción de organismos curados por nuestros expertos.</p>
+			<p>Organismos curados por nuestros expertos.</p>
+			<Suspense fallback={<div>Cargando...</div>}>
+				<FeaturedOrganisms />
+			</Suspense>
 		</div>
 	)
 }

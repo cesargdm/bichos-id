@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: Props) {
 	}
 
 	return {
-		title: organism.commonName,
+		title: organism.common_name,
 		description: organism.description,
 	}
 }

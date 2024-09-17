@@ -9,11 +9,15 @@
 		"format": "turbo format",
 		"clean": "turbo clean"
 	},
-	"packageManager": "bun@1.1.26",
+	"packageManager": "bun@1.1.27",
 	"workspaces": {
 		"packages": [
 			"apps/*",
 			"packages/*"
 		]
+	},
+	"devDependencies": {
+		"prettier": "^3.3.3",
+		"prettier-config-cretia": "^3.0.0"
 	}
 }

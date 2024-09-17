@@ -1,5 +1,5 @@
+import { ReactNode } from 'react'
 import { Metadata } from 'next'
-
 import { StylesProvider } from './styles-provider'
 import './globals.css'
 import Nav from '../components/Nav'
@@ -15,10 +15,11 @@ export const metadata: Metadata = {
 }
 
 type Props = {
-	children: React.ReactNode
+	children: ReactNode
+	settings: ReactNode
 }
 
-export default function RootLayout({ children }: Props) {
+export default function RootLayout({ children, settings }: Props) {
 	return (
 		<html lang="en">
 			<link
@@ -46,6 +47,7 @@ export default function RootLayout({ children }: Props) {
 					<main>{children}</main>
 				</StylesProvider>
 				<Footer />
+				{settings}
 			</body>
 		</html>
 	)
