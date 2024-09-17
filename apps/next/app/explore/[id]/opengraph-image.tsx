@@ -1,8 +1,9 @@
 import { ImageResponse } from '@vercel/og'
 import { notFound } from 'next/navigation'
 
-import { getOrganism } from './_db'
 import { ASSETS_BASE_URL } from '@bichos-id/app/lib/api'
+
+import { getOrganism } from './_db'
 
 type Props = {
 	params: { id: string }

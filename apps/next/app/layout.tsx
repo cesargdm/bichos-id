@@ -1,9 +1,12 @@
-import { ReactNode } from 'react'
-import { Metadata } from 'next'
-import { StylesProvider } from './styles-provider'
-import './globals.css'
+import type { ReactNode } from 'react'
+import type { Metadata } from 'next'
+
 import Nav from '../components/Nav'
 import Footer from '../components/Footer'
+
+import { StylesProvider } from './styles-provider'
+
+import './globals.css'
 
 export const metadata: Metadata = {
 	title: {
