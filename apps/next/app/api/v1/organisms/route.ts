@@ -1,4 +1,4 @@
-import type { NextRequest} from 'next/server';
+import type { NextRequest } from 'next/server'
 
 import { createKysely } from '@vercel/postgres-kysely'
 import { NextResponse } from 'next/server'

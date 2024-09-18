@@ -1,4 +1,4 @@
-import type { NextRequest} from 'next/server';
+import type { NextRequest } from 'next/server'
 
 import { GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3'
 import { createKysely } from '@vercel/postgres-kysely'
@@ -10,7 +10,7 @@ import OpenAI from 'openai'
 import { zodResponseFormat } from 'openai/helpers/zod'
 import { z } from 'zod'
 
-import type { Database} from '../../_db';
+import type { Database } from '../../_db'
 
 import { IdentificationSchema, OrganismSchema } from '../../_db'
 import { getR2Client, R2_BUCKET_NAME } from '../../_r2'

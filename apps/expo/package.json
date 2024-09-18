@@ -12,7 +12,7 @@
 		"format": "prettier --write .",
 		"lint": "eslint . --max-warnings=0",
 		"clean": "rm -rf node_modules .turbo .expo",
-		"licenses": "bunx license-report > ../../packages/app/lib/licenses/app.json"
+		"licenses": "bunx license-report >| '../../packages/app/lib/licenses/app.json'"
 	},
 	"dependencies": {
 		"@babel/runtime": "^7.25.6",
