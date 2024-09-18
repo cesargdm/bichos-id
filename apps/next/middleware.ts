@@ -1,11 +1,13 @@
-import type { NextRequest} from 'next/server';
+import type { NextRequest } from 'next/server'
 
 import { Ratelimit } from '@upstash/ratelimit'
 import { kv } from '@vercel/kv'
 import { NextResponse } from 'next/server'
 
+const RATE_LIMIT = 5
+
 const rateLimit = new Ratelimit({
-	limiter: Ratelimit.slidingWindow(3, '24 h'),
+	limiter: Ratelimit.slidingWindow(RATE_LIMIT, '24 h'),
 	redis: kv,
 })
 
@@ -37,6 +39,7 @@ export async function middleware(request: NextRequest) {
 			{
 				headers: {
 					'Retry-After': Math.floor((waitUntil - Date.now()) / 1000).toString(),
+					'X-RateLimit-Limit': RATE_LIMIT.toString(),
 				},
 				status: 429,
 			},

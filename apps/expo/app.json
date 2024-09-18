@@ -31,7 +31,9 @@
 			["expo-build-properties", { "ios": { "useFrameworks": "static" } }],
 			[
 				"expo-image-picker",
-				{ "photosPermission": "Identifica de tu librería de fotos." }
+				{
+					"photosPermission": "Carga e identifica organismos desde tu librería de fotos."
+				}
 			],
 
 			"@react-native-firebase/app",
@@ -39,7 +41,9 @@
 
 			[
 				"react-native-vision-camera",
-				{ "cameraPermissionText": "Captura e identifica nuevas fotos." }
+				{
+					"cameraPermissionText": "Captura, carga e identifica organismos usando tu cámara."
+				}
 			],
 
 			[
