@@ -1,0 +1,12 @@
+[
+	{
+		"relation": ["delegate_permission/common.handle_all_urls"],
+		"target": {
+			"namespace": "android_app",
+			"package_name": "com.fucesa.bichos_id",
+			"sha256_cert_fingerprints": [
+				"E9:F7:68:AE:B9:86:E3:76:0C:F8:2D:3B:91:5F:F1:7A:29:42:01:5C:4F:DC:2E:86:D9:7A:1E:FF:A5:8F:D8:72"
+			]
+		}
+	}
+]
