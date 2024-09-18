@@ -10,7 +10,7 @@ import Organism from './Organism'
 
 export default function LatestDiscoveries() {
 	const { data } = useSWR<OrganismType[]>(
-		'/api/v1/organisms?sortBy=created_at',
+		'/api/v1/organisms?sortBy=created_at&order=desc',
 		fetcher,
 		{ fallbackData: [], suspense: true },
 	)
