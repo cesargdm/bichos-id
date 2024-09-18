@@ -43,8 +43,6 @@ const sentryConfig = {
 	reactComponentAnnotation: {
 		enabled: true,
 	},
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-	silent: !import.meta.env.CI,
 	tunnelRoute: '/monitoring',
 	widenClientFileUpload: true,
 }
