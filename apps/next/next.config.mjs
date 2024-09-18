@@ -24,8 +24,6 @@ const nextConfig = {
 		'expo-linear-gradient',
 		'@expo/html-elements',
 
-		'react-native-mmkv',
-
 		'react-native-reanimated',
 		'react-native-gesture-handler',
 

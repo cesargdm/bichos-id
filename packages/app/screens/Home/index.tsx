@@ -4,6 +4,7 @@ import type { NativeStackNavigationOptions } from '@react-navigation/native-stac
 import type { Point } from 'react-native-vision-camera'
 
 import { Ionicons } from '@expo/vector-icons'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import MaskedView from '@react-native-masked-view/masked-view'
 import { useIsFocused } from '@react-navigation/native'
 import { manipulateAsync, SaveFormat } from 'expo-image-manipulator'
@@ -12,7 +13,6 @@ import { StatusBar } from 'expo-status-bar'
 import { useCallback, useRef, useState, useEffect } from 'react'
 import { StyleSheet, Text, View, Alert, Image, Pressable } from 'react-native'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
-import { useMMKVBoolean } from 'react-native-mmkv'
 import { runOnJS } from 'react-native-reanimated'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import {
@@ -104,9 +104,6 @@ function HomeScreen() {
 	const cameraRef = useRef<Camera>(null)
 	const isFocused = useIsFocused()
 	const { hasPermission, requestPermission } = useCameraPermission()
-	const [isOnboardingComplete] = useMMKVBoolean(
-		'@bichos-id/onboarding-complete',
-	)
 	const [isCameraInitialized, setIsCameraInitialized] = useState(false)
 
 	const device = useCameraDevice('back')
@@ -141,10 +138,15 @@ function HomeScreen() {
 
 	useEffect(() => {
 		if (!isFocused) return
-		if (isOnboardingComplete) return
 
-		router.push('/settings')
-	}, [isFocused])
+		void AsyncStorage.getItem('@bichos-id/onboarding-complete').then(
+			(value) => {
+				if (value !== 'true') {
+					router.push('/settings')
+				}
+			},
+		)
+	}, [isFocused, router])
 
 	const handleCameraInitialized = useCallback(() => {
 		setIsCameraInitialized(true)
@@ -265,7 +267,7 @@ function HomeScreen() {
 					}
 				>
 					<GestureDetector gesture={gesture}>
-						{device ? (
+						{device && hasPermission ? (
 							<Camera
 								torch={isTorchEnabled}
 								ref={cameraRef}
@@ -288,7 +290,7 @@ function HomeScreen() {
 										onPress={requestPermission}
 										style={{ padding: 20 }}
 									>
-										<Text style={{ color: 'white' }}>
+										<Text style={{ color: 'white', fontSize: 15 }}>
 											Permitir acceso a la cámara
 										</Text>
 									</Pressable>

@@ -3,10 +3,10 @@
 
 import type { NativeStackNavigationOptions } from '@react-navigation/native-stack'
 
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { StatusBar } from 'expo-status-bar'
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect, useMemo } from 'react'
 import { View, Pressable, Text, Platform, StyleSheet } from 'react-native'
-import { MMKV } from 'react-native-mmkv'
 import { SolitoImage } from 'solito/image'
 import { Link } from 'solito/link'
 import { useRouter } from 'solito/navigation'
@@ -25,23 +25,34 @@ const styles = StyleSheet.create({
 	},
 })
 
-function getIsOnboardingComplete() {
-	if (Platform.OS === 'web') {
-		return true
-	}
+function useBooleanItem(key: string) {
+	const [value, setValue] = useState<boolean | null>(null)
 
-	const storage = new MMKV()
-	return storage.getBoolean('@bichos-id/onboarding-complete') ?? false
+	useEffect(() => {
+		void AsyncStorage.getItem(key).then((value) => setValue(value === 'true'))
+	}, [key])
+
+	return useMemo(
+		() =>
+			[
+				value,
+				(value: boolean) => {
+					setValue(value)
+					void AsyncStorage.setItem(key, value ? 'true' : 'false')
+				},
+			] as const,
+		[value, key],
+	)
 }
 
 function SettingsScreen() {
-	const [isOnboardingComplete] = useState<boolean>(getIsOnboardingComplete)
 	const router = useRouter()
+	const [isOnboardingComplete, setIsOnboardingComplete] = useBooleanItem(
+		'@bichos-id/onboarding-complete',
+	)
 
 	const handleDismiss = useCallback(() => {
-		const storage = new MMKV()
-		storage.set('@bichos-id/onboarding-complete', true)
-
+		setIsOnboardingComplete(true)
 		router.back()
 	}, [router])
 

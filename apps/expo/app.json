@@ -15,6 +15,11 @@
 				"NSLocationWhenInUseUsageDescription": "Con tu ubicación podremos generar una identificación más precisa."
 			}
 		},
+		"splash": {
+			"image": "./assets/images/splash.png",
+			"resizeMode": "contain",
+			"backgroundColor": "#000000"
+		},
 		"android": {
 			"permissions": ["android.permission.CAMERA"],
 			"googleServicesFile": "./google-services.json",
