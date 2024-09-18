@@ -1,5 +1,12 @@
 name: update
-on: push
+on:
+  push:
+    paths:
+      - 'apps/expo/**'
+      - 'packages/app/**'
+      - 'app.json'
+      - 'eas.json'
+      - '.github/workflows/update.yml'
 
 jobs:
   'Update':
