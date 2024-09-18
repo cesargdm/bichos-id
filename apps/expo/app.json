@@ -10,7 +10,10 @@
 		"ios": {
 			"googleServicesFile": "./GoogleService-Info.plist",
 			"bundleIdentifier": "com.fucesa.bichos-id",
-			"config": { "usesNonExemptEncryption": false }
+			"config": { "usesNonExemptEncryption": false },
+			"infoPlist": {
+				"NSLocationWhenInUseUsageDescription": "Con tu ubicación podremos generar una identificación más precisa."
+			}
 		},
 		"android": {
 			"permissions": ["android.permission.CAMERA"],

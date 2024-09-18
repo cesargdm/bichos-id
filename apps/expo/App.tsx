@@ -46,8 +46,7 @@ function App() {
 				const { status } = await requestTrackingPermissionsAsync()
 
 				if (status === PermissionStatus.GRANTED) {
-					// eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-					analytics().setAnalyticsCollectionEnabled(true)
+					void analytics().setAnalyticsCollectionEnabled(true)
 					if (state.user?.uid) {
 						Sentry.setUser({ id: state.user.uid })
 					}
