@@ -1,17 +1,13 @@
 import type { MetadataRoute } from 'next'
 
-import { createKysely } from '@vercel/postgres-kysely'
-
-import type { Database } from '@/next/lib/db'
+import { getOrganisms } from '@/next/lib/db'
 
 export const revalidate = 60
 
 const origin = process.env.NEXT_PUBLIC_ORIGIN
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-	const db = createKysely<Database>()
-
-	const organisms = await db.selectFrom('organisms').selectAll().execute()
+	const organisms = await getOrganisms()
 
 	return [
 		{

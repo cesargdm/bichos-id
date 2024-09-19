@@ -71,7 +71,7 @@ export function getOrganisms(options: GetOrganismsOptions = {}) {
 		dbQuery = dbQuery.where('common_name', 'ilike', `%${query}%`)
 	}
 
-	return dbQuery.execute()
+	return dbQuery.execute().catch(() => [])
 }
 
 /**
@@ -80,9 +80,7 @@ export function getOrganisms(options: GetOrganismsOptions = {}) {
 export function getOrganism(id: string) {
 	const db = createKysely<Database>()
 
-	return db
-		.selectFrom('organisms')
-		.where('id', '=', id)
-		.selectAll()
-		.executeTakeFirst()
+	const dbQuery = db.selectFrom('organisms').where('id', '=', id).selectAll()
+
+	return dbQuery.executeTakeFirst().catch(() => undefined)
 }
