@@ -40,13 +40,17 @@ const styles = StyleSheet.create({
 function DiscoverDetailScreen({ fallbackData }: Props) {
 	const params = useUserParams()
 
-	const { data, error, isLoading } = useSWR<Props['fallbackData'], Error>(
+	const {
+		data: organism,
+		error,
+		isLoading,
+	} = useSWR<Props['fallbackData'], Error>(
 		keys.organisms.detail(params.id),
 		fetcher,
 		{ fallbackData },
 	)
 
-	if (!data) {
+	if (!organism) {
 		if (isLoading) {
 			return <Text>Cargando...</Text>
 		}
@@ -54,22 +58,8 @@ function DiscoverDetailScreen({ fallbackData }: Props) {
 		return <Text>Error {JSON.stringify(error, null, 2)}</Text>
 	}
 
-	const jsonLd = {
-		'@context': 'https://schema.org',
-		'@type': 'Taxon',
-		alternateName: data.common_name,
-		description: data.description,
-		identifier: data.id,
-		image: data.images?.[0],
-		name: `${data.classification?.genus} ${data.classification?.species}`,
-	}
-
 	return (
 		<>
-			<script
-				type="application/ld+json"
-				dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-			/>
 			<LinearGradient
 				colors={['rgba(0,0,0,0.9)', 'rgba(0,0,0,0)']}
 				style={{
@@ -87,14 +77,14 @@ function DiscoverDetailScreen({ fallbackData }: Props) {
 				contentContainerStyle={{ paddingBottom: 50 }}
 			>
 				<FlatList
-					data={data.images}
+					data={organism.images}
 					horizontal
 					bounces={false}
 					showsHorizontalScrollIndicator={false}
 					style={{ width: '100%' }}
 					renderItem={({ item }) => (
 						<SolitoImage
-							alt={`${data?.common_name} - ${data.classification?.genus} ${data.classification?.species}`}
+							alt={`${organism?.common_name} - ${organism.classification?.genus} ${organism.classification?.species}`}
 							contentFit="cover"
 							width={200}
 							height={300}
@@ -110,12 +100,12 @@ function DiscoverDetailScreen({ fallbackData }: Props) {
 							role="heading"
 							aria-level={1}
 						>
-							{data?.common_name}
+							{organism?.common_name}
 						</Text>
 
 						<Text style={{ color: 'white', fontSize: 16 }}>
-							Nombre científico: {data?.classification?.genus}{' '}
-							{data?.classification?.species}
+							Nombre científico: {organism?.classification?.genus}{' '}
+							{organism?.classification?.species}
 						</Text>
 					</View>
 
@@ -128,12 +118,12 @@ function DiscoverDetailScreen({ fallbackData }: Props) {
 						bounces={false}
 						showsHorizontalScrollIndicator={false}
 					>
-						{data?.metadata?.venomous?.level ? (
+						{organism?.metadata?.venomous?.level ? (
 							<View
 								style={{
 									alignItems: 'center',
 									backgroundColor: getVenomousColor(
-										data.metadata.venomous.level,
+										organism.metadata.venomous.level,
 									),
 									borderRadius: 999,
 									flexDirection: 'row',
@@ -148,7 +138,7 @@ function DiscoverDetailScreen({ fallbackData }: Props) {
 									src={require('./medical-cross.png')}
 								/>
 								<Text style={{ color: 'white', fontWeight: '700' }}>
-									{getVenomousLabel(data.metadata.venomous.level)}
+									{getVenomousLabel(organism.metadata.venomous.level)}
 								</Text>
 							</View>
 						) : null}
@@ -158,7 +148,7 @@ function DiscoverDetailScreen({ fallbackData }: Props) {
 								style={{ height: 15, width: 15 }}
 								src={require('./eye.png')}
 							/>
-							<Text style={{ color: 'white' }}>{data.scan_count}</Text>
+							<Text style={{ color: 'white' }}>{organism.scan_count}</Text>
 						</View>
 						<View style={styles.tagContainer}>
 							<SolitoImage
@@ -167,7 +157,7 @@ function DiscoverDetailScreen({ fallbackData }: Props) {
 								src={require('./dna.png')}
 							/>
 							<Text style={{ color: 'white' }}>
-								{getTaxonomyLabel(data.taxonomy)}
+								{getTaxonomyLabel(organism.taxonomy)}
 							</Text>
 						</View>
 					</ScrollView>
@@ -183,7 +173,7 @@ function DiscoverDetailScreen({ fallbackData }: Props) {
 							Descripción
 						</Text>
 						<Text style={{ color: 'white', fontSize: 16, lineHeight: 28 }}>
-							{data?.description}
+							{organism?.description}
 						</Text>
 					</View>
 
@@ -198,7 +188,7 @@ function DiscoverDetailScreen({ fallbackData }: Props) {
 							Hábitat
 						</Text>
 						<Text style={{ color: 'white', fontSize: 16, lineHeight: 28 }}>
-							{data?.habitat}
+							{organism?.habitat}
 						</Text>
 					</View>
 
@@ -213,12 +203,12 @@ function DiscoverDetailScreen({ fallbackData }: Props) {
 							Taxonomía
 						</Text>
 						<Text style={{ color: 'white', fontSize: 16, lineHeight: 28 }}>
-							{`Filo: ${data?.classification?.phylum}
-  Clase: ${data?.classification?.class}
-    Orden: ${data?.classification?.order}
-      Familia: ${data?.classification?.family}
-        Género: ${data?.classification?.genus}
-          Especie: ${data?.classification?.species}`}
+							{`Filo: ${organism?.classification?.phylum}
+  Clase: ${organism?.classification?.class}
+    Orden: ${organism?.classification?.order}
+      Familia: ${organism?.classification?.family}
+        Género: ${organism?.classification?.genus}
+          Especie: ${organism?.classification?.species}`}
 						</Text>
 					</View>
 				</View>

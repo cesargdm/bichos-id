@@ -32,6 +32,22 @@ export default async function DiscoveryDetailPage({ params }: Props) {
 	if (!organism) {
 		return notFound()
 	}
+	const jsonLd = {
+		'@context': 'https://schema.org',
+		'@type': 'Taxon',
+		alternateName: organism.common_name,
+		description: organism.description,
+		identifier: organism.id,
+		name: `${organism.classification?.genus} ${organism.classification?.species}`,
+	}
 
-	return <DiscoveryDetailScreen fallbackData={organism} />
+	return (
+		<>
+			<script
+				type="application/ld+json"
+				dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+			/>
+			<DiscoveryDetailScreen fallbackData={organism} />
+		</>
+	)
 }
