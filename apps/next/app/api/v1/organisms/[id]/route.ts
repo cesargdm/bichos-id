@@ -6,7 +6,7 @@ import { NextResponse } from 'next/server'
 import { getOrganism, type Database } from '@/next/lib/db'
 import { getR2Client, R2_BUCKET_NAME } from '@/next/lib/r2'
 
-export const revalidate = 60 * 60 * 1 // 1 hour
+export const revalidate = 60 * 60 * 3 // 3 hours
 
 export async function GET(
 	_request: Request,

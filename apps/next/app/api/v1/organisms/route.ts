@@ -6,6 +6,8 @@ import { NextResponse } from 'next/server'
 import { getOrganisms } from '@/next/lib/db'
 import { getOrganismsSchema } from '@/next/lib/schema'
 
+export const revalidate = 60 * 60 // 1 hour
+
 export async function GET(request: NextRequest) {
 	try {
 		const params = getOrganismsSchema.parse(

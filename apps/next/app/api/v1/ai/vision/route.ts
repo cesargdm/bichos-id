@@ -5,6 +5,7 @@ import * as Sentry from '@sentry/nextjs'
 import { createKysely } from '@vercel/postgres-kysely'
 import { initializeApp, cert } from 'firebase-admin/app'
 import { getAuth } from 'firebase-admin/auth'
+import { revalidatePath } from 'next/cache'
 import { NextResponse } from 'next/server'
 import * as crypto from 'node:crypto'
 import OpenAI from 'openai'
@@ -24,11 +25,11 @@ const requestBodySchema = z.object({
 		.max(1024 * 1024 * 10),
 })
 
-function slugify(text: string) {
+function slugify<T extends string>(text: T) {
 	return text
 		.toLowerCase()
 		.replace(/\s+/g, '-')
-		.replace(/[^a-z0-9-]/g, '')
+		.replace(/[^a-z0-9-]/g, '') as Lowercase<T>
 }
 
 function initializeFirebase() {
@@ -134,8 +135,8 @@ ${
 		const { _imageQualityRating, ...identification } = parsedIdentification
 
 		const organismSpecies = `${identification.classification.family}-${
-			identification.classification.genus ?? 'sp'
-		}-${identification.classification.species ?? 'sp'}`
+			identification.classification.genus || ''
+		}-${identification.classification.species || ''}` as const
 
 		const organismId = slugify(organismSpecies)
 		const imagePath = `scans/${organismSpecies.replaceAll('-', '/')}`
@@ -258,6 +259,10 @@ Instructions:
 			})
 
 			await db.insertInto('organisms').values(newOrganismValues).execute()
+
+			// Revalidate existing cache
+			revalidatePath(`/explore`)
+			revalidatePath(`/api/v1/organisms`)
 		} else if (existing.image_quality_rating < _imageQualityRating) {
 			await db
 				.updateTable('organisms')
@@ -268,6 +273,10 @@ Instructions:
 					scan_count: eb('scan_count', '+', 1),
 				}))
 				.execute()
+
+			// Revalidate existing cache
+			revalidatePath(`/explore/${organismId}`)
+			revalidatePath(`/api/v1/organisms/${organismId}`)
 		}
 
 		return NextResponse.json(
