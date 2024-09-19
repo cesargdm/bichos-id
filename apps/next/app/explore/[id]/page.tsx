@@ -50,7 +50,12 @@ export default async function DiscoveryDetailPage({ params }: Props) {
 				type="application/ld+json"
 				dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
 			/>
-			<DiscoveryDetailScreen fallbackData={organism} />
+			<DiscoveryDetailScreen
+				fallbackData={{
+					...organism,
+					images: [`${ASSETS_BASE_URL}/${organism.image_key}`],
+				}}
+			/>
 		</>
 	)
 }
