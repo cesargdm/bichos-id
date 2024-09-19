@@ -92,3 +92,17 @@ export function getOrganism(id: string) {
 		return undefined
 	}
 }
+
+export function getOrganismScans(id: string) {
+	try {
+		const db = createKysely<Database>()
+
+		return db
+			.selectFrom('organism_scans')
+			.where('organism_id', '=', id)
+			.selectAll()
+			.execute()
+	} catch {
+		return []
+	}
+}

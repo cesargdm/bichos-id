@@ -262,7 +262,6 @@ Instructions:
 
 			// Revalidate existing cache
 			revalidatePath(`/explore`)
-			revalidatePath(`/api/v1/organisms`)
 		} else if (existing.image_quality_rating < _imageQualityRating) {
 			await db
 				.updateTable('organisms')
@@ -276,7 +275,6 @@ Instructions:
 
 			// Revalidate existing cache
 			revalidatePath(`/explore/${organismId}`)
-			revalidatePath(`/api/v1/organisms/${organismId}`)
 		}
 
 		return NextResponse.json(

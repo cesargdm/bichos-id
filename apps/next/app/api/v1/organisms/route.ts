@@ -6,8 +6,6 @@ import { NextResponse } from 'next/server'
 import { getOrganisms } from '@/next/lib/db'
 import { getOrganismsSchema } from '@/next/lib/schema'
 
-export const revalidate = 60 * 60 // 1 hour
-
 export async function GET(request: NextRequest) {
 	try {
 		const params = getOrganismsSchema.parse(
@@ -16,7 +14,11 @@ export async function GET(request: NextRequest) {
 
 		const organisms = await getOrganisms(params)
 
-		return NextResponse.json(organisms)
+		return NextResponse.json(organisms, {
+			headers: {
+				'Cache-Control': 'public, max-age=3600, must-revalidate',
+			},
+		})
 	} catch (error) {
 		Sentry.captureException(error)
 
