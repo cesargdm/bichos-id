@@ -13,7 +13,8 @@ import useSWR from 'swr'
 import type { ASSETS_BASE_URL } from '@/app/lib/api/constants'
 import type { Organism } from '@/app/lib/types'
 
-import { Api, fetcher } from '@/app/lib/api'
+import { fetcher } from '@/app/lib/api/fetcher'
+import { keys } from '@/app/lib/api/keys'
 
 import { getTaxonomyLabel, getVenomousColor, getVenomousLabel } from './utils'
 
@@ -40,7 +41,7 @@ function DiscoverDetailScreen({ fallbackData }: Props) {
 	const params = useUserParams()
 
 	const { data, error, isLoading } = useSWR<Props['fallbackData'], Error>(
-		Api.getOrganismKey(params.id),
+		keys.organisms.detail(params.id),
 		fetcher,
 		{ fallbackData },
 	)

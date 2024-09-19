@@ -20,8 +20,9 @@ import useSWR from 'swr'
 
 import type { Organism } from '@/app/lib/types'
 
-import { Api, fetcher } from '@/app/lib/api'
 import { ASSETS_BASE_URL } from '@/app/lib/api/constants'
+import { fetcher } from '@/app/lib/api/fetcher'
+import { keys } from '@/app/lib/api/keys'
 
 import ErrorScreen from '../Error'
 
@@ -59,7 +60,7 @@ function DiscoverScreen({ fallbackData }: Props) {
 	const { data, error, isLoading, mutate } = useSWR<
 		Props['fallbackData'],
 		Error
-	>(Api.getOrganismsKey(params), fetcher, { fallbackData })
+	>(keys.organisms.all(params), fetcher, { fallbackData })
 
 	if (!data) {
 		if (isLoading) {

@@ -4,15 +4,21 @@ import useSWR from 'swr'
 
 import type { Organism } from '@/app/lib/types'
 
-import { fetcher } from '@/app/lib/api'
+import { fetcher } from '@/app/lib/api/fetcher'
+import { keys } from '@/app/lib/api/keys'
 
-import OrganismItem from './Organism'
+import { latestListOptions } from '../utils'
+import OrganismItem from './OrganismItem'
 
-export default function LatestDiscoveries() {
+export default function LatestsOrganisms({
+	fallbackData,
+}: {
+	fallbackData?: Organism[]
+}) {
 	const { data } = useSWR<Organism[]>(
-		'/api/v1/organisms?sortBy=created_at&direction=desc',
+		keys.organisms.all(new URLSearchParams(latestListOptions)),
 		fetcher,
-		{ fallbackData: [], suspense: true },
+		{ fallbackData, suspense: true },
 	)
 
 	return (

@@ -25,6 +25,8 @@ import { useRouter } from 'solito/navigation'
 
 import { Api } from '@/app/lib/api'
 
+import type { Props } from './utils'
+
 const CAPTURABLE_WIDTH_PERCENTAGE = 0.6
 const CAPTURABLE_HEIGHT_PERCENTAGE = 0.4
 
@@ -99,7 +101,8 @@ const styles = StyleSheet.create({
 	},
 })
 
-function HomeScreen() {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function HomeScreen(_props: Props) {
 	const router = useRouter()
 	const cameraRef = useRef<Camera>(null)
 	const isFocused = useIsFocused()

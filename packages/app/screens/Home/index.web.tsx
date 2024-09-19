@@ -1,10 +1,16 @@
 import { Suspense } from 'react'
 
-import FeaturedOrganisms from './components/FeaturedOrganisms'
-import LatestDiscoveries from './components/LatestDiscoveries'
-import MostSearched from './components/MostSearched'
+import type { Props } from './utils'
 
-export default function HomeScreen() {
+import FeaturedOrganisms from './components/FeaturedList'
+import LatestsOrganisms from './components/LatestsList'
+import PopularOrganisms from './components/PopularList'
+
+export default function HomeScreen({
+	featuredOrganismsData,
+	latestsOrganismsData,
+	popularOrganismsData,
+}: Props) {
 	return (
 		<div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
 			<h1>Descubre insectos, arácnidos y otros artrópodos</h1>
@@ -55,7 +61,7 @@ export default function HomeScreen() {
 				has encontrado?
 			</p>
 			<Suspense fallback={<div>Cargando...</div>}>
-				<MostSearched />
+				<PopularOrganisms fallbackData={popularOrganismsData} />
 			</Suspense>
 
 			<h2>Nuevos descubrimientos</h2>
@@ -65,13 +71,13 @@ export default function HomeScreen() {
 				sobre el fascinante mundo de los artrópodos.
 			</p>
 			<Suspense fallback={<div>Cargando...</div>}>
-				<LatestDiscoveries />
+				<LatestsOrganisms fallbackData={latestsOrganismsData} />
 			</Suspense>
 
 			<h2>Destacados</h2>
 			<p>Organismos curados por nuestros expertos.</p>
 			<Suspense fallback={<div>Cargando...</div>}>
-				<FeaturedOrganisms />
+				<FeaturedOrganisms fallbackData={featuredOrganismsData} />
 			</Suspense>
 		</div>
 	)

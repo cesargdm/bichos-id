@@ -1,19 +1,6 @@
-import Sentry from '@/app/lib/sentry'
-
 import { getIdToken } from '../auth'
 import { API_BASE_URL } from './constants'
-
-export function fetcher<TData, TKey extends string = string>(
-	url: TKey,
-	options?: RequestInit,
-) {
-	return fetch(url, options)
-		.then((response) => response.json() as TData)
-		.catch((error: unknown) => {
-			Sentry.captureException(error, { data: { error } })
-			throw error
-		})
-}
+import { fetcher } from './fetcher'
 
 export class Api {
 	static async identify(base64Image: string) {
@@ -31,13 +18,5 @@ export class Api {
 				method: 'POST',
 			},
 		)
-	}
-
-	static getOrganismKey(id: string) {
-		return `${API_BASE_URL}/organisms/${id}` as const
-	}
-
-	static getOrganismsKey(params?: URLSearchParams) {
-		return `${API_BASE_URL}/organisms?${params}` as const
 	}
 }

@@ -10,7 +10,7 @@ type Props = {
 
 export const dynamic = 'force-dynamic'
 
-export const revalidate = 60 * 60 * 24 // 1 day
+export const revalidate = 60 * 60 * 3 // 3 hours
 
 export async function generateMetadata({ params }: Props) {
 	const id = params.id
