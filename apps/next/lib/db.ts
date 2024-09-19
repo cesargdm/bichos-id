@@ -46,8 +46,6 @@ export interface Database {
 	organism_scans: OrganismScan
 }
 
-export const db = createKysely<Database>()
-
 /**
  * Returns a list of organisms.
  */
@@ -62,6 +60,8 @@ export function getOrganisms({
 	limit?: number
 	query?: string
 } = {}) {
+	const db = createKysely<Database>()
+
 	return db
 		.selectFrom('organisms')
 		.orderBy(sortBy, direction)
@@ -75,6 +75,8 @@ export function getOrganisms({
  * Returns an organism by its ID.
  */
 export function getOrganism(id: string) {
+	const db = createKysely<Database>()
+
 	return db
 		.selectFrom('organisms')
 		.where('id', '=', id)
