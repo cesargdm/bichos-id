@@ -66,6 +66,7 @@ function DiscoverDetailScreen({ fallbackData }: Props) {
 					height: 100,
 					position: 'absolute',
 					top: 0,
+					left: 0,
 					width: '100%',
 					zIndex: 999,
 				}}
