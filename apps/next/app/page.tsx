@@ -1,5 +1,3 @@
-import { Suspense } from 'react'
-
 import HomeScreen from '@/app/screens/Home'
 import {
 	featuredListOptions,
@@ -7,8 +5,6 @@ import {
 	popularListOptions,
 } from '@/app/screens/Home/utils'
 import { getOrganisms } from '@/next/lib/db'
-
-export const dynamic = 'force-dynamic'
 
 export const revalidate = 60 * 60 * 1 // 1 hour
 
@@ -21,12 +17,10 @@ export default async function HomePage() {
 		])
 
 	return (
-		<Suspense fallback={null}>
-			<HomeScreen
-				latestsOrganismsData={latestsOrganismsData}
-				popularOrganismsData={popularOrganismsData}
-				featuredOrganismsData={featuredOrganismsData}
-			/>
-		</Suspense>
+		<HomeScreen
+			latestsOrganismsData={latestsOrganismsData}
+			popularOrganismsData={popularOrganismsData}
+			featuredOrganismsData={featuredOrganismsData}
+		/>
 	)
 }

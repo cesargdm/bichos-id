@@ -1,15 +1,11 @@
 import type { Metadata } from 'next'
 
-import { Suspense } from 'react'
-
 import ExploreScreen from '@/app/screens/Explore'
 import { getOrganisms } from '@/next/lib/db'
 
 type Props = {
 	searchParams: { [key: string]: string | string[] | undefined }
 }
-
-export const dynamic = 'force-dynamic'
 
 export const revalidate = 60 * 60 * 1 // 1 hour
 
@@ -22,9 +18,5 @@ export const metadata: Metadata = {
 export default async function ExplorePage({ searchParams }: Props) {
 	const organisms = await getOrganisms(searchParams)
 
-	return (
-		<Suspense fallback={null}>
-			<ExploreScreen fallbackData={organisms} />
-		</Suspense>
-	)
+	return <ExploreScreen fallbackData={organisms} />
 }

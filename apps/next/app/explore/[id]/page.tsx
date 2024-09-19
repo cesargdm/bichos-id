@@ -1,5 +1,4 @@
 import { notFound } from 'next/navigation'
-import { Suspense } from 'react'
 
 import DiscoveryDetailScreen from '@/app/screens/ExploreDetail'
 import { getOrganism } from '@/next/lib/db'
@@ -7,8 +6,6 @@ import { getOrganism } from '@/next/lib/db'
 type Props = {
 	params: { id: string }
 }
-
-export const dynamic = 'force-dynamic'
 
 export const revalidate = 60 * 60 * 3 // 3 hours
 
@@ -36,9 +33,5 @@ export default async function DiscoveryDetailPage({ params }: Props) {
 		return notFound()
 	}
 
-	return (
-		<Suspense fallback={null}>
-			<DiscoveryDetailScreen fallbackData={organism} />
-		</Suspense>
-	)
+	return <DiscoveryDetailScreen fallbackData={organism} />
 }

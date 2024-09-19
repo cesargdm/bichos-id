@@ -44,8 +44,7 @@ function initializeFirebase() {
 			}),
 		})
 	} catch (error) {
-		console.log('initializeApp() failed')
-		console.log(error)
+		Sentry.captureException(error)
 	}
 }
 

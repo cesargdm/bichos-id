@@ -46,29 +46,32 @@ export interface Database {
 	organism_scans: OrganismScan
 }
 
-/**
- * Returns a list of organisms.
- */
-export function getOrganisms({
-	direction,
-	limit = 50,
-	query,
-	sortBy = 'common_name',
-}: {
+type GetOrganismsOptions = {
 	sortBy?: UndirectedOrderByExpression<Database, 'organisms', object>
 	direction?: 'asc' | 'desc'
 	limit?: number
 	query?: string
-} = {}) {
+}
+
+/**
+ * Returns a list of organisms.
+ */
+export function getOrganisms(options: GetOrganismsOptions = {}) {
+	const { direction, limit = 50, query, sortBy = 'common_name' } = options
+
 	const db = createKysely<Database>()
 
-	return db
+	let dbQuery = db
 		.selectFrom('organisms')
 		.orderBy(sortBy, direction)
-		.where('common_name', 'ilike', `%${query}%`)
 		.limit(limit)
 		.selectAll()
-		.execute()
+
+	if (query) {
+		dbQuery = dbQuery.where('common_name', 'ilike', `%${query}%`)
+	}
+
+	return dbQuery.execute()
 }
 
 /**

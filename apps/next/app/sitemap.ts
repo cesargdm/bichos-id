@@ -4,8 +4,6 @@ import { createKysely } from '@vercel/postgres-kysely'
 
 import type { Database } from '@/next/lib/db'
 
-export const dynamic = 'force-dynamic'
-
 export const revalidate = 60
 
 const origin = process.env.NEXT_PUBLIC_ORIGIN

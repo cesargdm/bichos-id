@@ -14,6 +14,17 @@ type Props = {
 	fallbackData?: Organism[]
 }
 
+const styles = {
+	container: {
+		display: 'flex',
+		flexDirection: 'row',
+		gap: 5,
+		overflowX: 'auto',
+		paddingBottom: 20,
+		width: '100%',
+	},
+} as const
+
 export default function MostSearched({ fallbackData }: Props) {
 	const { data } = useSWR<Organism[]>(
 		keys.organisms.all(new URLSearchParams(popularListOptions)),
@@ -22,16 +33,7 @@ export default function MostSearched({ fallbackData }: Props) {
 	)
 
 	return (
-		<div
-			style={{
-				display: 'flex',
-				flexDirection: 'row',
-				gap: 5,
-				overflowX: 'auto',
-				paddingBottom: 20,
-				width: '100%',
-			}}
-		>
+		<div style={styles.container}>
 			{data?.map((organism) => (
 				<OrganismItem key={organism.id} data={organism} />
 			))}

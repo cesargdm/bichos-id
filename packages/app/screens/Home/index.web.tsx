@@ -6,13 +6,19 @@ import FeaturedOrganisms from './components/FeaturedList'
 import LatestsOrganisms from './components/LatestsList'
 import PopularOrganisms from './components/PopularList'
 
-export default function HomeScreen({
-	featuredOrganismsData,
-	latestsOrganismsData,
-	popularOrganismsData,
-}: Props) {
+export default function HomeScreen(props: Props) {
+	const { featuredOrganismsData, latestsOrganismsData, popularOrganismsData } =
+		props
+
 	return (
-		<div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+		<div
+			style={{
+				display: 'flex',
+				flexDirection: 'column',
+				gap: 20,
+				width: '100%',
+			}}
+		>
 			<h1>Descubre insectos, arácnidos y otros artrópodos</h1>
 			<p>
 				Identifica insectos, arácnidos y otros artrópodos usando Inteligencia
@@ -60,6 +66,7 @@ export default function HomeScreen({
 				Descubre los bichos más buscados por la comunidad de Bicho ID. ¿Ya los
 				has encontrado?
 			</p>
+
 			<Suspense fallback={<div>Cargando...</div>}>
 				<PopularOrganisms fallbackData={popularOrganismsData} />
 			</Suspense>
