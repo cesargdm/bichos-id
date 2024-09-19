@@ -9,6 +9,8 @@ type Props = {
 	searchParams: { [key: string]: string | string[] | undefined }
 }
 
+export const dynamic = 'force-dynamic'
+
 export const revalidate = 60 * 60 * 1 // 1 hour
 
 export const metadata: Metadata = {
