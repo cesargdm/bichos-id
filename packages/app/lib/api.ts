@@ -1,5 +1,3 @@
-import { Platform } from 'react-native'
-
 import Sentry from '@/app/lib/sentry'
 
 import { getIdToken } from './auth'
@@ -8,7 +6,8 @@ function getBaseUrl() {
 	const isDevelopment = process.env.NODE_ENV === 'development'
 	if (isDevelopment) return 'http://localhost:3000/api/v1'
 
-	if (Platform.OS === 'web') return '/api/v1'
+	// Check if we're in web environment
+	if (typeof globalThis === 'object' && 'window' in globalThis) return '/api/v1'
 
 	return 'https://bichos-id.fucesa.com/api/v1'
 }
@@ -28,7 +27,6 @@ export function fetcher<TData, TKey extends string = string>(
 	return fetch(url, options)
 		.then((response) => response.json() as TData)
 		.catch((error: unknown) => {
-			// console.log('Platform.OS', Platform.OS)
 			Sentry.captureException(error, { data: { error } })
 			throw error
 		})
