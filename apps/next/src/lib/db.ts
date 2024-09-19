@@ -1,4 +1,9 @@
+import type { UndirectedOrderByExpression } from 'kysely/dist/cjs/parser/order-by-parser'
+
+import { createKysely } from '@vercel/postgres-kysely'
 import { z } from 'zod'
+
+import type { Organism } from '@/app/lib/types'
 
 export const IdentificationSchema = z.object({
 	_imageQualityRating: z.number(),
@@ -25,33 +30,6 @@ export const OrganismSchema = z.object({
 	}),
 })
 
-export interface Organism {
-	id: string
-	common_name: string
-	classification: {
-		phylum: string
-		class: string
-		order: string
-		family: string
-		genus?: string
-		species?: string
-	}
-	description?: string
-	metadata: {
-		venomous: {
-			type?: string
-			level: 'NON_VENOMOUS' | 'VENOMOUS' | 'HIGHLY_VENOMOUS'
-		}
-	}
-	scan_count: number
-	taxonomy: 'SPECIES' | 'GENUS' | 'FAMILY'
-	image_quality_rating: number
-	image_key: string
-	created_at: string
-	updated_at: string
-	created_by: string
-}
-
 export interface OrganismScan {
 	id: string
 	image_key: string
@@ -66,4 +44,40 @@ export interface OrganismScan {
 export interface Database {
 	organisms: Organism
 	organism_scans: OrganismScan
+}
+
+export const db = createKysely<Database>()
+
+/**
+ * Returns a list of organisms.
+ */
+export function getOrganisms({
+	direction,
+	limit = 50,
+	query,
+	sortBy = 'common_name',
+}: {
+	sortBy?: UndirectedOrderByExpression<Database, 'organisms', object>
+	direction?: 'asc' | 'desc'
+	limit?: number
+	query?: string
+} = {}) {
+	return db
+		.selectFrom('organisms')
+		.orderBy(sortBy, direction)
+		.where('common_name', 'ilike', `%${query}%`)
+		.limit(limit)
+		.selectAll()
+		.execute()
+}
+
+/**
+ * Returns an organism by its ID.
+ */
+export function getOrganism(id: string) {
+	return db
+		.selectFrom('organisms')
+		.where('id', '=', id)
+		.selectAll()
+		.executeTakeFirst()
 }

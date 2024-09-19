@@ -1,6 +1,6 @@
 import { Suspense } from 'react'
 
-import HomeScreen from '@bichos-id/app/screens/Home'
+import HomeScreen from '@/app/screens/Home'
 
 export default function HomePage() {
 	return (

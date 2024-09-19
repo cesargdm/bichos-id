@@ -2,7 +2,7 @@ import type { MetadataRoute } from 'next'
 
 import { createKysely } from '@vercel/postgres-kysely'
 
-import type { Database } from './api/v1/_db'
+import type { Database } from '../lib/db'
 
 export const dynamic = 'force-dynamic'
 

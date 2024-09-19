@@ -20,16 +20,19 @@ export default function HomeScreen() {
 					gap: 10,
 					margin: 'auto',
 				}}
-				action=""
+				method="get"
+				action="/explore"
 			>
 				<input
 					style={{
 						backgroundColor: 'transparent',
 						border: '1px solid #ddd',
 						borderRadius: 8,
+						color: 'white',
 						fontSize: 16,
 						padding: 16,
 					}}
+					name="query"
 					placeholder="Buscar bicho..."
 					type="search"
 				/>

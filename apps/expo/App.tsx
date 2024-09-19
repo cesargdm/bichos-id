@@ -9,9 +9,9 @@ import {
 } from 'expo-tracking-transparency'
 import { useEffect, useState } from 'react'
 
-import Sentry from '@bichos-id/app/lib/sentry'
-import { NativeNavigation } from '@bichos-id/app/navigation/native'
-import { Provider } from '@bichos-id/app/provider'
+import Sentry from '@/app/lib/sentry'
+import { NativeNavigation } from '@/app/navigation/native'
+import { Provider } from '@/app/provider'
 
 void preventAutoHideAsync()
 

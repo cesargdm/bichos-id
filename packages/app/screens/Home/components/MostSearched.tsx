@@ -2,12 +2,14 @@
 
 import useSWR from 'swr'
 
-import { fetcher } from '@bichos-id/app/lib/api'
+import type { Organism } from '@/app/lib/types'
 
-import Organism from './Organism'
+import { fetcher } from '@/app/lib/api'
+
+import OrganismItem from './Organism'
 
 export default function MostSearched() {
-	const { data } = useSWR<{ id: string }[]>(
+	const { data } = useSWR<Organism[]>(
 		'/api/v1/organisms?sortBy=scan_count&direction=desc',
 		fetcher,
 		{ fallbackData: [], suspense: true },
@@ -24,7 +26,9 @@ export default function MostSearched() {
 				width: '100%',
 			}}
 		>
-			{data?.map((organism) => <Organism key={organism.id} data={organism} />)}
+			{data?.map((organism) => (
+				<OrganismItem key={organism.id} data={organism} />
+			))}
 		</div>
 	)
 }

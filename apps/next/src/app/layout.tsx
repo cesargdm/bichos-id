@@ -3,8 +3,9 @@ import type { ReactNode } from 'react'
 
 import { GoogleAnalytics } from '@next/third-parties/google'
 
-import Footer from '../components/Footer'
-import Nav from '../components/Nav'
+import Footer from '@/next/components/Footer'
+import Nav from '@/next/components/Nav'
+
 import './globals.css'
 import { StylesProvider } from './styles-provider'
 

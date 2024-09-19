@@ -3,7 +3,8 @@
 		"strictNullChecks": true,
 		"noUncheckedIndexedAccess": true,
 		"paths": {
-			"@bichos-id/app/*": ["./packages/app/*"]
+			"@/app/*": ["./packages/app/*"],
+			"@/next/*": ["./apps/next/src/*"]
 		}
 	},
 	"include": ["eslint.config.mjs", "packages/**/*", "apps/**/*"],

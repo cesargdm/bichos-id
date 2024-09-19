@@ -2,20 +2,18 @@ import type { Metadata } from 'next'
 
 import { Suspense } from 'react'
 
-import ExploreScreen from '@bichos-id/app/screens/Explore'
+import SettingsScreen from '@/app/screens/Settings'
 
 export const metadata: Metadata = {
 	description:
 		'Descubre insectos, arácnidos y otros bichos con Bichos ID usando inteligencia artificial.',
-	title: 'Explorar',
+	title: 'Ajustes - Bichos ID - Fucesa',
 }
 
-export default function ExplorePage() {
-	const organisms = [] as never[]
-
+export default function SettingsPage() {
 	return (
 		<Suspense fallback={null}>
-			<ExploreScreen fallbackData={organisms} />
+			<SettingsScreen />
 		</Suspense>
 	)
 }

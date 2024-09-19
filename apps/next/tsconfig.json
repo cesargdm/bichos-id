@@ -14,11 +14,10 @@
 		"isolatedModules": true,
 		"jsx": "preserve",
 		"incremental": true,
-		"plugins": [
-			{
-				"name": "next"
-			}
-		]
+		"plugins": [{ "name": "next" }],
+		"paths": {
+			"@/next/*": ["./src/*"]
+		}
 	},
 	"include": [
 		"next-env.d.ts",
@@ -28,5 +27,6 @@
 		".next/types/**/*.ts",
 		"next.config.mjs"
 	],
-	"exclude": ["node_modules"]
+	"exclude": ["node_modules"],
+	"extends": "../../tsconfig"
 }

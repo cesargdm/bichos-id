@@ -1,9 +1,7 @@
 import * as Sentry from '@sentry/react-native'
 
 export const routingInstrumentation = new Sentry.ReactNavigationInstrumentation(
-	{
-		enableTimeToInitialDisplay: true,
-	},
+	{ enableTimeToInitialDisplay: true },
 )
 
 Sentry.init({

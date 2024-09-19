@@ -7,12 +7,13 @@ const styles = StyleSheet.create({
 		gap: 10,
 		justifyContent: 'center',
 	},
+	title: { color: 'white', fontSize: 25 },
 })
 
 export default function ErrorScreen({ error }: { error: Error | undefined }) {
 	return (
 		<View style={styles.container}>
-			<Text style={{ color: 'white', fontSize: 25 }}>Ocurrió un error</Text>
+			<Text style={styles.title}>Ocurrió un error</Text>
 			{error && 'message' in error ? (
 				<Text style={{ color: 'white' }}>{error.message}</Text>
 			) : null}

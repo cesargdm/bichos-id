@@ -1,6 +1,7 @@
 import type { NextRequest } from 'next/server'
 
 import { GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3'
+import * as Sentry from '@sentry/nextjs'
 import { createKysely } from '@vercel/postgres-kysely'
 import { initializeApp, cert } from 'firebase-admin/app'
 import { getAuth } from 'firebase-admin/auth'
@@ -10,10 +11,10 @@ import OpenAI from 'openai'
 import { zodResponseFormat } from 'openai/helpers/zod'
 import { z } from 'zod'
 
-import type { Database } from '../../_db'
+import type { Database } from '@/next/lib/db'
 
-import { IdentificationSchema, OrganismSchema } from '../../_db'
-import { getR2Client, R2_BUCKET_NAME } from '../../_r2'
+import { IdentificationSchema, OrganismSchema } from '@/next/lib/db'
+import { getR2Client, R2_BUCKET_NAME } from '@/next/lib/r2'
 
 const requestBodySchema = z.object({
 	base64Image: z
@@ -122,7 +123,7 @@ ${
 		})
 
 		const parsedIdentification =
-			identificationResponse.choices[0].message?.parsed
+			identificationResponse.choices[0]?.message?.parsed
 
 		if (!parsedIdentification) {
 			return NextResponse.json(
@@ -144,10 +145,10 @@ ${
 			.createHash('sha256')
 			.update(data.base64Image)
 			.digest('hex')
-		const imageExtension = data.base64Image
+		const imageExtension = data?.base64Image
 			.split(';')[0]
-			.split('/')[1]
-			.toLowerCase()
+			?.split('/')[1]
+			?.toLowerCase()
 
 		const imageKey =
 			`${imagePath}/${imageSha256}.${imageExtension}`.toLowerCase()
@@ -229,31 +230,35 @@ Instructions:
 				response_format: zodResponseFormat(OrganismSchema, 'event'),
 			})
 
-			const parsedOrganismInfo = organismResponse.choices[0].message?.parsed
+			const parsedOrganismInfo = organismResponse.choices[0]?.message?.parsed
 
 			if (!parsedOrganismInfo) {
 				throw new Error('No response from AI')
 			}
 
-			await db
-				.insertInto('organisms')
-				.values({
-					id: organismId,
-					...identification,
-					...parsedOrganismInfo,
-					created_at: new Date().toISOString(),
-					created_by: decodedToken.sub,
-					image_key: imageKey,
-					image_quality_rating: _imageQualityRating,
-					scan_count: 0,
-					taxonomy: identification.classification.species
-						? 'SPECIES'
-						: identification.classification.genus
-							? 'GENUS'
-							: 'FAMILY',
-					updated_at: new Date().toISOString(),
-				})
-				.execute()
+			const newOrganismValues = {
+				id: organismId,
+				...identification,
+				...parsedOrganismInfo,
+				created_at: new Date().toISOString(),
+				created_by: decodedToken.sub,
+				image_key: imageKey,
+				image_quality_rating: _imageQualityRating,
+				scan_count: 0,
+				taxonomy: identification.classification.species
+					? 'SPECIES'
+					: identification.classification.genus
+						? 'GENUS'
+						: 'FAMILY',
+				updated_at: new Date().toISOString(),
+			} as const
+
+			Sentry.captureEvent({
+				extra: { values: newOrganismValues },
+				message: 'New organism',
+			})
+
+			await db.insertInto('organisms').values(newOrganismValues).execute()
 		} else if (existing.image_quality_rating < _imageQualityRating) {
 			await db
 				.updateTable('organisms')
@@ -271,7 +276,7 @@ Instructions:
 			{ status: 200 },
 		)
 	} catch (error) {
-		console.log(error)
+		Sentry.captureException(error)
 
 		return NextResponse.json({ error: 'An error occurred' }, { status: 500 })
 	}

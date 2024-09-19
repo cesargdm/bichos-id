@@ -1,8 +1,9 @@
-import { licenses, type License } from '@bichos-id/app/lib/licenses'
+import { licenses, type License } from '@/app/lib/licenses'
 
 import './style.css'
+
 function cleanAuthor(author: string): string {
-	return author.split(/ <|\(|https?:\/\/|@|mailto:/)[0].trim()
+	return author.split(/ <|\(|https?:\/\/|@|mailto:/)[0]?.trim() ?? ''
 }
 
 function cleanLicenseLink(link: string): string {
@@ -25,9 +26,10 @@ function groupByAuthor(licenses: License[]) {
 		(acc, license) => {
 			const cleanedAuthor = cleanAuthor(license.author)
 			if (!acc[cleanedAuthor]) {
-				acc[cleanedAuthor] = []
+				acc[cleanedAuthor] = [license]
+			} else {
+				acc[cleanedAuthor]?.push(license)
 			}
-			acc[cleanedAuthor].push(license)
 			return acc
 		},
 		{} as Record<string, License[]>,

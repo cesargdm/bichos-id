@@ -15,6 +15,9 @@
 		},
 		"licenses": {
 			"dependsOn": ["^licenses"]
+		},
+		"typecheck": {
+			"dependsOn": ["^typecheck"]
 		}
 	}
 }

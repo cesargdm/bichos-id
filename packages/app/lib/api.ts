@@ -1,6 +1,6 @@
 import { Platform } from 'react-native'
 
-import Sentry from '@bichos-id/app/lib/sentry'
+import Sentry from '@/app/lib/sentry'
 
 import { getIdToken } from './auth'
 
@@ -28,6 +28,7 @@ export function fetcher<TData, TKey extends string = string>(
 	return fetch(url, options)
 		.then((response) => response.json() as TData)
 		.catch((error: unknown) => {
+			// console.log('Platform.OS', Platform.OS)
 			Sentry.captureException(error, { data: { error } })
 			throw error
 		})
@@ -55,7 +56,7 @@ export class Api {
 		return `${API_BASE_URL}/organisms/${id}` as const
 	}
 
-	static getOrganismsKey() {
-		return `${API_BASE_URL}/organisms` as const
+	static getOrganismsKey(params?: URLSearchParams) {
+		return `${API_BASE_URL}/organisms?${params}` as const
 	}
 }

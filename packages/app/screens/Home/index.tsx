@@ -23,7 +23,7 @@ import {
 import { Link } from 'solito/link'
 import { useRouter } from 'solito/navigation'
 
-import { Api } from '@bichos-id/app/lib/api'
+import { Api } from '@/app/lib/api'
 
 const CAPTURABLE_WIDTH_PERCENTAGE = 0.6
 const CAPTURABLE_HEIGHT_PERCENTAGE = 0.4

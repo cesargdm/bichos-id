@@ -2,7 +2,7 @@ import { DarkTheme, NavigationContainer } from '@react-navigation/native'
 import * as Linking from 'expo-linking'
 import { useCallback, useMemo, useRef } from 'react'
 
-import { routingInstrumentation } from '@bichos-id/app/lib/sentry'
+import { routingInstrumentation } from '@/app/lib/sentry'
 
 type Props = {
 	children: React.ReactNode

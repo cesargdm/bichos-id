@@ -1,17 +1,14 @@
-import * as RSentry from '@sentry/react'
+import * as Sentry from '@sentry/nextjs'
 
 export const routingInstrumentation = null
 
-RSentry.init({
-	dsn: 'https://d8fb4a916d7f155778f7ea083e566572@o4507958202662912.ingest.us.sentry.io/4507958206201856',
-	integrations: [
-		RSentry.browserTracingIntegration(),
-		RSentry.replayIntegration(),
-	],
+Sentry.init({
+	dsn: 'https://e50094c733f8a02cff976221d95c6a62@o4507958202662912.ingest.us.sentry.io/4507958204628992',
+	integrations: [],
 	replaysOnErrorSampleRate: 1.0,
 	replaysSessionSampleRate: 0.1,
-	tracePropagationTargets: ['https://bichos-id.fucesa.com', /^\/api\//],
+	tracePropagationTargets: ['https://bichos-id.fucesa.com', /^\//, 'localhost'],
 	tracesSampleRate: 1.0,
 })
 
-export default RSentry
+export default Sentry

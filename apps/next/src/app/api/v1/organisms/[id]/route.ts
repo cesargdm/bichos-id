@@ -1,10 +1,10 @@
 import { ListObjectsCommand } from '@aws-sdk/client-s3'
+import * as Sentry from '@sentry/nextjs'
 import { createKysely } from '@vercel/postgres-kysely'
 import { NextResponse } from 'next/server'
 
-import type { Database } from '../../_db'
-
-import { getR2Client, R2_BUCKET_NAME } from '../../_r2'
+import { getOrganism, type Database } from '@/next/lib/db'
+import { getR2Client, R2_BUCKET_NAME } from '@/next/lib/r2'
 
 export const revalidate = 60 * 60 * 1 // 1 hour
 
@@ -20,11 +20,7 @@ export async function GET(
 		const images_path = `scans/${id.replaceAll('-', '/')}`
 
 		const [organism, organismScans, images] = await Promise.all([
-			db
-				.selectFrom('organisms')
-				.where('id', '=', id)
-				.selectAll()
-				.executeTakeFirst(),
+			getOrganism(id),
 			db
 				.selectFrom('organism_scans')
 				.where('organism_id', '=', id)
@@ -50,7 +46,9 @@ export async function GET(
 			images,
 			scansCount: organismScans.length,
 		})
-	} catch {
+	} catch (error) {
+		Sentry.captureException(error)
+
 		return NextResponse.json(
 			{ error: 'Failed to connect to database' },
 			{ status: 500 },

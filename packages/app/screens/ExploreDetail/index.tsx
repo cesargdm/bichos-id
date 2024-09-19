@@ -10,62 +10,17 @@ import { SolitoImage } from 'solito/image'
 import { useParams } from 'solito/navigation'
 import useSWR from 'swr'
 
-import type { ASSETS_BASE_URL } from '@bichos-id/app/lib/api'
+import type { ASSETS_BASE_URL } from '@/app/lib/api'
+import type { Organism } from '@/app/lib/types'
 
-import { Api, fetcher } from '@bichos-id/app/lib/api'
+import { Api, fetcher } from '@/app/lib/api'
+
+import { getTaxonomyLabel, getVenomousColor, getVenomousLabel } from './utils'
 
 const useUserParams = useParams<{ id: string }>
 
-type OrganismData = {
-	id: string
-	images?: `${typeof ASSETS_BASE_URL}/${string}`[]
-	common_name: string
-	description?: string
-	habitat?: string
-	scansCount?: number
-	taxonomy: 'SPECIES' | 'GENUS' | 'FAMILY'
-	metadata: {
-		venomous: {
-			type?: string
-			level: 'NON_VENOMOUS' | 'VENOMOUS' | 'HIGHLY_VENOMOUS'
-		}
-	}
-	classification: {
-		phylum: string
-		class: string
-		order: string
-		family: string
-		genus?: string
-		species?: string
-	}
-}
-
 type Props = {
-	fallbackData?: OrganismData
-}
-
-function getVenomousLabel(level: string) {
-	switch (level) {
-		case 'HIGHLY_VENOMOUS':
-			return 'Importancia médica'
-		case 'VENOMOUS':
-			return 'Precaución médica'
-		case 'NON_VENOMOUS':
-			return 'Sin importancia médica'
-		default:
-			return level
-	}
-}
-
-function getVenomousColor(level: string) {
-	switch (level) {
-		case 'HIGHLY_VENOMOUS':
-			return 'rgba(255,0,0,0.2)'
-		case 'VENOMOUS':
-			return 'rgba(238, 207, 5, 0.2)'
-		default:
-			return 'rgba(255,255,255,0.1)'
-	}
+	fallbackData?: Organism & { images?: `${typeof ASSETS_BASE_URL}/${string}`[] }
 }
 
 const styles = StyleSheet.create({
@@ -81,18 +36,10 @@ const styles = StyleSheet.create({
 	},
 })
 
-function getTaxonomyLabel(data: OrganismData['taxonomy']) {
-	return {
-		FAMILY: 'Familia',
-		GENUS: 'Género',
-		SPECIES: 'Especie',
-	}[data]
-}
-
 function DiscoverDetailScreen({ fallbackData }: Props) {
 	const params = useUserParams()
 
-	const { data, error, isLoading } = useSWR<OrganismData, Error>(
+	const { data, error, isLoading } = useSWR<Props['fallbackData'], Error>(
 		Api.getOrganismKey(params.id),
 		fetcher,
 		{ fallbackData },
@@ -196,7 +143,7 @@ function DiscoverDetailScreen({ fallbackData }: Props) {
 								style={{ height: 15, width: 15 }}
 								src={require('./eye.png')}
 							/>
-							<Text style={{ color: 'white' }}>{data.scansCount}</Text>
+							<Text style={{ color: 'white' }}>{data.scan_count}</Text>
 						</View>
 						<View style={styles.tagContainer}>
 							<SolitoImage

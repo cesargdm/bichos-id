@@ -27,7 +27,7 @@ const nextConfig = {
 		'react-native-reanimated',
 		'react-native-gesture-handler',
 
-		'@bichos-id/app',
+		'@/app',
 	],
 }
 

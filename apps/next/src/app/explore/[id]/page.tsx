@@ -1,9 +1,8 @@
 import { notFound } from 'next/navigation'
 import { Suspense } from 'react'
 
-import DiscoveryDetailScreen from '@bichos-id/app/screens/ExploreDetail'
-
-import { getOrganism } from './_db'
+import DiscoveryDetailScreen from '@/app/screens/ExploreDetail'
+import { getOrganism } from '@/next/lib/db'
 
 type Props = {
 	params: { id: string }
@@ -32,6 +31,10 @@ export default async function DiscoveryDetailPage({ params }: Props) {
 	const id = params.id
 
 	const organism = await getOrganism(id)
+
+	if (!organism) {
+		return notFound()
+	}
 
 	return (
 		<Suspense fallback={null}>

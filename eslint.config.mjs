@@ -45,7 +45,7 @@ export default [
 						'object',
 						'unknown',
 					],
-					internalPattern: ['@bichos-id/**'],
+					internalPattern: ['@/**'],
 					order: 'asc',
 					type: 'alphabetical',
 				},
@@ -61,6 +61,6 @@ export default [
 		...tseslint.configs.disableTypeChecked,
 	},
 	{
-		ignores: ['**/.next'],
+		ignores: ['**/.next', 'apps/expo/android/**', 'apps/expo/ios/**'],
 	},
 ]

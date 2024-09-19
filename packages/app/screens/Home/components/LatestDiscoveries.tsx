@@ -2,15 +2,15 @@
 
 import useSWR from 'swr'
 
-import { fetcher } from '@bichos-id/app/lib/api'
+import type { Organism } from '@/app/lib/types'
 
-import type { Organism as OrganismType } from '../../../../../apps/next/app/api/v1/_db'
+import { fetcher } from '@/app/lib/api'
 
-import Organism from './Organism'
+import OrganismItem from './Organism'
 
 export default function LatestDiscoveries() {
-	const { data } = useSWR<OrganismType[]>(
-		'/api/v1/organisms?sortBy=created_at&order=desc',
+	const { data } = useSWR<Organism[]>(
+		'/api/v1/organisms?sortBy=created_at&direction=desc',
 		fetcher,
 		{ fallbackData: [], suspense: true },
 	)
@@ -26,7 +26,9 @@ export default function LatestDiscoveries() {
 				width: '100%',
 			}}
 		>
-			{data?.map((organism) => <Organism key={organism.id} data={organism} />)}
+			{data?.map((organism) => (
+				<OrganismItem key={organism.id} data={organism} />
+			))}
 		</div>
 	)
 }

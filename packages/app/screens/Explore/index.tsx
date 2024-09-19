@@ -15,29 +15,21 @@ import {
 	Text,
 } from 'react-native'
 import { Link, TextLink } from 'solito/link'
+import { useSearchParams } from 'solito/navigation'
 import useSWR from 'swr'
 
-import { Api, ASSETS_BASE_URL, fetcher } from '@bichos-id/app/lib/api'
+import type { Organism } from '@/app/lib/types'
+
+import { Api, ASSETS_BASE_URL, fetcher } from '@/app/lib/api'
 
 import ErrorScreen from '../Error'
 
-type Data = {
-	id: string
-	image_key: string
-	common_name: string
-	classification: { genus: string; species: string }
-}
-
 type Props = {
-	fallbackData?: Data[]
+	fallbackData?: Organism[]
 }
 
 const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		gap: 1,
-		padding: 1,
-	},
+	container: { flex: 1, width: '100%' },
 	padded: {
 		padding: 16,
 	},
@@ -49,20 +41,31 @@ const styles = StyleSheet.create({
 		marginRight: 10,
 		width: 250,
 	},
+	skeletonContainer: {
+		flex: 1,
+		gap: 1,
+		padding: 1,
+	},
 })
 
+type Params = {
+	query?: string
+}
+
 function DiscoverScreen({ fallbackData }: Props) {
+	const params = useSearchParams<Params>()
+
 	const { data, error, isLoading, mutate } = useSWR<
 		Props['fallbackData'],
 		Error
-	>(Api.getOrganismsKey(), fetcher, { fallbackData })
+	>(Api.getOrganismsKey(params), fetcher, { fallbackData })
 
 	if (!data) {
 		if (isLoading) {
 			return (
 				<MotiView
 					transition={{ delay: 1, type: 'timing' }}
-					style={styles.container}
+					style={styles.skeletonContainer}
 				>
 					<Skeleton radius={0} colorMode="dark" width="100%" height={200} />
 					<Skeleton radius={0} colorMode="dark" width="100%" height={200} />
@@ -79,7 +82,7 @@ function DiscoverScreen({ fallbackData }: Props) {
 		<>
 			<StatusBar style="light" />
 			<FlatList
-				style={{ flex: 1, width: '100%' }}
+				style={styles.container}
 				data={data}
 				refreshControl={
 					Platform.OS !== 'web' ? (
@@ -91,14 +94,14 @@ function DiscoverScreen({ fallbackData }: Props) {
 				}
 				renderItem={({ item: organism }) => (
 					<Link
-						viewProps={
-							{
+						viewProps={{
+							style: {
 								flex: 1,
-								height: 200,
+								minHeight: Platform.OS === 'web' ? 400 : 200,
 								overflow: 'hidden',
 								width: '100%',
-							} as object
-						}
+							},
+						}}
 						href={`/explore/${organism.id}`}
 					>
 						<ImageBackground

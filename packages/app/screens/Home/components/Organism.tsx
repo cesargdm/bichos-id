@@ -1,9 +1,9 @@
 import Image from 'next/image'
 import { Link } from 'solito/link'
 
-import { getImageUrl } from '@bichos-id/app/lib/api'
+import type { Organism } from '@/app/lib/types'
 
-import type { Organism } from '../../../../../apps/next/app/api/v1/_db'
+import { getImageUrl } from '@/app/lib/api'
 
 export default function Organism({ data }: { data: Organism }) {
 	return (
