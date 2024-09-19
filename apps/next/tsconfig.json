@@ -16,7 +16,7 @@
 		"incremental": true,
 		"plugins": [{ "name": "next" }],
 		"paths": {
-			"@/next/*": ["./src/*"]
+			"@/next/*": ["./*"]
 		}
 	},
 	"include": [
@@ -27,6 +27,5 @@
 		".next/types/**/*.ts",
 		"next.config.mjs"
 	],
-	"exclude": ["node_modules"],
-	"extends": "../../tsconfig"
+	"exclude": ["node_modules"]
 }
