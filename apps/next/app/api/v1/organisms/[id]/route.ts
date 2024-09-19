@@ -2,10 +2,25 @@ import { ListObjectsCommand } from '@aws-sdk/client-s3'
 import * as Sentry from '@sentry/nextjs'
 import { NextResponse } from 'next/server'
 
+import { ASSETS_BASE_URL } from '@/app/lib/api/constants'
 import { getOrganism, getOrganismScans } from '@/next/lib/db'
 import { getR2Client, R2_BUCKET_NAME } from '@/next/lib/r2'
 
 const cacheMaxAge = 60 * 60 * 3 // 3 hours
+
+function getOrganismImages(prefix: string) {
+	return getR2Client()
+		.send(
+			new ListObjectsCommand({
+				Bucket: R2_BUCKET_NAME,
+				Prefix: prefix,
+			}),
+		)
+		.catch(() => ({ Contents: [] }))
+		.then(({ Contents = [] }) =>
+			Contents.map(({ Key }) => `${ASSETS_BASE_URL}/${Key}`),
+		)
+}
 
 export async function GET(
 	_request: Request,
@@ -19,19 +34,7 @@ export async function GET(
 		const [organism, organismScans, images] = await Promise.all([
 			getOrganism(id),
 			getOrganismScans(id),
-			await getR2Client()
-				.send(
-					new ListObjectsCommand({
-						Bucket: R2_BUCKET_NAME,
-						Prefix: images_path,
-					}),
-				)
-				.catch(() => ({ Contents: [] }))
-				.then(({ Contents = [] }) =>
-					Contents.map(
-						({ Key }) => `https://bichos-id.assets.fucesa.com/${Key}`,
-					),
-				),
+			getOrganismImages(images_path),
 		])
 
 		return NextResponse.json(
@@ -42,7 +45,7 @@ export async function GET(
 			},
 			{
 				headers: {
-					'Cache-Control': `public, max-age=${cacheMaxAge}, must-revalidate`,
+					'Cache-Control': `public, s-maxage=${cacheMaxAge}, must-revalidate`,
 				},
 			},
 		)

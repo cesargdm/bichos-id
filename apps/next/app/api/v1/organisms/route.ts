@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
 
 		return NextResponse.json(organisms, {
 			headers: {
-				'Cache-Control': `public, max-age=${cacheMaxAge}, must-revalidate`,
+				'Cache-Control': `public, s-maxage=${cacheMaxAge}, must-revalidate`,
 			},
 		})
 	} catch (error) {

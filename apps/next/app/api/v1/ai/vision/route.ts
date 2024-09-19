@@ -192,7 +192,7 @@ ${
 							'base64',
 						),
 						Bucket: R2_BUCKET_NAME,
-						CacheControl: 'max-age=31536000, immutable',
+						CacheControl: 'public, max-age=31536000, immutable',
 						ContentEncoding: 'base64',
 						ContentType: `image/${imageExtension}`,
 						Key: imageKey,
