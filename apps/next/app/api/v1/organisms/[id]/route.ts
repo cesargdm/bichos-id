@@ -5,6 +5,8 @@ import { NextResponse } from 'next/server'
 import { getOrganism, getOrganismScans } from '@/next/lib/db'
 import { getR2Client, R2_BUCKET_NAME } from '@/next/lib/r2'
 
+const cacheMaxAge = 60 * 60 * 3 // 3 hours
+
 export async function GET(
 	_request: Request,
 	{ params }: { params: { id: string } },
@@ -40,7 +42,7 @@ export async function GET(
 			},
 			{
 				headers: {
-					'Cache-Control': 'public, max-age=3600, must-revalidate',
+					'Cache-Control': `public, max-age=${cacheMaxAge}, must-revalidate`,
 				},
 			},
 		)

@@ -6,6 +6,8 @@ import { NextResponse } from 'next/server'
 import { getOrganisms } from '@/next/lib/db'
 import { getOrganismsSchema } from '@/next/lib/schema'
 
+const cacheMaxAge = 60 * 60 // 1 hour
+
 export async function GET(request: NextRequest) {
 	try {
 		const params = getOrganismsSchema.parse(
@@ -16,7 +18,7 @@ export async function GET(request: NextRequest) {
 
 		return NextResponse.json(organisms, {
 			headers: {
-				'Cache-Control': 'public, max-age=3600, must-revalidate',
+				'Cache-Control': `public, max-age=${cacheMaxAge}, must-revalidate`,
 			},
 		})
 	} catch (error) {
