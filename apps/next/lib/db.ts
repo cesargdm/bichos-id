@@ -57,30 +57,38 @@ type GetOrganismsOptions = {
  * Returns a list of organisms.
  */
 export function getOrganisms(options: GetOrganismsOptions = {}) {
-	const { direction, limit = 50, query, sortBy = 'common_name' } = options
+	try {
+		const { direction, limit = 50, query, sortBy = 'common_name' } = options
 
-	const db = createKysely<Database>()
+		const db = createKysely<Database>()
 
-	let dbQuery = db
-		.selectFrom('organisms')
-		.orderBy(sortBy, direction)
-		.limit(limit)
-		.selectAll()
+		let dbQuery = db
+			.selectFrom('organisms')
+			.orderBy(sortBy, direction)
+			.limit(limit)
+			.selectAll()
 
-	if (query) {
-		dbQuery = dbQuery.where('common_name', 'ilike', `%${query}%`)
+		if (query) {
+			dbQuery = dbQuery.where('common_name', 'ilike', `%${query}%`)
+		}
+
+		return dbQuery.execute()
+	} catch {
+		return []
 	}
-
-	return dbQuery.execute().catch(() => [])
 }
 
 /**
  * Returns an organism by its ID.
  */
 export function getOrganism(id: string) {
-	const db = createKysely<Database>()
+	try {
+		const db = createKysely<Database>()
 
-	const dbQuery = db.selectFrom('organisms').where('id', '=', id).selectAll()
+		const dbQuery = db.selectFrom('organisms').where('id', '=', id).selectAll()
 
-	return dbQuery.executeTakeFirst().catch(() => undefined)
+		return dbQuery.executeTakeFirst()
+	} catch {
+		return undefined
+	}
 }
