@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation'
 
+import { ASSETS_BASE_URL } from '@/app/lib/api/constants'
 import DiscoveryDetailScreen from '@/app/screens/ExploreDetail'
 import { getOrganism } from '@/next/lib/db'
 
@@ -32,12 +33,14 @@ export default async function DiscoveryDetailPage({ params }: Props) {
 	if (!organism) {
 		return notFound()
 	}
+
 	const jsonLd = {
 		'@context': 'https://schema.org',
 		'@type': 'Taxon',
 		alternateName: organism.common_name,
 		description: organism.description,
 		identifier: organism.id,
+		image: `${ASSETS_BASE_URL}/${organism.image_key}`,
 		name: `${organism.classification?.genus} ${organism.classification?.species}`,
 	}
 

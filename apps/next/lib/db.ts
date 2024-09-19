@@ -1,6 +1,7 @@
 import type { UndirectedOrderByExpression } from 'kysely/dist/cjs/parser/order-by-parser'
 
 import { createKysely } from '@vercel/postgres-kysely'
+import { cache } from 'react'
 import { z } from 'zod'
 
 import type { Organism } from '@/app/lib/types'
@@ -56,7 +57,7 @@ type GetOrganismsOptions = {
 /**
  * Returns a list of organisms.
  */
-export function getOrganisms(options: GetOrganismsOptions = {}) {
+export const getOrganisms = cache((options: GetOrganismsOptions = {}) => {
 	try {
 		const { direction, limit = 50, query, sortBy = 'common_name' } = options
 
@@ -76,24 +77,22 @@ export function getOrganisms(options: GetOrganismsOptions = {}) {
 	} catch {
 		return []
 	}
-}
+})
 
 /**
  * Returns an organism by its ID.
  */
-export function getOrganism(id: string) {
+export const getOrganism = cache((id: string) => {
 	try {
 		const db = createKysely<Database>()
-
 		const dbQuery = db.selectFrom('organisms').where('id', '=', id).selectAll()
-
 		return dbQuery.executeTakeFirst()
 	} catch {
 		return undefined
 	}
-}
+})
 
-export function getOrganismScans(id: string) {
+export const getOrganismScans = cache((id: string) => {
 	try {
 		const db = createKysely<Database>()
 
@@ -105,4 +104,4 @@ export function getOrganismScans(id: string) {
 	} catch {
 		return []
 	}
-}
+})
