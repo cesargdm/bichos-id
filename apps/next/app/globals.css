@@ -135,6 +135,7 @@ main {
 	width: 100%;
 	min-height: 0;
 	min-height: 100svh;
+	min-width: 0;
 }
 
 button,
