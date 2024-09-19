@@ -20,7 +20,8 @@ import useSWR from 'swr'
 
 import type { Organism } from '@/app/lib/types'
 
-import { Api, ASSETS_BASE_URL, fetcher } from '@/app/lib/api'
+import { Api, fetcher } from '@/app/lib/api'
+import { ASSETS_BASE_URL } from '@/app/lib/api/constants'
 
 import ErrorScreen from '../Error'
 

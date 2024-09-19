@@ -10,7 +10,7 @@ import { SolitoImage } from 'solito/image'
 import { useParams } from 'solito/navigation'
 import useSWR from 'swr'
 
-import type { ASSETS_BASE_URL } from '@/app/lib/api'
+import type { ASSETS_BASE_URL } from '@/app/lib/api/constants'
 import type { Organism } from '@/app/lib/types'
 
 import { Api, fetcher } from '@/app/lib/api'

@@ -1,3 +1,5 @@
+'use client'
+
 import auth from '@react-native-firebase/auth'
 
 export function getIdToken() {

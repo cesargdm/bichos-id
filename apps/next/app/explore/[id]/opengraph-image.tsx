@@ -1,7 +1,7 @@
 import { ImageResponse } from '@vercel/og'
 import { notFound } from 'next/navigation'
 
-import { ASSETS_BASE_URL } from '@/app/lib/api'
+import { ASSETS_BASE_URL } from '@/app/lib/api/constants'
 import { getOrganism } from '@/next/lib/db'
 
 type Props = {

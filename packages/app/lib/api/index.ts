@@ -1,24 +1,7 @@
 import Sentry from '@/app/lib/sentry'
 
-import { getIdToken } from './auth'
-
-function getBaseUrl() {
-	const isDevelopment = process.env.NODE_ENV === 'development'
-	if (isDevelopment) return 'http://localhost:3000/api/v1'
-
-	// Check if we're in web environment
-	if (typeof globalThis === 'object' && 'window' in globalThis) return '/api/v1'
-
-	return 'https://bichos-id.fucesa.com/api/v1'
-}
-
-export const API_BASE_URL = getBaseUrl()
-
-export const ASSETS_BASE_URL = 'https://bichos-id.assets.fucesa.com'
-
-export function getImageUrl(imageKey: string) {
-	return `${ASSETS_BASE_URL}/${imageKey}`
-}
+import { getIdToken } from '../auth'
+import { API_BASE_URL } from './constants'
 
 export function fetcher<TData, TKey extends string = string>(
 	url: TKey,

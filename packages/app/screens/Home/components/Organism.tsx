@@ -3,7 +3,7 @@ import { Link } from 'solito/link'
 
 import type { Organism } from '@/app/lib/types'
 
-import { getImageUrl } from '@/app/lib/api'
+import { getImageUrl } from '@/app/lib/api/constants'
 
 export default function Organism({ data }: { data: Organism }) {
 	return (
