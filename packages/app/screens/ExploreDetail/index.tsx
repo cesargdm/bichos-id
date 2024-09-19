@@ -54,8 +54,22 @@ function DiscoverDetailScreen({ fallbackData }: Props) {
 		return <Text>Error {JSON.stringify(error, null, 2)}</Text>
 	}
 
+	const jsonLd = {
+		'@context': 'https://schema.org',
+		'@type': 'Taxon',
+		alternateName: data.common_name,
+		description: data.description,
+		identifier: data.id,
+		image: data.images?.[0],
+		name: `${data.classification?.genus} ${data.classification?.species}`,
+	}
+
 	return (
 		<>
+			<script
+				type="application/ld+json"
+				dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+			/>
 			<LinearGradient
 				colors={['rgba(0,0,0,0.9)', 'rgba(0,0,0,0)']}
 				style={{
