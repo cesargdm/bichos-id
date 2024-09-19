@@ -1,0 +1,20 @@
+{
+	"applinks": {
+		"apps": [],
+		"details": [
+			{
+				"appID": "AUR7UR6M72.com.fucesa.bichos-id"
+			}
+		]
+	},
+	"activitycontinuation": {
+		"apps": [
+			"AUR7UR6M72.com.fucesa.bichos-id"
+		]
+	},
+	"webcredentials": {
+		"apps": [
+			"AUR7UR6M72.com.fucesa.bichos-id"
+		]
+	}
+}

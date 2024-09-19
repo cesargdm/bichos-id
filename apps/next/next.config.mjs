@@ -3,6 +3,17 @@ import { withSentryConfig } from '@sentry/nextjs'
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+	headers: [
+		{
+			headers: [
+				{
+					key: 'Content-Type',
+					value: 'application/json',
+				},
+			],
+			source: '.well-known/apple-app-site-association',
+		},
+	],
 	images: {
 		remotePatterns: [{ hostname: 'bichos-id.assets.fucesa.com' }],
 	},

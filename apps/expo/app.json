@@ -7,23 +7,37 @@
 		"icon": "./assets/icon.png",
 		"platforms": ["ios", "android"],
 		"orientation": "portrait",
+		"splash": {
+			"image": "./assets/images/splash.png",
+			"resizeMode": "contain",
+			"backgroundColor": "#000000"
+		},
 		"ios": {
 			"googleServicesFile": "./GoogleService-Info.plist",
 			"bundleIdentifier": "com.fucesa.bichos-id",
 			"config": { "usesNonExemptEncryption": false },
 			"infoPlist": {
 				"NSLocationWhenInUseUsageDescription": "Con tu ubicación podremos generar una identificación más precisa."
-			}
-		},
-		"splash": {
-			"image": "./assets/images/splash.png",
-			"resizeMode": "contain",
-			"backgroundColor": "#000000"
+			},
+			"associatedDomains": ["applinks:bichos-id.fucesa.com"]
 		},
 		"android": {
 			"permissions": ["android.permission.CAMERA"],
 			"googleServicesFile": "./google-services.json",
-			"package": "com.fucesa.bichos_id"
+			"package": "com.fucesa.bichos_id",
+			"intentFilters": [
+				{
+					"action": "VIEW",
+					"autoVerify": true,
+					"data": [
+						{
+							"scheme": "https",
+							"host": "bichos-id.fucesa.com"
+						}
+					],
+					"category": ["BROWSABLE", "DEFAULT"]
+				}
+			]
 		},
 		"plugins": [
 			"expo-secure-store",
