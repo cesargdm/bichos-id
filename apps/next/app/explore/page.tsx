@@ -4,10 +4,10 @@ import ExploreScreen from '@/app/screens/Explore'
 import { getOrganisms } from '@/next/lib/db'
 
 type Props = {
-	searchParams: { [key: string]: string | string[] | undefined }
+	searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }
 
-export const revalidate = 60 * 60 * 1 // 1 hour
+export const revalidate = 3600 // 1 hour
 
 export const metadata: Metadata = {
 	description:
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 }
 
 export default async function ExplorePage({ searchParams }: Props) {
-	const organisms = await getOrganisms(searchParams)
+	const organisms = await getOrganisms(await searchParams)
 
 	return <ExploreScreen fallbackData={organisms} />
 }

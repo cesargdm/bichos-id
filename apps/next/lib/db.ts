@@ -35,7 +35,7 @@ export interface OrganismScan {
 	id: string
 	image_key: string
 	organism_id: string
-	model: 'gpt-4o-mini'
+	model: `gpt-${string}`
 	image_quality_rating: number
 	created_at: string
 	updated_at: string

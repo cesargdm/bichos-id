@@ -24,10 +24,10 @@ function getOrganismImages(prefix: string) {
 
 export async function GET(
 	_request: Request,
-	{ params }: { params: { id: string } },
+	{ params }: { params: Promise<{ id: string }> },
 ) {
 	try {
-		const id = params.id
+		const id = (await params).id
 
 		const images_path = `scans/${id.replaceAll('-', '/')}`
 

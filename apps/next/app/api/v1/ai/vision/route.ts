@@ -2,6 +2,7 @@ import type { NextRequest } from 'next/server'
 
 import { GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3'
 import * as Sentry from '@sentry/nextjs'
+import { geolocation } from '@vercel/functions'
 import { createKysely } from '@vercel/postgres-kysely'
 import { initializeApp, cert } from 'firebase-admin/app'
 import { getAuth } from 'firebase-admin/auth'
@@ -81,12 +82,14 @@ export async function POST(request: NextRequest) {
 		const rawData: unknown = await request.json()
 		const data = requestBodySchema.parse(rawData)
 
-		const model = 'gpt-4o-mini'
+		const model = 'gpt-4o-2024-11-20'
+
+		const geo = geolocation(request)
 
 		const identificationResponse = await openai.beta.chat.completions.parse({
 			messages: [
 				{
-					content: `You are an expert entomologist that will recognize organisms accurately appearing in a photo uploaded by a user. Be as accurate as possible.
+					content: `You are an expert entomologist that will recognize organisms accurately appearing in a photo taken by a user. Be as accurate as possible.
 
 Instructions:
 - Use shapes, colors, surroundings and metadata to get the best identification.
@@ -96,18 +99,14 @@ Instructions:
 - Review the image quality rating in a scale from 0 to 10, consider composition, quality, lighting and sharpness.
 - In the species field, only return the species name avoid the genus.
 ${
-	request.geo
-		? `- The user's geo data is, country: '${request.geo?.country}', region: '${request.geo?.region}'.`
+	Object.values(geo ?? {}).length
+		? `- The user's geo data is, country: '${geo?.country}', region: '${geo?.region}'.`
 		: ''
 }`,
 					role: 'system',
 				},
 				{
 					content: [
-						{
-							text: `The given photo is:`,
-							type: 'text',
-						},
 						{
 							image_url: { url: data.base64Image },
 							type: 'image_url',
@@ -137,6 +136,13 @@ ${
 		const organismSpecies = `${identification.classification.family}-${
 			identification.classification.genus || ''
 		}-${identification.classification.species || ''}` as const
+
+		if (organismSpecies.startsWith('-')) {
+			return NextResponse.json(
+				{ error: 'Invalid organism species' },
+				{ status: 400 },
+			)
+		}
 
 		const organismId = slugify(organismSpecies)
 		const imagePath = `scans/${organismSpecies.replaceAll('-', '/')}`
@@ -226,7 +232,7 @@ Instructions:
 						role: 'user',
 					},
 				],
-				model: 'gpt-4o-2024-08-06',
+				model,
 				response_format: zodResponseFormat(OrganismSchema, 'event'),
 			})
 

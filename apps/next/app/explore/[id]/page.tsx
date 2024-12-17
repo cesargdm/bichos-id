@@ -5,13 +5,13 @@ import DiscoveryDetailScreen from '@/app/screens/ExploreDetail'
 import { getOrganism } from '@/next/lib/db'
 
 type Props = {
-	params: { id: string }
+	params: Promise<{ id: string }>
 }
 
-export const revalidate = 60 * 60 * 3 // 3 hours
+export const revalidate = 10800 // 3 hours
 
 export async function generateMetadata({ params }: Props) {
-	const id = params.id
+	const id = (await params).id
 
 	const organism = await getOrganism(id)
 
@@ -26,7 +26,7 @@ export async function generateMetadata({ params }: Props) {
 }
 
 export default async function DiscoveryDetailPage({ params }: Props) {
-	const id = params.id
+	const id = (await params).id
 
 	const organism = await getOrganism(id)
 

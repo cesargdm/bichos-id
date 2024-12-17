@@ -2,16 +2,17 @@
 	"expo": {
 		"name": "Bichos ID",
 		"slug": "bichos-id",
-		"version": "1.0.0",
+		"version": "1.1.0",
 		"scheme": "bichos-id",
 		"icon": "./assets/icon.png",
 		"platforms": ["ios", "android"],
 		"orientation": "portrait",
 		"splash": {
 			"image": "./assets/images/splash.png",
-			"resizeMode": "contain",
+			"contentFit": "contain",
 			"backgroundColor": "#000000"
 		},
+		"newArchEnabled": true,
 		"ios": {
 			"googleServicesFile": "./GoogleService-Info.plist",
 			"bundleIdentifier": "com.fucesa.bichos-id",

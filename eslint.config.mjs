@@ -15,8 +15,8 @@ export default [
 			},
 		},
 		plugins: {
-			perfectionist,
 			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+			perfectionist,
 			react,
 		},
 		rules: {
@@ -45,7 +45,7 @@ export default [
 						'object',
 						'unknown',
 					],
-					internalPattern: ['@/**'],
+					internalPattern: ['^@/.*'],
 					order: 'asc',
 					type: 'alphabetical',
 				},

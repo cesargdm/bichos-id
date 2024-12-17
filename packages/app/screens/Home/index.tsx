@@ -8,7 +8,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import MaskedView from '@react-native-masked-view/masked-view'
 import { useIsFocused } from '@react-navigation/native'
 import { manipulateAsync, SaveFormat } from 'expo-image-manipulator'
-import { launchImageLibraryAsync, MediaTypeOptions } from 'expo-image-picker'
+import * as ImagePicker from 'expo-image-picker'
 import { StatusBar } from 'expo-status-bar'
 import { useCallback, useRef, useState, useEffect } from 'react'
 import { StyleSheet, Text, View, Alert, Image, Pressable } from 'react-native'
@@ -214,9 +214,9 @@ function HomeScreen(_props: Props) {
 		try {
 			setIsLoading(true)
 
-			const result = await launchImageLibraryAsync({
+			const result = await ImagePicker.launchImageLibraryAsync({
 				base64: true,
-				mediaTypes: MediaTypeOptions.Images,
+				mediaTypes: 'images',
 				quality: 0.3,
 			})
 

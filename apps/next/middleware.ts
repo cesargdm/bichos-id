@@ -1,6 +1,7 @@
 import type { NextRequest } from 'next/server'
 
 import { Ratelimit } from '@upstash/ratelimit'
+import { ipAddress } from '@vercel/functions'
 import { kv } from '@vercel/kv'
 import { NextResponse } from 'next/server'
 
@@ -23,7 +24,7 @@ export async function middleware(request: NextRequest) {
 	let waitUntil = Date.now()
 
 	try {
-		const ip = request.ip ?? '127.0.0.1'
+		const ip = ipAddress(request) || '127.0.0.1'
 
 		const { reset, success } = await rateLimit.limit(ip)
 

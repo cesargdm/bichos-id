@@ -109,7 +109,7 @@ function DiscoverScreen({ fallbackData }: Props) {
 						<ImageBackground
 							source={{ uri: `${ASSETS_BASE_URL}/${organism.image_key}` }}
 							style={{ flex: 1 }}
-							resizeMode="cover"
+							imageStyle={{ resizeMode: 'cover' }}
 						>
 							<LinearGradient
 								colors={['transparent', 'rgba(0,0,0,0.7)']}
