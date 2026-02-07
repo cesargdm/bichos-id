@@ -78,7 +78,8 @@ export async function POST(request: NextRequest) {
 		const rawData: unknown = await request.json()
 		const data = requestBodySchema.parse(rawData)
 
-		const model = 'gpt-4o-2024-11-20'
+		const visionModel = 'gpt-4.1'
+		const textModel = 'gpt-4.1-nano'
 
 		const geo = geolocation(request)
 
@@ -111,7 +112,7 @@ ${
 					role: 'user',
 				},
 			],
-			model,
+			model: visionModel,
 			response_format: zodResponseFormat(IdentificationSchema, 'event'),
 			temperature: 0.3,
 			user: idToken,
@@ -167,7 +168,7 @@ ${
 				id: getRandomId(),
 				image_key: imageKey,
 				image_quality_rating: _imageQualityRating,
-				model,
+				model: visionModel,
 				organism_id: organismId,
 				updated_at: new Date().toISOString(),
 			})
@@ -228,7 +229,7 @@ Instructions:
 						role: 'user',
 					},
 				],
-				model,
+				model: textModel,
 				response_format: zodResponseFormat(OrganismSchema, 'event'),
 			})
 
