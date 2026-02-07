@@ -2,7 +2,7 @@ import type { MetadataRoute } from 'next'
 
 import { getOrganisms } from '@/next/lib/db'
 
-export const revalidate = 60
+export const revalidate = 3600
 
 const origin = process.env.NEXT_PUBLIC_ORIGIN
 

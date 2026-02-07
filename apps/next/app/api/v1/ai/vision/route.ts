@@ -3,7 +3,6 @@ import type { NextRequest } from 'next/server'
 import { GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3'
 import * as Sentry from '@sentry/nextjs'
 import { geolocation } from '@vercel/functions'
-import { createKysely } from '@vercel/postgres-kysely'
 import { initializeApp, cert } from 'firebase-admin/app'
 import { getAuth } from 'firebase-admin/auth'
 import { revalidatePath } from 'next/cache'
@@ -13,9 +12,7 @@ import OpenAI from 'openai'
 import { zodResponseFormat } from 'openai/helpers/zod'
 import { z } from 'zod'
 
-import type { Database } from '@/next/lib/db'
-
-import { IdentificationSchema, OrganismSchema } from '@/next/lib/db'
+import { db, IdentificationSchema, OrganismSchema } from '@/next/lib/db'
 import { getR2Client, R2_BUCKET_NAME } from '@/next/lib/r2'
 
 const requestBodySchema = z.object({
@@ -77,7 +74,6 @@ export async function POST(request: NextRequest) {
 		}
 
 		const openai = new OpenAI()
-		const db = createKysely<Database>()
 
 		const rawData: unknown = await request.json()
 		const data = requestBodySchema.parse(rawData)

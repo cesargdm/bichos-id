@@ -1,6 +1,8 @@
 import type { UndirectedOrderByExpression } from 'kysely/dist/cjs/parser/order-by-parser'
 
-import { createKysely } from '@vercel/postgres-kysely'
+import { neon } from '@neondatabase/serverless'
+import { Kysely } from 'kysely'
+import { NeonDialect } from 'kysely-neon'
 import { cache } from 'react'
 import { z } from 'zod'
 
@@ -47,6 +49,12 @@ export interface Database {
 	organism_scans: OrganismScan
 }
 
+export const db = new Kysely<Database>({
+	dialect: new NeonDialect({
+		neon: neon(process.env.POSTGRES_URL!),
+	}),
+})
+
 type GetOrganismsOptions = {
 	sortBy?: UndirectedOrderByExpression<Database, 'organisms', object>
 	direction?: 'asc' | 'desc'
@@ -60,8 +68,6 @@ type GetOrganismsOptions = {
 export const getOrganisms = cache((options: GetOrganismsOptions = {}) => {
 	try {
 		const { direction, limit = 50, query, sortBy = 'common_name' } = options
-
-		const db = createKysely<Database>()
 
 		let dbQuery = db
 			.selectFrom('organisms')
@@ -84,7 +90,6 @@ export const getOrganisms = cache((options: GetOrganismsOptions = {}) => {
  */
 export const getOrganism = cache((id: string) => {
 	try {
-		const db = createKysely<Database>()
 		const dbQuery = db.selectFrom('organisms').where('id', '=', id).selectAll()
 		return dbQuery.executeTakeFirst()
 	} catch {
@@ -94,8 +99,6 @@ export const getOrganism = cache((id: string) => {
 
 export const getOrganismScans = cache((id: string) => {
 	try {
-		const db = createKysely<Database>()
-
 		return db
 			.selectFrom('organism_scans')
 			.where('organism_id', '=', id)
