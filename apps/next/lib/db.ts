@@ -55,6 +55,23 @@ export const db = new Kysely<Database>({
 	}),
 })
 
+/**
+ * An organism is considered "complete enough to index" only when it has real,
+ * non-empty content across all of: common name, description, and a species-level
+ * classification. Incomplete stubs (e.g. a genus with a trailing-dash slug and no
+ * species) are thin pages that Google reports as "Crawled - currently not indexed",
+ * so they should be excluded from the sitemap and marked noindex.
+ */
+export function isOrganismIndexable(
+	organism: Pick<Organism, 'common_name' | 'description' | 'classification'>,
+): boolean {
+	return Boolean(
+		organism.common_name?.trim() &&
+			organism.description?.trim() &&
+			organism.classification?.species?.trim(),
+	)
+}
+
 type GetOrganismsOptions = {
 	sortBy?: UndirectedOrderByExpression<Database, 'organisms', object>
 	direction?: 'asc' | 'desc'

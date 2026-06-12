@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation'
 
 import { ASSETS_BASE_URL } from '@/app/lib/api/constants'
 import DiscoveryDetailScreen from '@/app/screens/ExploreDetail'
-import { getOrganism } from '@/next/lib/db'
+import { getOrganism, isOrganismIndexable } from '@/next/lib/db'
 
 type Props = {
 	params: Promise<{ id: string }>
@@ -21,6 +21,13 @@ export async function generateMetadata({ params }: Props) {
 
 	return {
 		description: organism.description,
+		// Incomplete taxonomy stubs (missing common name, description, or species)
+		// are thin pages that Google flags as "Crawled - currently not indexed".
+		// Mark them noindex (but keep follow so link equity still flows) while
+		// leaving complete organisms fully indexable.
+		...(isOrganismIndexable(organism)
+			? null
+			: { robots: { follow: true, index: false } }),
 		title: organism.common_name,
 	}
 }

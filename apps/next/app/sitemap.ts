@@ -1,6 +1,6 @@
 import type { MetadataRoute } from 'next'
 
-import { getOrganisms } from '@/next/lib/db'
+import { getOrganisms, isOrganismIndexable } from '@/next/lib/db'
 
 export const revalidate = 3600
 
@@ -20,7 +20,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 			priority: 1,
 			url: `${origin}/explore`,
 		},
-		...organisms.map((organism) => ({
+		// Only emit complete organisms. Incomplete taxonomy stubs are marked
+		// noindex on their detail page, so keeping them out of the sitemap avoids
+		// advertising thin URLs that drag down crawl quality.
+		...organisms.filter(isOrganismIndexable).map((organism) => ({
 			lastModified: organism.updated_at,
 			priority: 1,
 			url: `${origin}/explore/${organism.id}`,
