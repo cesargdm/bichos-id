@@ -7,7 +7,11 @@ export const revalidate = 3600
 const origin = process.env.NEXT_PUBLIC_ORIGIN
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-	const organisms = await getOrganisms()
+	// Fetch the full organism set rather than the default 50-row page: the
+	// completeness filter below must see every organism, otherwise incomplete
+	// stubs sorting into the first page would shrink the sitemap and push
+	// complete, indexable organisms out of it. 50,000 is the per-sitemap URL cap.
+	const organisms = await getOrganisms({ limit: 50_000 })
 
 	return [
 		{
