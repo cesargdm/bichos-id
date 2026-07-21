@@ -78,12 +78,14 @@ export async function POST(request: NextRequest) {
 		const rawData: unknown = await request.json()
 		const data = requestBodySchema.parse(rawData)
 
-		const visionModel = 'gpt-4.1'
-		const textModel = 'gpt-4.1-nano'
+		// Cost/benefit: luna is half gpt-4.1's price with newer-generation vision;
+		// nano descriptions are generated once per organism and cached in the DB.
+		const visionModel = 'gpt-5.6-luna'
+		const textModel = 'gpt-5.4-nano'
 
 		const geo = geolocation(request)
 
-		const identificationResponse = await openai.beta.chat.completions.parse({
+		const identificationResponse = await openai.chat.completions.parse({
 			messages: [
 				{
 					content: `You are an expert entomologist that will recognize organisms accurately appearing in a photo taken by a user. Be as accurate as possible.
@@ -105,7 +107,7 @@ ${
 				{
 					content: [
 						{
-							image_url: { url: data.base64Image },
+							image_url: { detail: 'high', url: data.base64Image },
 							type: 'image_url',
 						},
 					],
@@ -113,8 +115,8 @@ ${
 				},
 			],
 			model: visionModel,
+			reasoning_effort: 'low',
 			response_format: zodResponseFormat(IdentificationSchema, 'event'),
-			temperature: 0.3,
 			user: idToken,
 		})
 
@@ -208,7 +210,7 @@ ${
 		])
 
 		if (!existing) {
-			const organismResponse = await openai.beta.chat.completions.parse({
+			const organismResponse = await openai.chat.completions.parse({
 				messages: [
 					{
 						content: `You are an expert entomologist with extensive knowledge of arthropods, particularly insects and arachnids.
@@ -230,6 +232,7 @@ Instructions:
 					},
 				],
 				model: textModel,
+				reasoning_effort: 'none',
 				response_format: zodResponseFormat(OrganismSchema, 'event'),
 			})
 

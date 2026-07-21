@@ -5,7 +5,7 @@ import { ASSETS_BASE_URL } from '@/app/lib/api/constants'
 import { getOrganism } from '@/next/lib/db'
 
 type Props = {
-	params: { id: string }
+	params: Promise<{ id: string }>
 }
 
 export const runtime = 'edge'
@@ -18,7 +18,7 @@ export const size = {
 export const contentType = 'image/png'
 
 export default async function Image({ params }: Props) {
-	const id = params.id
+	const id = (await params).id
 
 	const organism = await getOrganism(id)
 

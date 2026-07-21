@@ -7,16 +7,12 @@
 		"icon": "./assets/icon.png",
 		"platforms": ["ios", "android"],
 		"orientation": "portrait",
-		"splash": {
-			"image": "./assets/images/splash.png",
-			"contentFit": "contain",
-			"backgroundColor": "#000000"
-		},
-		"newArchEnabled": true,
 		"ios": {
 			"googleServicesFile": "./GoogleService-Info.plist",
 			"bundleIdentifier": "com.fucesa.bichos-id",
-			"config": { "usesNonExemptEncryption": false },
+			"config": {
+				"usesNonExemptEncryption": false
+			},
 			"infoPlist": {
 				"NSLocationWhenInUseUsageDescription": "Con tu ubicación podremos generar una identificación más precisa."
 			},
@@ -43,24 +39,28 @@
 		"plugins": [
 			"expo-secure-store",
 			"expo-tracking-transparency",
-			["expo-build-properties", { "ios": { "useFrameworks": "static" } }],
+			[
+				"expo-build-properties",
+				{
+					"ios": {
+						"useFrameworks": "static"
+					}
+				}
+			],
 			[
 				"expo-image-picker",
 				{
 					"photosPermission": "Carga e identifica organismos desde tu librería de fotos."
 				}
 			],
-
 			"@react-native-firebase/app",
 			"@react-native-firebase/auth",
-
 			[
 				"react-native-vision-camera",
 				{
 					"cameraPermissionText": "Captura, carga e identifica organismos usando tu cámara."
 				}
 			],
-
 			[
 				"@sentry/react-native/expo",
 				{
@@ -68,7 +68,17 @@
 					"project": "bichos-id-native",
 					"organization": "fucesa"
 				}
-			]
+			],
+			"expo-image",
+			[
+				"expo-splash-screen",
+				{
+					"image": "./assets/images/splash.png",
+					"resizeMode": "contain",
+					"backgroundColor": "#000000"
+				}
+			],
+			"expo-status-bar"
 		],
 		"extra": {
 			"eas": {

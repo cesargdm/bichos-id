@@ -96,13 +96,11 @@ function DiscoverScreen({ fallbackData }: Props) {
 				}
 				renderItem={({ item: organism }) => (
 					<Link
-						viewProps={{
-							style: {
-								flex: 1,
-								minHeight: Platform.OS === 'web' ? 400 : 200,
-								overflow: 'hidden',
-								width: '100%',
-							},
+						style={{
+							flex: 1,
+							minHeight: Platform.OS === 'web' ? 400 : 200,
+							overflow: 'hidden',
+							width: '100%',
 						}}
 						href={`/explore/${organism.id}`}
 					>

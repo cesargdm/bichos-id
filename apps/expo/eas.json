@@ -11,7 +11,7 @@
 				"SENTRY_PROJECT": "bichos-id-native"
 			},
 			"ios": {
-				"cocoapods": "1.15.2"
+				"cocoapods": "1.16.2"
 			}
 		},
 		"development": {

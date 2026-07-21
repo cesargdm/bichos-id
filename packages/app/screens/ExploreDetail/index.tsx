@@ -64,9 +64,9 @@ function DiscoverDetailScreen({ fallbackData }: Props) {
 				colors={['rgba(0,0,0,0.9)', 'rgba(0,0,0,0)']}
 				style={{
 					height: 100,
+					left: 0,
 					position: 'absolute',
 					top: 0,
-					left: 0,
 					width: '100%',
 					zIndex: 999,
 				}}
