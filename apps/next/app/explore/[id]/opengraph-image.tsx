@@ -1,4 +1,4 @@
-import { ImageResponse } from '@vercel/og'
+import { ImageResponse } from 'next/og'
 import { notFound } from 'next/navigation'
 
 import { ASSETS_BASE_URL } from '@/app/lib/api/constants'
@@ -7,8 +7,6 @@ import { getOrganism } from '@/next/lib/db'
 type Props = {
 	params: Promise<{ id: string }>
 }
-
-export const runtime = 'edge'
 
 export const size = {
 	height: 630,

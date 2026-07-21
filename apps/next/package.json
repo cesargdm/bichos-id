@@ -24,7 +24,6 @@
 		"@neondatabase/serverless": "1.1.0",
 		"@vercel/functions": "3.7.5",
 		"@vercel/kv": "3.0.0",
-		"@vercel/og": "0.11.1",
 		"firebase-admin": "14.2.0",
 		"kysely": "0.29.4",
 		"kysely-neon": "3.0.0",
