@@ -14,6 +14,7 @@
 				"usesNonExemptEncryption": false
 			},
 			"infoPlist": {
+				"NSCameraUsageDescription": "Captura, carga e identifica organismos usando tu cámara.",
 				"NSLocationWhenInUseUsageDescription": "Con tu ubicación podremos generar una identificación más precisa."
 			},
 			"associatedDomains": ["applinks:bichos-id.fucesa.com"]
@@ -55,12 +56,6 @@
 			],
 			"@react-native-firebase/app",
 			"@react-native-firebase/auth",
-			[
-				"react-native-vision-camera",
-				{
-					"cameraPermissionText": "Captura, carga e identifica organismos usando tu cámara."
-				}
-			],
 			[
 				"@sentry/react-native/expo",
 				{
