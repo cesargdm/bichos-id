@@ -49,11 +49,31 @@ export interface Database {
 	organism_scans: OrganismScan
 }
 
+// Constructed lazily: `neon()` throws when POSTGRES_URL is absent, and doing
+// that at module scope makes merely importing this file fatal.
+let neonClient: ReturnType<typeof neon> | undefined
+
+function getNeonClient() {
+	neonClient ??= neon(process.env.POSTGRES_URL!)
+	return neonClient
+}
+
 export const db = new Kysely<Database>({
-	dialect: new NeonDialect({
-		neon: neon(process.env.POSTGRES_URL!),
-	}),
+	dialect: new NeonDialect({ neon: () => getNeonClient() }),
 })
+
+/**
+ * Whether a database connection is configured at all.
+ *
+ * Used only so a build without `POSTGRES_URL` (local, CI) can still prerender
+ * pages instead of failing. Genuine query errors are deliberately NOT
+ * swallowed: returning empty data on a transient failure would let ISR cache
+ * an empty page — or, worse, a `notFound()` 404 for a real organism — for the
+ * whole revalidate window. Letting them throw yields an uncached 500 instead.
+ */
+function isDatabaseConfigured() {
+	return Boolean(process.env.POSTGRES_URL)
+}
 
 type GetOrganismsOptions = {
 	sortBy?: AnyColumn<Database, 'organisms'>
@@ -66,45 +86,42 @@ type GetOrganismsOptions = {
  * Returns a list of organisms.
  */
 export const getOrganisms = cache((options: GetOrganismsOptions = {}) => {
-	try {
-		const { direction, limit = 50, query, sortBy = 'common_name' } = options
+	if (!isDatabaseConfigured()) return []
 
-		let dbQuery = db
-			.selectFrom('organisms')
-			.orderBy(sortBy, direction)
-			.limit(limit)
-			.selectAll()
+	const { direction, limit = 50, query, sortBy = 'common_name' } = options
 
-		if (query) {
-			dbQuery = dbQuery.where('common_name', 'ilike', `%${query}%`)
-		}
+	let dbQuery = db
+		.selectFrom('organisms')
+		.orderBy(sortBy, direction)
+		.limit(limit)
+		.selectAll()
 
-		return dbQuery.execute()
-	} catch {
-		return []
+	if (query) {
+		dbQuery = dbQuery.where('common_name', 'ilike', `%${query}%`)
 	}
+
+	return dbQuery.execute()
 })
 
 /**
  * Returns an organism by its ID.
  */
 export const getOrganism = cache((id: string) => {
-	try {
-		const dbQuery = db.selectFrom('organisms').where('id', '=', id).selectAll()
-		return dbQuery.executeTakeFirst()
-	} catch {
-		return undefined
-	}
+	if (!isDatabaseConfigured()) return undefined
+
+	return db
+		.selectFrom('organisms')
+		.where('id', '=', id)
+		.selectAll()
+		.executeTakeFirst()
 })
 
 export const getOrganismScans = cache((id: string) => {
-	try {
-		return db
-			.selectFrom('organism_scans')
-			.where('organism_id', '=', id)
-			.selectAll()
-			.execute()
-	} catch {
-		return []
-	}
+	if (!isDatabaseConfigured()) return []
+
+	return db
+		.selectFrom('organism_scans')
+		.where('organism_id', '=', id)
+		.selectAll()
+		.execute()
 })

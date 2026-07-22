@@ -1,5 +1,5 @@
-import { ImageResponse } from 'next/og'
 import { notFound } from 'next/navigation'
+import { ImageResponse } from 'next/og'
 
 import { ASSETS_BASE_URL } from '@/app/lib/api/constants'
 import { getOrganism } from '@/next/lib/db'

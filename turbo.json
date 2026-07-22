@@ -2,7 +2,26 @@
 	"tasks": {
 		"build": {
 			"dependsOn": ["^build"],
-			"outputs": [".next/**"]
+			"outputs": [".next/**"],
+			"env": [
+				"NODE_ENV",
+				"NEXT_PUBLIC_ORIGIN",
+				"POSTGRES_URL",
+				"OPENAI_API_KEY",
+				"FIREBASE_CLIENT_EMAIL",
+				"FIREBASE_PRIVATE_KEY",
+				"CLOUDFLARE_ACCOUNT_ID",
+				"R2_ACCESS_KEY_ID",
+				"R2_SECRET_ACCESS_KEY",
+				"R2_BUCKET_NAME",
+				"KV_REST_API_URL",
+				"KV_REST_API_TOKEN",
+				"SENTRY_ORG",
+				"SENTRY_PROJECT",
+				"SENTRY_AUTH_TOKEN",
+				"VERCEL_URL",
+				"VERCEL_ENV"
+			]
 		},
 		"lint": {
 			"dependsOn": ["^lint"]
