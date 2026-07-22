@@ -1,3 +1,5 @@
+import type { Metadata } from 'next'
+
 import { notFound } from 'next/navigation'
 
 import { ASSETS_BASE_URL } from '@/app/lib/api/constants'
@@ -10,7 +12,25 @@ type Props = {
 
 export const revalidate = 10800 // 3 hours
 
-export async function generateMetadata({ params }: Props) {
+/**
+ * Required for this route to be cached at all.
+ *
+ * Without `generateStaticParams`, Next renders a dynamic segment on every
+ * request and `revalidate` above never engages — the route was serving
+ * `x-vercel-cache: MISS` on repeat hits. Returning an empty array prerenders
+ * nothing at build time (so build duration and OG-image generation are
+ * unaffected) while opting every organism page into ISR: each is rendered once
+ * on first visit, then served from cache until `revalidate` elapses.
+ *
+ * See https://nextjs.org/docs/app/api-reference/functions/generate-static-params
+ * — "You must always return an array from generateStaticParams, even if it's
+ * empty. Otherwise, the route will be dynamically rendered."
+ */
+export function generateStaticParams() {
+	return []
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
 	const id = (await params).id
 
 	const organism = await getOrganism(id)
