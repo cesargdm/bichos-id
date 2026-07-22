@@ -1,7 +1,6 @@
 import type { AnyColumn } from 'kysely'
 
 import { neon } from '@neondatabase/serverless'
-import * as Sentry from '@sentry/nextjs'
 import { Kysely } from 'kysely'
 import { NeonDialect } from 'kysely-neon'
 import { cache } from 'react'
@@ -51,9 +50,7 @@ export interface Database {
 }
 
 // Constructed lazily: `neon()` throws when POSTGRES_URL is absent, and doing
-// that at module scope makes merely importing this file fatal — which breaks
-// static generation instead of letting the query helpers below degrade to
-// empty results.
+// that at module scope makes merely importing this file fatal.
 let neonClient: ReturnType<typeof neon> | undefined
 
 function getNeonClient() {
@@ -65,6 +62,19 @@ export const db = new Kysely<Database>({
 	dialect: new NeonDialect({ neon: () => getNeonClient() }),
 })
 
+/**
+ * Whether a database connection is configured at all.
+ *
+ * Used only so a build without `POSTGRES_URL` (local, CI) can still prerender
+ * pages instead of failing. Genuine query errors are deliberately NOT
+ * swallowed: returning empty data on a transient failure would let ISR cache
+ * an empty page — or, worse, a `notFound()` 404 for a real organism — for the
+ * whole revalidate window. Letting them throw yields an uncached 500 instead.
+ */
+function isDatabaseConfigured() {
+	return Boolean(process.env.POSTGRES_URL)
+}
+
 type GetOrganismsOptions = {
 	sortBy?: AnyColumn<Database, 'organisms'>
 	direction?: 'asc' | 'desc'
@@ -75,49 +85,43 @@ type GetOrganismsOptions = {
 /**
  * Returns a list of organisms.
  */
-export const getOrganisms = cache(async (options: GetOrganismsOptions = {}) => {
-	try {
-		const { direction, limit = 50, query, sortBy = 'common_name' } = options
+export const getOrganisms = cache((options: GetOrganismsOptions = {}) => {
+	if (!isDatabaseConfigured()) return []
 
-		let dbQuery = db
-			.selectFrom('organisms')
-			.orderBy(sortBy, direction)
-			.limit(limit)
-			.selectAll()
+	const { direction, limit = 50, query, sortBy = 'common_name' } = options
 
-		if (query) {
-			dbQuery = dbQuery.where('common_name', 'ilike', `%${query}%`)
-		}
+	let dbQuery = db
+		.selectFrom('organisms')
+		.orderBy(sortBy, direction)
+		.limit(limit)
+		.selectAll()
 
-		return await dbQuery.execute()
-	} catch (error) {
-		Sentry.captureException(error)
-		return []
+	if (query) {
+		dbQuery = dbQuery.where('common_name', 'ilike', `%${query}%`)
 	}
+
+	return dbQuery.execute()
 })
 
 /**
  * Returns an organism by its ID.
  */
-export const getOrganism = cache(async (id: string) => {
-	try {
-		const dbQuery = db.selectFrom('organisms').where('id', '=', id).selectAll()
-		return await dbQuery.executeTakeFirst()
-	} catch (error) {
-		Sentry.captureException(error)
-		return undefined
-	}
+export const getOrganism = cache((id: string) => {
+	if (!isDatabaseConfigured()) return undefined
+
+	return db
+		.selectFrom('organisms')
+		.where('id', '=', id)
+		.selectAll()
+		.executeTakeFirst()
 })
 
-export const getOrganismScans = cache(async (id: string) => {
-	try {
-		return await db
-			.selectFrom('organism_scans')
-			.where('organism_id', '=', id)
-			.selectAll()
-			.execute()
-	} catch (error) {
-		Sentry.captureException(error)
-		return []
-	}
+export const getOrganismScans = cache((id: string) => {
+	if (!isDatabaseConfigured()) return []
+
+	return db
+		.selectFrom('organism_scans')
+		.where('organism_id', '=', id)
+		.selectAll()
+		.execute()
 })
