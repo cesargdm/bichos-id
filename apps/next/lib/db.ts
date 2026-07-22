@@ -1,4 +1,4 @@
-import type { UndirectedOrderByExpression } from 'kysely/dist/cjs/parser/order-by-parser'
+import type { AnyColumn } from 'kysely'
 
 import { neon } from '@neondatabase/serverless'
 import { Kysely } from 'kysely'
@@ -56,7 +56,7 @@ export const db = new Kysely<Database>({
 })
 
 type GetOrganismsOptions = {
-	sortBy?: UndirectedOrderByExpression<Database, 'organisms', object>
+	sortBy?: AnyColumn<Database, 'organisms'>
 	direction?: 'asc' | 'desc'
 	limit?: number
 	query?: string

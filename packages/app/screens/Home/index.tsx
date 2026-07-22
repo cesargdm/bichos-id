@@ -1,24 +1,22 @@
 'use client'
 
 import type { NativeStackNavigationOptions } from '@react-navigation/native-stack'
-import type { Point } from 'react-native-vision-camera'
 
 import { Ionicons } from '@expo/vector-icons'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import MaskedView from '@react-native-masked-view/masked-view'
 import { useIsFocused } from '@react-navigation/native'
-import { manipulateAsync, SaveFormat } from 'expo-image-manipulator'
+import { ImageManipulator, SaveFormat } from 'expo-image-manipulator'
 import * as ImagePicker from 'expo-image-picker'
 import { StatusBar } from 'expo-status-bar'
-import { useCallback, useRef, useState, useEffect } from 'react'
+import { useCallback, useState, useEffect } from 'react'
 import { StyleSheet, Text, View, Alert, Image, Pressable } from 'react-native'
-import { Gesture, GestureDetector } from 'react-native-gesture-handler'
-import { runOnJS } from 'react-native-reanimated'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import {
 	Camera,
 	useCameraPermission,
 	useCameraDevice,
+	usePhotoOutput,
 } from 'react-native-vision-camera'
 import { Link } from 'solito/link'
 import { useRouter } from 'solito/navigation'
@@ -104,9 +102,9 @@ const styles = StyleSheet.create({
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function HomeScreen(_props: Props) {
 	const router = useRouter()
-	const cameraRef = useRef<Camera>(null)
 	const isFocused = useIsFocused()
 	const { hasPermission, requestPermission } = useCameraPermission()
+	const photoOutput = usePhotoOutput({ qualityPrioritization: 'balanced' })
 	const [isCameraInitialized, setIsCameraInitialized] = useState(false)
 
 	const device = useCameraDevice('back')
@@ -159,39 +157,34 @@ function HomeScreen(_props: Props) {
 		setIsLoading(true)
 
 		try {
-			const photo = await cameraRef.current?.takePhoto({
-				enableShutterSound: false,
-			})
-
-			if (!photo) {
-				throw new Error('No image taken')
-			}
+			const photo = await photoOutput.capturePhoto(
+				{ enableShutterSound: false },
+				{},
+			)
 
 			const photoHeight = photo.height
 			const photoWidth = photo.width
 
 			const photoRatio = photoHeight / photoWidth
 
+			const photoPath = await photo.saveToTemporaryFileAsync()
+
 			const PHOTO_HEIGHT = 500 / CAPTURABLE_HEIGHT_PERCENTAGE
 			const PHOTO_WIDTH = Math.round(PHOTO_HEIGHT * photoRatio)
 
-			const base64Image = await manipulateAsync(
-				photo.path,
-				[
-					{
-						resize: { height: PHOTO_HEIGHT, width: PHOTO_WIDTH },
-					},
-					{
-						crop: {
-							height: PHOTO_HEIGHT * CAPTURABLE_HEIGHT_PERCENTAGE,
-							originX: PHOTO_WIDTH * ((1 - CAPTURABLE_WIDTH_PERCENTAGE) / 2),
-							originY: PHOTO_HEIGHT * ((1 - CAPTURABLE_HEIGHT_PERCENTAGE) / 2),
-							width: PHOTO_WIDTH * CAPTURABLE_WIDTH_PERCENTAGE,
-						},
-					},
-				],
-				{ base64: true, compress: 0.666, format: SaveFormat.JPEG },
-			).then((result) => result.base64)
+			const renderedImage = await ImageManipulator.manipulate(photoPath)
+				.resize({ height: PHOTO_HEIGHT, width: PHOTO_WIDTH })
+				.crop({
+					height: PHOTO_HEIGHT * CAPTURABLE_HEIGHT_PERCENTAGE,
+					originX: PHOTO_WIDTH * ((1 - CAPTURABLE_WIDTH_PERCENTAGE) / 2),
+					originY: PHOTO_HEIGHT * ((1 - CAPTURABLE_HEIGHT_PERCENTAGE) / 2),
+					width: PHOTO_WIDTH * CAPTURABLE_WIDTH_PERCENTAGE,
+				})
+				.renderAsync()
+
+			const base64Image = await renderedImage
+				.saveAsync({ base64: true, compress: 0.666, format: SaveFormat.JPEG })
+				.then((result) => result.base64)
 
 			if (!base64Image) throw new Error('No image taken')
 
@@ -244,15 +237,6 @@ function HomeScreen(_props: Props) {
 		}
 	}, [router])
 
-	const focus = useCallback((point: Point) => {
-		if (cameraRef.current == null) return
-		void cameraRef.current.focus(point)
-	}, [])
-
-	const gesture = Gesture.Tap().onEnd(({ x, y }) => {
-		runOnJS(focus)({ x, y })
-	})
-
 	const handleExplore = useCallback(() => {
 		router.push('/explore')
 	}, [router])
@@ -269,38 +253,31 @@ function HomeScreen(_props: Props) {
 						</View>
 					}
 				>
-					<GestureDetector gesture={gesture}>
-						{device && hasPermission ? (
-							<Camera
-								torch={isTorchEnabled}
-								ref={cameraRef}
-								device={device}
-								onInitialized={handleCameraInitialized}
-								isActive={isCameraActive}
-								outputOrientation="preview"
-								photoQualityBalance="balanced"
-								photoHdr
-								photo
-								enableZoomGesture
-								style={styles.camera}
-							/>
-						) : (
-							<View style={styles.permissionContainer}>
-								{hasPermission ? (
-									<Text style={{ color: 'white' }}>Cargando...</Text>
-								) : (
-									<Pressable
-										onPress={requestPermission}
-										style={{ padding: 20 }}
-									>
-										<Text style={{ color: 'white', fontSize: 15 }}>
-											Permitir acceso a la cámara
-										</Text>
-									</Pressable>
-								)}
-							</View>
-						)}
-					</GestureDetector>
+					{device && hasPermission ? (
+						<Camera
+							torchMode={isTorchEnabled}
+							device={device}
+							onStarted={handleCameraInitialized}
+							isActive={isCameraActive}
+							outputs={[photoOutput]}
+							constraints={[{ photoHDR: true }]}
+							enableNativeZoomGesture
+							enableNativeTapToFocusGesture
+							style={styles.camera}
+						/>
+					) : (
+						<View style={styles.permissionContainer}>
+							{hasPermission ? (
+								<Text style={{ color: 'white' }}>Cargando...</Text>
+							) : (
+								<Pressable onPress={requestPermission} style={{ padding: 20 }}>
+									<Text style={{ color: 'white', fontSize: 15 }}>
+										Permitir acceso a la cámara
+									</Text>
+								</Pressable>
+							)}
+						</View>
+					)}
 				</MaskedView>
 
 				{base64Image ? (
@@ -321,7 +298,7 @@ function HomeScreen(_props: Props) {
 							<Ionicons size={30} color="white" name="flashlight" />
 						</Pressable>
 						<View aria-hidden />
-						<Link href="/settings" viewProps={{ style: { padding: 20 } }}>
+						<Link href="/settings" style={{ padding: 20 }}>
 							<Ionicons size={30} color="white" name="settings" />
 						</Link>
 					</View>
