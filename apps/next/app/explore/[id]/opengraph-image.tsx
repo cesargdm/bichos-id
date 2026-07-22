@@ -13,6 +13,13 @@ export const size = {
 	width: 1200,
 }
 
+// Same reasoning as the page: without this the OG image is regenerated on
+// every request. Satori rendering plus the remote image fetch is expensive and
+// social crawlers hit these repeatedly, so let each one cache after first use.
+export function generateStaticParams() {
+	return []
+}
+
 export const contentType = 'image/png'
 
 export default async function Image({ params }: Props) {

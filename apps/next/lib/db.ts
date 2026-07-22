@@ -82,6 +82,9 @@ type GetOrganismsOptions = {
 	query?: string
 }
 
+/** The sitemap protocol caps a single sitemap file at 50,000 URLs. */
+const SITEMAP_MAX_URLS = 50_000
+
 /**
  * Returns a list of organisms.
  */
@@ -101,6 +104,27 @@ export const getOrganisms = cache((options: GetOrganismsOptions = {}) => {
 	}
 
 	return dbQuery.execute()
+})
+
+/**
+ * Returns just the id and last-modified date of every organism.
+ *
+ * Deliberately not `getOrganisms()`: that selects every column (including the
+ * long `description` text) and caps at 50 rows by default, which silently
+ * truncated the sitemap. This selects two columns so the full catalogue stays
+ * cheap to fetch.
+ */
+export const getOrganismRefs = cache((limit = SITEMAP_MAX_URLS) => {
+	if (!isDatabaseConfigured()) return []
+
+	return db
+		.selectFrom('organisms')
+		// Ordered by the primary key: stable output for diffing, and free
+		// compared with sorting the whole table on an unindexed column.
+		.orderBy('id', 'asc')
+		.select(['id', 'updated_at'])
+		.limit(limit)
+		.execute()
 })
 
 /**
