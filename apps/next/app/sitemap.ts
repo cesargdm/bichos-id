@@ -1,13 +1,13 @@
 import type { MetadataRoute } from 'next'
 
-import { getOrganismRefs } from '@/next/lib/db'
+import { getIndexableOrganismRefs } from '@/next/lib/db'
 
 export const revalidate = 3600
 
 const origin = process.env.NEXT_PUBLIC_ORIGIN
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-	const organisms = await getOrganismRefs()
+	const organisms = await getIndexableOrganismRefs()
 
 	return [
 		{

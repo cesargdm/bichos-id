@@ -1,7 +1,7 @@
 import type { AnyColumn } from 'kysely'
 
 import { neon } from '@neondatabase/serverless'
-import { Kysely } from 'kysely'
+import { Kysely, sql } from 'kysely'
 import { NeonDialect } from 'kysely-neon'
 import { cache } from 'react'
 import { z } from 'zod'
@@ -86,6 +86,36 @@ type GetOrganismsOptions = {
 const SITEMAP_MAX_URLS = 50_000
 
 /**
+ * An organism is complete enough to index only when it has real content for
+ * all of: common name, description, and a species-level classification.
+ *
+ * Incomplete stubs — a family or genus with no species, whose slug ends in a
+ * trailing dash (`acrididae-caelifera-`, or even `--`) — are thin pages that
+ * Google reports as "Crawled - currently not indexed". They should be marked
+ * noindex on their detail page and kept out of the sitemap.
+ *
+ * NOTE: `indexableOrganismFilter` below expresses this same rule in SQL so the
+ * sitemap can filter without transferring every description. Keep the two in
+ * sync.
+ */
+export function isOrganismIndexable(
+	organism: Pick<Organism, 'classification' | 'common_name' | 'description'>,
+) {
+	return Boolean(
+		organism.common_name?.trim() &&
+			organism.description?.trim() &&
+			organism.classification?.species?.trim(),
+	)
+}
+
+/** SQL counterpart of {@link isOrganismIndexable}. */
+const indexableOrganismFilter = sql<boolean>`
+	btrim(coalesce(common_name, '')) <> ''
+	and btrim(coalesce(description, '')) <> ''
+	and btrim(coalesce(classification ->> 'species', '')) <> ''
+`
+
+/**
  * Returns a list of organisms.
  */
 export const getOrganisms = cache((options: GetOrganismsOptions = {}) => {
@@ -107,18 +137,19 @@ export const getOrganisms = cache((options: GetOrganismsOptions = {}) => {
 })
 
 /**
- * Returns just the id and last-modified date of every organism.
+ * Returns the id and last-modified date of every organism worth indexing.
  *
  * Deliberately not `getOrganisms()`: that selects every column (including the
  * long `description` text) and caps at 50 rows by default, which silently
- * truncated the sitemap. This selects two columns so the full catalogue stays
- * cheap to fetch.
+ * truncated the sitemap. This selects two columns and filters incomplete stubs
+ * out in SQL, so the full catalogue stays cheap to fetch.
  */
-export const getOrganismRefs = cache((limit = SITEMAP_MAX_URLS) => {
+export const getIndexableOrganismRefs = cache((limit = SITEMAP_MAX_URLS) => {
 	if (!isDatabaseConfigured()) return []
 
 	return db
 		.selectFrom('organisms')
+		.where(indexableOrganismFilter)
 		// Ordered by the primary key: stable output for diffing, and free
 		// compared with sorting the whole table on an unindexed column.
 		.orderBy('id', 'asc')
