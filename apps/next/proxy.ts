@@ -16,7 +16,7 @@ export const config = {
 	matcher: '/api/:path*',
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
 	if (request.method !== 'POST') {
 		return NextResponse.next()
 	}
