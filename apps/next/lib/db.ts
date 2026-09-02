@@ -8,23 +8,35 @@ import { z } from 'zod'
 
 import type { Organism } from '@/app/lib/types'
 
+// Every string here comes straight from the model, which occasionally returns
+// values with surrounding whitespace (there is a " abejorro de cabeza grande"
+// in the database, leading space and all, which then renders into headings and
+// page titles). Trimming at the parse boundary keeps it out of the database —
+// and matters most for the classification fields, since those are concatenated
+// into the organism id and its R2 object path.
 export const IdentificationSchema = z.object({
 	_imageQualityRating: z.number(),
 	classification: z.object({
-		class: z.string(),
-		family: z.string(),
-		genus: z.string().optional(),
-		order: z.string(),
-		phylum: z.string(),
-		species: z.string().optional(),
+		class: z.string().trim(),
+		family: z.string().trim(),
+		// `.nullable()`, not `.optional()`: OpenAI's structured outputs require
+		// every field to be present, and `zodResponseFormat` throws outright on
+		// an optional-but-not-nullable field ("uses `.optional()` without
+		// `.nullable()` which is not supported by the API"). That throw happened
+		// before any request reached OpenAI, so identification failed with a
+		// generic 500 for every authenticated request.
+		genus: z.string().trim().nullable(),
+		order: z.string().trim(),
+		phylum: z.string().trim(),
+		species: z.string().trim().nullable(),
 	}),
-	common_name: z.string(),
+	common_name: z.string().trim(),
 })
 
 export const OrganismSchema = z.object({
-	common_name: z.string(),
-	description: z.string(),
-	habitat: z.string(),
+	common_name: z.string().trim(),
+	description: z.string().trim(),
+	habitat: z.string().trim(),
 	metadata: z.object({
 		venomous: z.object({
 			level: z.enum(['NON_VENOMOUS', 'VENOMOUS', 'HIGHLY_VENOMOUS']),

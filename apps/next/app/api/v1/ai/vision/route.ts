@@ -119,7 +119,20 @@ ${
 			)
 		}
 
-		const { _imageQualityRating, ...identification } = parsedIdentification
+		const { _imageQualityRating, ...parsed } = parsedIdentification
+
+		// The model must return genus/species as null rather than omitting them
+		// (see IdentificationSchema), but stored rows have always used "absent"
+		// for unknown. Normalize back so a null doesn't become a third state in
+		// the persisted JSON.
+		const identification = {
+			...parsed,
+			classification: {
+				...parsed.classification,
+				genus: parsed.classification.genus ?? undefined,
+				species: parsed.classification.species ?? undefined,
+			},
+		}
 
 		const organismSpecies = `${identification.classification.family}-${
 			identification.classification.genus || ''
