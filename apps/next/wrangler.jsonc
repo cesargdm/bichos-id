@@ -1,0 +1,25 @@
+{
+	"$schema": "./node_modules/wrangler/config-schema.json",
+	"name": "bichos-id-web",
+	"main": ".open-next/worker.js",
+	"compatibility_date": "2026-08-25",
+	"compatibility_flags": ["nodejs_compat"],
+	"assets": {
+		"directory": ".open-next/assets",
+		"binding": "ASSETS"
+	},
+	"kv_namespaces": [
+		{
+			"binding": "PUBLIC_JWK_CACHE_KV",
+			"id": "a025a0d0cc854d68b4499a8747a7bebc"
+		}
+	],
+	"vars": {
+		"CLOUDFLARE_ACCOUNT_ID": "1b22f6fcae34f97236b9f22cc51cfb18",
+		"FIREBASE_PROJECT_ID": "bichos-id",
+		"PUBLIC_JWK_CACHE_KEY": "bichos-id-firebase-jwk-cache"
+	},
+	"observability": {
+		"enabled": true
+	}
+}

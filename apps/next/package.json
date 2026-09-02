@@ -9,32 +9,37 @@
 		"lint": "eslint . --max-warnings=0",
 		"format": "prettier --write .",
 		"typecheck": "tsc --noEmit",
-		"clean": "rm -rf node_modules .next",
-		"licenses": "bunx license-report >| '../../packages/app/lib/licenses/web.json'"
+		"clean": "rm -rf node_modules .next .open-next .wrangler",
+		"licenses": "bunx license-report >| '../../packages/app/lib/licenses/web.json'",
+		"preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+		"deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
+		"cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts"
 	},
 	"dependencies": {
-		"@aws-sdk/client-s3": "3.1092.0",
+		"@aws-sdk/client-s3": "3.1124.0",
 		"@expo/next-adapter": "6.0.0",
-		"@next/third-parties": "16.2.11",
-		"@sentry/nextjs": "10.67.0",
+		"@next/third-parties": "16.3.4",
+		"@sentry/nextjs": "10.73.0",
 		"@upstash/ratelimit": "2.0.8",
+		"@upstash/redis": "1.38.3",
 		"@neondatabase/serverless": "1.1.0",
-		"@vercel/functions": "3.7.5",
-		"@vercel/kv": "3.0.0",
-		"firebase-admin": "14.2.0",
+		"firebase-auth-cloudflare-workers": "2.0.6",
 		"kysely": "0.29.4",
 		"kysely-neon": "3.0.0",
-		"next": "16.2.11",
-		"openai": "6.48.0",
+		"next": "16.3.4",
+		"openai": "7.8.0",
 		"react": "19.2.3",
 		"react-dom": "19.2.3",
 		"react-native": "0.86.0",
 		"react-native-web": "~0.21.2",
-		"zod": "4.4.3"
+		"zod": "4.5.4"
 	},
 	"devDependencies": {
+		"@cloudflare/workers-types": "^5.20260901.1",
+		"@opennextjs/cloudflare": "1.20.5",
 		"@types/node": "~26.1.1",
 		"@types/react-dom": "^19",
-		"sharp": "^0.35.3"
+		"sharp": "^0.35.3",
+		"wrangler": "4.128.0"
 	}
 }

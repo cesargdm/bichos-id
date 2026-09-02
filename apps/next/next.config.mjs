@@ -1,5 +1,5 @@
 import { withExpo } from '@expo/next-adapter'
-import { withSentryConfig } from '@sentry/nextjs'
+import { withSentryConfig } from '@sentry/nextjs/config'
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
