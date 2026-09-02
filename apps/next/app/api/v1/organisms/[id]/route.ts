@@ -3,6 +3,7 @@ import * as Sentry from '@sentry/nextjs'
 import { NextResponse } from 'next/server'
 
 import { DETAIL_IMAGE_WIDTH, getImageUrl } from '@/app/lib/api/constants'
+import { buildScanPrefix, repairLegacyOrganismId } from '@/app/lib/organism-id'
 import { getOrganism, getOrganismScans } from '@/next/lib/db'
 import { getR2Client, R2_BUCKET_NAME } from '@/next/lib/r2'
 
@@ -35,50 +36,77 @@ function getOrganismImages(prefix: string) {
 		.catch((error: unknown) => {
 			console.error('getOrganismImages failed', error)
 			Sentry.captureException(error)
-			return { failed: true, images: [] }
+			return { failed: true, images: [] as string[] }
 		})
 }
 
 export async function GET(
-	_request: Request,
+	request: Request,
 	{ params }: { params: Promise<{ id: string }> },
 ) {
 	try {
 		const id = (await params).id
 
-		const images_path = `scans/${id.replaceAll('-', '/')}`
-
-		const [organism, organismScans, imageResult] = await Promise.all([
+		const [organism, organismScans] = await Promise.all([
 			getOrganism(id),
 			getOrganismScans(id),
-			getOrganismImages(images_path),
 		])
 
 		// Without this an unknown id spreads `undefined` into the response and
 		// returns 200 with `{"images":[],"scansCount":0}`, so callers can't tell
 		// a missing organism from one that simply has no photos.
 		if (!organism) {
+			// The native apps open universal links straight against this endpoint,
+			// so they never see the web redirect. Point a legacy id at its current
+			// row here too, rather than 404ing an old shared link.
+			const repaired = repairLegacyOrganismId(id)
+
+			if (repaired !== id && (await getOrganism(repaired))) {
+				return NextResponse.redirect(
+					new URL(`/api/v1/organisms/${repaired}`, request.url),
+					301,
+				)
+			}
+
 			return NextResponse.json({ error: 'Not found' }, { status: 404 })
 		}
 
-		// The organism's own image always leads, and the R2 listing only adds
-		// *other* scans on top of it.
-		//
-		// Previously `images` was the R2 listing alone, so whenever that listing
-		// came back empty — a failed call, or a key layout the prefix doesn't
-		// match — the detail page rendered its server-side image and then blanked
-		// out the moment SWR revalidated against this endpoint and got `[]`.
+		// Derived from the classification rather than the slug: the slug drops
+		// unidentified ranks, which would make a family's prefix an ancestor of
+		// every species below it and pull their photos into its carousel.
+		const imageResult = await getOrganismImages(
+			buildScanPrefix([
+				organism.classification?.family,
+				organism.classification?.genus,
+				organism.classification?.species,
+			]),
+		)
+
 		const primaryImage = getImageUrl(organism.image_key, {
 			width: DETAIL_IMAGE_WIDTH,
 		})
 
+		// A successful listing is the authority on what actually exists in R2: if
+		// it doesn't contain the organism's own image, that key is stale and
+		// prepending it would put a broken image first in the carousel. It only
+		// leads when the listing confirms it.
+		//
+		// An empty or failed listing is different — it says nothing about the
+		// primary image, and returning `[]` there is what made the detail page
+		// render its server-side image and then blank out on SWR revalidation.
+		const images = imageResult.images.length
+			? imageResult.images.includes(primaryImage)
+				? [
+						primaryImage,
+						...imageResult.images.filter((image) => image !== primaryImage),
+					]
+				: imageResult.images
+			: [primaryImage]
+
 		return NextResponse.json(
 			{
 				...organism,
-				images: [
-					primaryImage,
-					...imageResult.images.filter((image) => image !== primaryImage),
-				],
+				images,
 				scansCount: organismScans.length,
 			},
 			{

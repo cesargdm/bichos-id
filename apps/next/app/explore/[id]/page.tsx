@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 
-import { notFound } from 'next/navigation'
+import { notFound, permanentRedirect } from 'next/navigation'
+
+import { repairLegacyOrganismId } from '@/app/lib/organism-id'
 
 import {
 	DETAIL_IMAGE_WIDTH,
@@ -65,6 +67,15 @@ export default async function DiscoveryDetailPage({ params }: Props) {
 	const organism = await getOrganism(id)
 
 	if (!organism) {
+		// Ids used to repeat a rank (`pentatomidae-chinavia-chinavia-hilaris`).
+		// The repair is attempted only after a miss, so a tautonymous species
+		// whose id legitimately repeats a segment still resolves to itself.
+		const repaired = repairLegacyOrganismId(id)
+
+		if (repaired !== id && (await getOrganism(repaired))) {
+			permanentRedirect(`/explore/${repaired}`)
+		}
+
 		return notFound()
 	}
 

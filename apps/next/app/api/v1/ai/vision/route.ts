@@ -5,12 +5,13 @@ import { getCloudflareContext } from '@opennextjs/cloudflare'
 import * as Sentry from '@sentry/nextjs'
 import { revalidatePath } from 'next/cache'
 import { NextResponse } from 'next/server'
+import { sql } from 'kysely'
 import * as crypto from 'node:crypto'
 import OpenAI from 'openai'
 import { zodResponseFormat } from 'openai/helpers/zod'
 import { z } from 'zod'
 
-import { buildOrganismId } from '@/app/lib/organism-id'
+import { buildOrganismId, buildScanPrefix } from '@/app/lib/organism-id'
 import { db, IdentificationSchema, OrganismSchema } from '@/next/lib/db'
 import { verifyFirebaseIdToken } from '@/next/lib/firebase-verify'
 import { getR2Client, R2_BUCKET_NAME } from '@/next/lib/r2'
@@ -164,7 +165,11 @@ LOCATION
 			)
 		}
 
-		const imagePath = `scans/${organismId.replaceAll('-', '/')}`
+		const imagePath = buildScanPrefix([
+			identification.classification.family,
+			identification.classification.genus,
+			identification.classification.species,
+		])
 
 		const imageSha256 = crypto
 			.createHash('sha256')
@@ -192,26 +197,34 @@ LOCATION
 		// on only one of them left `scan_count` reading 1 for organisms with
 		// dozens of scans. The organism row may not exist yet on the new-organism
 		// path — the update is then a no-op and the insert seeds the count at 1.
-		const insertScanRecord = async () => {
-			await db
-				.insertInto('organism_scans')
-				.values({
-					created_at: new Date().toISOString(),
-					created_by: decodedToken.sub,
-					id: getRandomId(),
-					image_key: imageKey,
-					image_quality_rating: _imageQualityRating,
-					model: visionModel,
-					organism_id: organismId,
-					updated_at: new Date().toISOString(),
-				})
-				.execute()
+		// Insert and counter bump in one statement, so a failure can't record a
+		// scan that never gets counted — a retry would then add a second scan
+		// while the counter advanced only once. It has to be a data-modifying CTE
+		// rather than `db.transaction()`: the Neon HTTP driver has no interactive
+		// transactions ("NeonDialect doesn't support interactive transactions"),
+		// so that call throws at runtime.
+		//
+		// On the new-organism path the row doesn't exist yet, so the update
+		// matches nothing and the subsequent insert seeds `scan_count` at 1.
+		const insertScanRecord = () => {
+			const now = new Date().toISOString()
 
-			await db
-				.updateTable('organisms')
-				.where('id', '=', organismId)
-				.set((eb) => ({ scan_count: eb('scan_count', '+', 1) }))
-				.execute()
+			return sql`
+				with inserted as (
+					insert into organism_scans (
+						created_at, created_by, id, image_key,
+						image_quality_rating, model, organism_id, updated_at
+					)
+					values (
+						${now}, ${decodedToken.sub}, ${getRandomId()}, ${imageKey},
+						${_imageQualityRating}, ${visionModel}, ${organismId}, ${now}
+					)
+					returning organism_id
+				)
+				update organisms
+				set scan_count = scan_count + 1
+				where id = (select organism_id from inserted)
+			`.execute(db)
 		}
 
 		if (existingImage) {

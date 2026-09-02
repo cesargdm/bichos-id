@@ -18,6 +18,18 @@ export function normalizeOrganismId(id: string) {
 }
 
 /**
+ * R2 key prefix for an organism's scans, one directory per rank.
+ *
+ * Unlike the id, an unidentified rank keeps its (empty) segment here. Dropping
+ * it would make a family's prefix an ancestor of every species beneath it —
+ * `scans/apidae/` would match `scans/apidae/apis/mellifera/…` — so listing a
+ * family's scans would return every descendant organism's photos.
+ */
+export function buildScanPrefix(parts: (string | null | undefined)[]) {
+	return `scans/${parts.map((part) => normalizeOrganismId(part ?? '')).join('/')}`
+}
+
+/**
  * Ids used to repeat a rank that already appeared in the slug —
  * `pentatomidae-chinavia-chinavia-hilaris` — because the id was built while the
  * species field still held the full binomial. Stored ids no longer contain an
@@ -38,6 +50,13 @@ export function buildOrganismId(parts: (string | null | undefined)[]) {
 	const id = parts
 		.map((part) => normalizeOrganismId(part ?? ''))
 		.filter(Boolean)
+		// A rank that repeats the one above it adds nothing to the URL. Dropping
+		// it here is what keeps stored ids free of adjacent repeated segments —
+		// the invariant `repairLegacyOrganismId` relies on — and it matches how
+		// existing rows were canonicalised, so a tautonymous species like
+		// *Saturnia saturnia* resolves to the row that already exists instead of
+		// minting a second one at `saturniidae-saturnia-saturnia`.
+		.filter((part, index, all) => index === 0 || part !== all[index - 1])
 		.join('-')
 
 	return id || undefined

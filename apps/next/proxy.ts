@@ -7,7 +7,7 @@ import { Redis } from '@upstash/redis/cloudflare'
 import { NextResponse } from 'next/server'
 
 import {
-	repairLegacyOrganismId,
+	normalizeOrganismId,
 	UNIDENTIFIED_ORGANISM_ID,
 } from '@/app/lib/organism-id'
 
@@ -108,7 +108,21 @@ function redirectLegacyOrganismUrl(request: NextRequest) {
 	// Anything with a further path segment isn't an organism id.
 	if (!id || id.includes('/')) return
 
-	const normalized = repairLegacyOrganismId(decodeURIComponent(id))
+	// Only the empty-segment collapse is safe to do blind: no stored id contains
+	// a doubled dash or a leading/trailing one, so this can never rewrite a live
+	// URL. Collapsing a *repeated rank* is not safe here — `membracidae-
+	// membracis-membracis` is a real tautonymous species — so that repair lives
+	// behind a database lookup in the organism page and API route instead.
+	let decoded: string
+	try {
+		decoded = decodeURIComponent(id)
+	} catch {
+		// A malformed escape like `/explore/%ZZ` throws; let the route handle it
+		// rather than turning every bad link into a middleware 500.
+		return
+	}
+
+	const normalized = normalizeOrganismId(decoded)
 	// `--` carried no taxonomy at all and normalizes to nothing, so it gets the
 	// explicit unidentified slug rather than an empty path.
 	const target = normalized || (/^-+$/.test(id) ? UNIDENTIFIED_ORGANISM_ID : '')

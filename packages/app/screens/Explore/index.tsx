@@ -2,6 +2,7 @@
 
 import type { NativeStackNavigationOptions } from '@react-navigation/native-stack'
 
+import { useEffect, useState } from 'react'
 import { LinearGradient } from 'expo-linear-gradient'
 import { StatusBar } from 'expo-status-bar'
 import { MotiView } from 'moti'
@@ -68,7 +69,17 @@ function getColumnCount(width: number) {
 function DiscoverScreen({ fallbackData }: Props) {
 	const params = useSearchParams<Params>()
 	const { width } = useWindowDimensions()
-	const numColumns = getColumnCount(width)
+
+	// The server has no viewport, so it always renders the two-column layout.
+	// Reading the real width only after mount keeps the first client render
+	// identical to it — otherwise a desktop browser hydrates with three columns,
+	// which changes both the row structure and the FlatList key and throws away
+	// the server-rendered list.
+	const [isMounted, setIsMounted] = useState(false)
+
+	useEffect(() => setIsMounted(true), [])
+
+	const numColumns = getColumnCount(isMounted ? width : 0)
 
 	const { data, error, isLoading, mutate } = useSWR<
 		Props['fallbackData'],

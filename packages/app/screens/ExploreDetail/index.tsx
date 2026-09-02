@@ -3,6 +3,7 @@
 
 import type { NativeStackNavigationOptions } from '@react-navigation/native-stack'
 
+import { useState } from 'react'
 import { LinearGradient } from 'expo-linear-gradient'
 import { StatusBar } from 'expo-status-bar'
 import { Text, View, ScrollView, FlatList, StyleSheet } from 'react-native'
@@ -33,6 +34,41 @@ type Props = {
 }
 
 const FAMILY_MEMBER_SIZE = 120
+
+/**
+ * Some rows' `image_key` points at an R2 object that no longer exists, and
+ * `getFamilyMembers` doesn't exclude them. Show a plain placeholder rather than
+ * a broken image, keeping the name and the link usable — the same treatment
+ * `OrganismItem` gives the cards on the home screen.
+ */
+function FamilyMemberImage({ member }: { member: FamilyMember }) {
+	const [failed, setFailed] = useState(false)
+
+	if (failed) {
+		return (
+			<View
+				style={{
+					backgroundColor: '#222',
+					borderRadius: 12,
+					height: FAMILY_MEMBER_SIZE,
+					width: FAMILY_MEMBER_SIZE,
+				}}
+			/>
+		)
+	}
+
+	return (
+		<SolitoImage
+			alt={member.common_name}
+			contentFit="cover"
+			height={FAMILY_MEMBER_SIZE}
+			onError={() => setFailed(true)}
+			src={getImageUrl(member.image_key, { width: FAMILY_MEMBER_SIZE * 2 })}
+			style={{ borderRadius: 12 }}
+			width={FAMILY_MEMBER_SIZE}
+		/>
+	)
+}
 
 const styles = StyleSheet.create({
 	tagContainer: {
@@ -260,16 +296,7 @@ function DiscoverDetailScreen({ fallbackData, familyMembers }: Props) {
 											href={`/explore/${member.id}`}
 											style={{ width: FAMILY_MEMBER_SIZE }}
 										>
-											<SolitoImage
-												alt={member.common_name}
-												contentFit="cover"
-												width={FAMILY_MEMBER_SIZE}
-												height={FAMILY_MEMBER_SIZE}
-												style={{ borderRadius: 12 }}
-												src={getImageUrl(member.image_key, {
-													width: FAMILY_MEMBER_SIZE * 2,
-												})}
-											/>
+											<FamilyMemberImage member={member} />
 											<Text
 												numberOfLines={2}
 												style={{ color: 'white', fontSize: 14, paddingTop: 4 }}
