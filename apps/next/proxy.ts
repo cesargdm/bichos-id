@@ -31,11 +31,14 @@ async function getRateLimit() {
 	return rateLimit
 }
 
+// Runs on every rendered page too (not just /api and /sitemap.xml), so the
+// workers.dev-noindex header below can apply site-wide — excludes static
+// assets, which `_headers` already covers with its own cache rules.
 export const config = {
-	matcher: '/api/:path*',
+	matcher: ['/((?!_next/static|_next/image|favicon).*)'],
 }
 
-export async function proxy(request: NextRequest) {
+async function withRateLimit(request: NextRequest) {
 	if (request.method !== 'POST') {
 		return NextResponse.next()
 	}
@@ -72,4 +75,31 @@ export async function proxy(request: NextRequest) {
 
 		return NextResponse.json({ error: 'An error occurred' }, { status: 500 })
 	}
+}
+
+export async function proxy(request: NextRequest) {
+	const response = request.nextUrl.pathname.startsWith('/api/')
+		? await withRateLimit(request)
+		: NextResponse.next()
+
+	if (request.nextUrl.pathname === '/sitemap.xml') {
+		// sitemap.ts's `revalidate` export isn't reflected in the response's
+		// Cache-Control under this adapter (unlike page routes, where it is) —
+		// set it explicitly so the sitemap doesn't get regenerated on every
+		// request.
+		response.headers.set(
+			'Cache-Control',
+			'public, s-maxage=3600, stale-while-revalidate=86400',
+		)
+	}
+
+	// Keep the workers.dev host out of search results — the real domain is
+	// bichos-id.fucesa.com, this one should never rank as duplicate content.
+	// (_headers can't cover this: it only overrides headers on genuinely
+	// static asset responses, not on pages the Worker renders.)
+	if (request.nextUrl.hostname.endsWith('.workers.dev')) {
+		response.headers.set('X-Robots-Tag', 'noindex')
+	}
+
+	return response
 }

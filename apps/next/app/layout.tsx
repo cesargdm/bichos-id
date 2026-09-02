@@ -12,6 +12,9 @@ import { StylesProvider } from './styles-provider'
 export const metadata: Metadata = {
 	description:
 		'Identifica insectos, arácnidos y otros bichos con Bichos ID utilizando inteligencia artificial avanzada.',
+	// Without this, Next resolves relative OG/Twitter image URLs (e.g. from
+	// opengraph-image.tsx) against http://localhost:3000 in production.
+	metadataBase: new URL(process.env.NEXT_PUBLIC_ORIGIN || 'http://localhost:3000'),
 	title: {
 		default: 'Bichos ID de Fucesa',
 		template: '%s - Bichos ID de Fucesa',
@@ -24,7 +27,7 @@ type Props = {
 
 export default function Layout({ children }: Props) {
 	return (
-		<html lang="en">
+		<html lang="es">
 			<link
 				rel="apple-touch-icon"
 				sizes="180x180"
