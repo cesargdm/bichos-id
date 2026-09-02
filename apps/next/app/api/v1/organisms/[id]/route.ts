@@ -86,22 +86,23 @@ export async function GET(
 			width: DETAIL_IMAGE_WIDTH,
 		})
 
-		// A successful listing is the authority on what actually exists in R2: if
-		// it doesn't contain the organism's own image, that key is stale and
-		// prepending it would put a broken image first in the carousel. It only
-		// leads when the listing confirms it.
+		// A successful listing is the authority on what exists in R2, including
+		// when it comes back empty: that is positive evidence the organism's
+		// `image_key` points at a deleted object, so leading with it would cache a
+		// broken image for the full three hours.
 		//
-		// An empty or failed listing is different — it says nothing about the
-		// primary image, and returning `[]` there is what made the detail page
-		// render its server-side image and then blank out on SWR revalidation.
-		const images = imageResult.images.length
-			? imageResult.images.includes(primaryImage)
+		// A *failed* listing is the opposite — it says nothing either way, and
+		// returning `[]` there is what made the detail page render its
+		// server-side image and then blank out on SWR revalidation. Only that
+		// case falls back to the unverified primary image.
+		const images = imageResult.failed
+			? [primaryImage]
+			: imageResult.images.includes(primaryImage)
 				? [
 						primaryImage,
 						...imageResult.images.filter((image) => image !== primaryImage),
 					]
 				: imageResult.images
-			: [primaryImage]
 
 		return NextResponse.json(
 			{
