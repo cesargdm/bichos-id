@@ -1,21 +1,32 @@
 import type { NextRequest } from 'next/server'
 
+import { getCloudflareContext } from '@opennextjs/cloudflare'
 import { Ratelimit } from '@upstash/ratelimit'
 import { Redis } from '@upstash/redis/cloudflare'
 import { NextResponse } from 'next/server'
 
+declare global {
+	interface CloudflareEnv {
+		UPSTASH_REDIS_REST_TOKEN: string
+		UPSTASH_REDIS_REST_URL: string
+	}
+}
+
 const RATE_LIMIT = 5
 
-// Constructed lazily: at module scope, on Workers, process.env isn't
-// guaranteed populated yet (bindings/vars land in the request context, not
-// necessarily before top-level module evaluation on a cold start).
+// Constructed lazily: Redis.fromEnv() (the Cloudflare build of @upstash/redis)
+// doesn't read process.env — it needs the Workers env bindings object passed
+// explicitly, which is only available once a request is in flight.
 let rateLimit: Ratelimit | undefined
 
-function getRateLimit() {
-	rateLimit ??= new Ratelimit({
-		limiter: Ratelimit.slidingWindow(RATE_LIMIT, '24 h'),
-		redis: Redis.fromEnv(),
-	})
+async function getRateLimit() {
+	if (!rateLimit) {
+		const { env } = await getCloudflareContext({ async: true })
+		rateLimit = new Ratelimit({
+			limiter: Ratelimit.slidingWindow(RATE_LIMIT, '24 h'),
+			redis: Redis.fromEnv(env),
+		})
+	}
 	return rateLimit
 }
 
@@ -33,7 +44,8 @@ export async function proxy(request: NextRequest) {
 	try {
 		const ip = request.headers.get('CF-Connecting-IP') || '127.0.0.1'
 
-		const { reset, success } = await getRateLimit().limit(ip)
+		const limiter = await getRateLimit()
+		const { reset, success } = await limiter.limit(ip)
 
 		if (!success) {
 			waitUntil = reset
