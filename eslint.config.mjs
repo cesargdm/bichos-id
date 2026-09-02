@@ -60,6 +60,12 @@ export default [
 		...tseslint.configs.disableTypeChecked,
 	},
 	{
-		ignores: ['**/.next', 'apps/expo/android/**', 'apps/expo/ios/**'],
+		ignores: [
+			'**/.next',
+			'**/.open-next',
+			'**/.wrangler',
+			'apps/expo/android/**',
+			'apps/expo/ios/**',
+		],
 	},
 ]

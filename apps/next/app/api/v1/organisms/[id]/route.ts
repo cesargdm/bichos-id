@@ -2,7 +2,7 @@ import { ListObjectsCommand } from '@aws-sdk/client-s3'
 import * as Sentry from '@sentry/nextjs'
 import { NextResponse } from 'next/server'
 
-import { ASSETS_BASE_URL } from '@/app/lib/api/constants'
+import { DETAIL_IMAGE_WIDTH, getImageUrl } from '@/app/lib/api/constants'
 import { getOrganism, getOrganismScans } from '@/next/lib/db'
 import { getR2Client, R2_BUCKET_NAME } from '@/next/lib/r2'
 
@@ -30,7 +30,7 @@ function getOrganismImages(prefix: string) {
 			failed: false,
 			images: Contents.filter(
 				(item): item is typeof item & { Key: string } => !!item.Key,
-			).map(({ Key }) => `${ASSETS_BASE_URL}/${Key}`),
+			).map(({ Key }) => getImageUrl(Key, { width: DETAIL_IMAGE_WIDTH })),
 		}))
 		.catch((error: unknown) => {
 			console.error('getOrganismImages failed', error)

@@ -10,7 +10,6 @@ import { SolitoImage } from 'solito/image'
 import { useParams } from 'solito/navigation'
 import useSWR from 'swr'
 
-import type { ASSETS_BASE_URL } from '@/app/lib/api/constants'
 import type { Organism } from '@/app/lib/types'
 
 import { fetcher } from '@/app/lib/api/fetcher'
@@ -21,7 +20,7 @@ import { getTaxonomyLabel, getVenomousColor, getVenomousLabel } from './utils'
 const useUserParams = useParams<{ id: string }>
 
 type Props = {
-	fallbackData?: Organism & { images?: `${typeof ASSETS_BASE_URL}/${string}`[] }
+	fallbackData?: Organism & { images?: string[] }
 }
 
 const styles = StyleSheet.create({

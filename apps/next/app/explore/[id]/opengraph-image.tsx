@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation'
 import { ImageResponse } from 'next/og'
 
-import { ASSETS_BASE_URL } from '@/app/lib/api/constants'
+import { getImageUrl, SOCIAL_IMAGE_WIDTH } from '@/app/lib/api/constants'
 import { getOrganism } from '@/next/lib/db'
 
 type Props = {
@@ -42,7 +42,9 @@ export default async function Image({ params }: Props) {
 				}}
 			>
 				<img
-					src={`${ASSETS_BASE_URL}/${organism.image_key}`}
+					src={getImageUrl(organism.image_key, {
+						width: SOCIAL_IMAGE_WIDTH,
+					})}
 					style={{
 						height: '100%',
 						left: 0,

@@ -2,7 +2,11 @@ import type { Metadata } from 'next'
 
 import { notFound } from 'next/navigation'
 
-import { ASSETS_BASE_URL } from '@/app/lib/api/constants'
+import {
+	DETAIL_IMAGE_WIDTH,
+	getImageUrl,
+	SOCIAL_IMAGE_WIDTH,
+} from '@/app/lib/api/constants'
 import DiscoveryDetailScreen from '@/app/screens/ExploreDetail'
 import { getOrganism, isOrganismIndexable } from '@/next/lib/db'
 
@@ -66,7 +70,7 @@ export default async function DiscoveryDetailPage({ params }: Props) {
 		alternateName: organism.common_name,
 		description: organism.description,
 		identifier: organism.id,
-		image: `${ASSETS_BASE_URL}/${organism.image_key}`,
+		image: getImageUrl(organism.image_key, { width: SOCIAL_IMAGE_WIDTH }),
 		name: `${organism.classification?.genus} ${organism.classification?.species}`,
 	}
 
@@ -79,7 +83,9 @@ export default async function DiscoveryDetailPage({ params }: Props) {
 			<DiscoveryDetailScreen
 				fallbackData={{
 					...organism,
-					images: [`${ASSETS_BASE_URL}/${organism.image_key}`],
+					images: [
+						getImageUrl(organism.image_key, { width: DETAIL_IMAGE_WIDTH }),
+					],
 				}}
 			/>
 		</>

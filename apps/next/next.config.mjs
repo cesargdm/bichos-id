@@ -16,6 +16,11 @@ const nextConfig = {
 			},
 		]),
 	images: {
+		// Cloudflare Images does the resizing/encoding at the edge, so next/image
+		// generates a srcset of transformation URLs instead of routing bytes
+		// through /_next/image (a passthrough on Workers).
+		loader: 'custom',
+		loaderFile: './lib/cloudflare-image-loader.ts',
 		remotePatterns: [{ hostname: 'bichos-id.assets.fucesa.com' }],
 	},
 	// reanimated (and thus, Moti) doesn't work with strict mode currently...

@@ -20,7 +20,7 @@ import useSWR from 'swr'
 
 import type { Organism } from '@/app/lib/types'
 
-import { ASSETS_BASE_URL } from '@/app/lib/api/constants'
+import { getImageUrl } from '@/app/lib/api/constants'
 import { fetcher } from '@/app/lib/api/fetcher'
 import { keys } from '@/app/lib/api/keys'
 
@@ -53,6 +53,8 @@ const styles = StyleSheet.create({
 type Params = {
 	query?: string
 }
+
+const TILE_HEIGHT = Platform.OS === 'web' ? 400 : 200
 
 function DiscoverScreen({ fallbackData }: Props) {
 	const params = useSearchParams<Params>()
@@ -98,20 +100,30 @@ function DiscoverScreen({ fallbackData }: Props) {
 					<Link
 						style={{
 							flex: 1,
-							minHeight: Platform.OS === 'web' ? 400 : 200,
+							height: TILE_HEIGHT,
 							overflow: 'hidden',
 							width: '100%',
 						}}
 						href={`/explore/${organism.id}`}
 					>
+						{/*
+						 * Explicit height rather than `flex: 1`: the Link renders as an
+						 * <a>, which isn't a flex item here, so a flex-based height
+						 * resolved to nothing on web and the image never rendered at all
+						 * (tiles showed the name over empty space).
+						 */}
 						<ImageBackground
-							source={{ uri: `${ASSETS_BASE_URL}/${organism.image_key}` }}
-							style={{ flex: 1 }}
+							source={{ uri: getImageUrl(organism.image_key, { width: 800 }) }}
+							style={{ height: TILE_HEIGHT, width: '100%' }}
 							imageStyle={{ resizeMode: 'cover' }}
 						>
 							<LinearGradient
 								colors={['transparent', 'rgba(0,0,0,0.7)']}
-								style={{ flex: 1, justifyContent: 'flex-end', padding: 10 }}
+								style={{
+									height: '100%',
+									justifyContent: 'flex-end',
+									padding: 10,
+								}}
 							>
 								<Text
 									lineBreakMode="middle"
