@@ -6,10 +6,18 @@ import { NextResponse } from 'next/server'
 
 const RATE_LIMIT = 5
 
-const rateLimit = new Ratelimit({
-	limiter: Ratelimit.slidingWindow(RATE_LIMIT, '24 h'),
-	redis: Redis.fromEnv(),
-})
+// Constructed lazily: at module scope, on Workers, process.env isn't
+// guaranteed populated yet (bindings/vars land in the request context, not
+// necessarily before top-level module evaluation on a cold start).
+let rateLimit: Ratelimit | undefined
+
+function getRateLimit() {
+	rateLimit ??= new Ratelimit({
+		limiter: Ratelimit.slidingWindow(RATE_LIMIT, '24 h'),
+		redis: Redis.fromEnv(),
+	})
+	return rateLimit
+}
 
 export const config = {
 	matcher: '/api/:path*',
@@ -25,7 +33,7 @@ export async function proxy(request: NextRequest) {
 	try {
 		const ip = request.headers.get('CF-Connecting-IP') || '127.0.0.1'
 
-		const { reset, success } = await rateLimit.limit(ip)
+		const { reset, success } = await getRateLimit().limit(ip)
 
 		if (!success) {
 			waitUntil = reset

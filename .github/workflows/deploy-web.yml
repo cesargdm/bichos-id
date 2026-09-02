@@ -32,6 +32,10 @@ jobs:
         run: bun run typecheck
         working-directory: ./apps/next
 
+      # `next build` (invoked by `opennextjs-cloudflare build` below) runs the
+      # @sentry/nextjs build plugin, which uploads sourcemaps itself using the
+      # org/project already set in next.config.mjs's sentryConfig, as long as
+      # SENTRY_AUTH_TOKEN is present — no separate sentry-cli step needed.
       - name: Build and deploy to Cloudflare Workers
         uses: cloudflare/wrangler-action@v3
         with:
@@ -40,9 +44,5 @@ jobs:
           workingDirectory: ./apps/next
           preCommands: bunx opennextjs-cloudflare build
           command: deploy
-
-      - name: Upload sourcemaps to Sentry
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-        run: bunx sentry-cli sourcemaps upload .open-next
-        working-directory: ./apps/next

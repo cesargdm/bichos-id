@@ -69,7 +69,10 @@ export async function POST(request: NextRequest) {
 		const textModel = 'gpt-5.4-nano'
 
 		const { cf } = await getCloudflareContext({ async: true })
-		const geo = cf && { country: cf.country, region: cf.region }
+		const geoParts = [
+			cf?.country && `country: '${cf.country}'`,
+			cf?.region && `region: '${cf.region}'`,
+		].filter(Boolean)
 
 		const identificationResponse = await openai.chat.completions.parse({
 			messages: [
@@ -84,8 +87,8 @@ Instructions:
 - Review the image quality rating in a scale from 0 to 10, consider composition, quality, lighting and sharpness.
 - In the species field, only return the species name avoid the genus.
 ${
-	Object.values(geo ?? {}).length
-		? `- The user's geo data is, country: '${geo?.country}', region: '${geo?.region}'.`
+	geoParts.length
+		? `- The user's geo data is, ${geoParts.join(', ')}.`
 		: ''
 }`,
 					role: 'system',
