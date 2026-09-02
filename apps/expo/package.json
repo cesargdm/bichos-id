@@ -10,8 +10,6 @@
 		"ios": "expo run:ios",
 		"typecheck": "tsc --noEmit",
 		"prebuild": "expo prebuild --clean",
-		"format": "prettier --write .",
-		"lint": "eslint . --max-warnings=0",
 		"clean": "rm -rf node_modules .turbo .expo",
 		"licenses": "bunx license-report >| '../../packages/app/lib/licenses/app.json'"
 	},

@@ -2,7 +2,7 @@
 
 import type { NativeStackNavigationOptions } from '@react-navigation/native-stack'
 
-import { useEffect, useState } from 'react'
+import { useSyncExternalStore } from 'react'
 import { LinearGradient } from 'expo-linear-gradient'
 import { StatusBar } from 'expo-status-bar'
 import { MotiView } from 'moti'
@@ -14,7 +14,7 @@ import {
 	Platform,
 	StyleSheet,
 	Text,
-	useWindowDimensions,
+	Dimensions,
 } from 'react-native'
 import { Link, TextLink } from 'solito/link'
 import { useSearchParams } from 'solito/navigation'
@@ -66,20 +66,32 @@ function getColumnCount(width: number) {
 	return width >= DESKTOP_BREAKPOINT ? 3 : 2
 }
 
+function subscribeToWidth(onChange: () => void) {
+	const subscription = Dimensions.addEventListener('change', onChange)
+
+	return () => subscription.remove()
+}
+
+const getColumnCountSnapshot = () =>
+	getColumnCount(Dimensions.get('window').width)
+
+// The server has no viewport, so it must render the two-column layout — and the
+// first client render has to match it, or a desktop browser hydrates with three
+// columns, changing both the row structure and the FlatList key and discarding
+// the server-rendered list.
+const getServerColumnCountSnapshot = () => getColumnCount(0)
+
 function DiscoverScreen({ fallbackData }: Props) {
 	const params = useSearchParams<Params>()
-	const { width } = useWindowDimensions()
 
-	// The server has no viewport, so it always renders the two-column layout.
-	// Reading the real width only after mount keeps the first client render
-	// identical to it — otherwise a desktop browser hydrates with three columns,
-	// which changes both the row structure and the FlatList key and throws away
-	// the server-rendered list.
-	const [isMounted, setIsMounted] = useState(false)
-
-	useEffect(() => setIsMounted(true), [])
-
-	const numColumns = getColumnCount(isMounted ? width : 0)
+	// `useSyncExternalStore` rather than a mounted flag in an effect: it hands
+	// hydration the server value and swaps to the real one without the extra
+	// render an effect would cause.
+	const numColumns = useSyncExternalStore(
+		subscribeToWidth,
+		getColumnCountSnapshot,
+		getServerColumnCountSnapshot,
+	)
 
 	const { data, error, isLoading, mutate } = useSWR<
 		Props['fallbackData'],

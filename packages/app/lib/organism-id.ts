@@ -39,7 +39,9 @@ export function buildScanPrefix(parts: (string | null | undefined)[]) {
 export function repairLegacyOrganismId(id: string) {
 	const parts = normalizeOrganismId(id).split('-')
 
-	return parts.filter((part, index) => index === 0 || part !== parts[index - 1]).join('-')
+	return parts
+		.filter((part, index) => index === 0 || part !== parts[index - 1])
+		.join('-')
 }
 
 /**

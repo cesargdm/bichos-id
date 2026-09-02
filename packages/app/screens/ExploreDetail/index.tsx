@@ -264,7 +264,10 @@ function DiscoverDetailScreen({ fallbackData, familyMembers }: Props) {
 								] as const
 							)
 								.filter(([, value]) => value?.trim())
-								.map(([label, value], index) => `${'  '.repeat(index)}${label}: ${value}`)
+								.map(
+									([label, value], index) =>
+										`${'  '.repeat(index)}${label}: ${value}`,
+								)
 								.join('\n')}
 						</Text>
 					</View>
@@ -281,8 +284,7 @@ function DiscoverDetailScreen({ fallbackData, familyMembers }: Props) {
 									role="heading"
 									aria-level="2"
 								>
-									Otros de la familia{' '}
-									{organism?.classification?.family ?? ''}
+									Otros de la familia {organism?.classification?.family ?? ''}
 								</Text>
 								<ScrollView
 									horizontal

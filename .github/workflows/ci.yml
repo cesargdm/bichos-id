@@ -1,0 +1,45 @@
+name: 'CI'
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: ${{ matrix.name }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    strategy:
+      # Report every failing check in one run, rather than hiding the second
+      # problem behind the first.
+      fail-fast: false
+      matrix:
+        include:
+          - name: Lint
+            command: bun run lint
+          - name: Format
+            command: bun run format:check
+          - name: Typecheck
+            command: bun run typecheck
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: ${{ matrix.name }}
+        run: ${{ matrix.command }}

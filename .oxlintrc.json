@@ -1,0 +1,32 @@
+{
+	"$schema": "./node_modules/oxlint/configuration_schema.json",
+	"categories": {
+		"correctness": "error"
+	},
+	"env": {
+		"builtin": true
+	},
+	"ignorePatterns": [
+		"**/.next",
+		"**/.open-next",
+		"**/.wrangler",
+		"**/.expo",
+		"apps/expo/android",
+		"apps/expo/ios",
+		"packages/app/lib/licenses"
+	],
+	"plugins": ["typescript", "unicorn", "oxc", "react", "import"],
+	"rules": {
+		// Six pre-existing violations in the native camera and settings flows.
+		// Surfaced rather than enforced: correcting hook dependencies there
+		// changes when callbacks re-create, which needs testing on a device, not
+		// a blind fix in a CI-setup change.
+		"react-hooks/exhaustive-deps": "warn",
+		"typescript/consistent-type-imports": [
+			"error",
+			{ "fixStyle": "separate-type-imports", "prefer": "type-imports" }
+		],
+		"typescript/no-misused-promises": ["error", { "checksVoidReturn": false }],
+		"typescript/no-require-imports": "off"
+	}
+}

@@ -5,8 +5,9 @@
 		"native": "cd apps/expo && bun run start",
 		"web": "cd apps/next && bun run next",
 		"prebuild": "cd apps/expo && bun run prebuild",
-		"lint": "turbo lint",
-		"format": "turbo format",
+		"lint": "oxlint --type-aware",
+		"format": "oxfmt .",
+		"format:check": "oxfmt --check .",
 		"clean": "turbo clean",
 		"licenses": "turbo licenses",
 		"typecheck": "turbo typecheck"
@@ -19,11 +20,9 @@
 		]
 	},
 	"devDependencies": {
-		"eslint-plugin-perfectionist": "~5.10.0",
-		"eslint-plugin-react": "~7.37.5",
-		"prettier": "~3.9.6",
-		"prettier-config-cretia": "~3.0.0",
-		"turbo": "~2.10.5",
-		"typescript-eslint": "~8.65.0"
+		"oxfmt": "~0.66.0",
+		"oxlint": "~1.81.0",
+		"oxlint-tsgolint": "~7.0.2001",
+		"turbo": "~2.10.5"
 	}
 }

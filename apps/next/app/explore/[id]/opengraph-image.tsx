@@ -32,56 +32,53 @@ export default async function Image({ params }: Props) {
 	}
 
 	return new ImageResponse(
-		(
+		<div
+			style={{
+				display: 'flex',
+				flexDirection: 'column',
+				height: '100%',
+				width: '100%',
+			}}
+		>
+			<img
+				src={getImageUrl(organism.image_key, {
+					width: SOCIAL_IMAGE_WIDTH,
+				})}
+				style={{
+					height: '100%',
+					left: 0,
+					objectFit: 'cover',
+					position: 'absolute',
+					top: 0,
+					width: '100%',
+				}}
+			/>
 			<div
 				style={{
+					background: 'linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0))',
+					color: 'white',
 					display: 'flex',
 					flexDirection: 'column',
+					fontSize: 50,
+					fontWeight: '600',
 					height: '100%',
+					justifyContent: 'flex-end',
+					padding: 20,
+					paddingLeft: 100,
+					paddingRight: 100,
 					width: '100%',
 				}}
 			>
-				<img
-					src={getImageUrl(organism.image_key, {
-						width: SOCIAL_IMAGE_WIDTH,
-					})}
+				<p
 					style={{
-						height: '100%',
-						left: 0,
-						objectFit: 'cover',
-						position: 'absolute',
-						top: 0,
-						width: '100%',
-					}}
-				/>
-				<div
-					style={{
-						background:
-							'linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0))',
-						color: 'white',
-						display: 'flex',
-						flexDirection: 'column',
-						fontSize: 50,
-						fontWeight: '600',
-						height: '100%',
-						justifyContent: 'flex-end',
-						padding: 20,
-						paddingLeft: 100,
-						paddingRight: 100,
-						width: '100%',
+						fontSize: 100,
+						fontWeight: '800',
+						margin: 0,
 					}}
 				>
-					<p
-						style={{
-							fontSize: 100,
-							fontWeight: '800',
-							margin: 0,
-						}}
-					>
-						{organism.common_name}
-					</p>
-				</div>
+					{organism.common_name}
+				</p>
 			</div>
-		),
+		</div>,
 	)
 }
