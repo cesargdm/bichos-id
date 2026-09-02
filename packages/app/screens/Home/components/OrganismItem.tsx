@@ -32,26 +32,43 @@ const styles = {
 		position: 'relative',
 		width: IMAGE_SIZE,
 	},
+	placeholder: {
+		backgroundColor: '#222',
+		height: IMAGE_SIZE,
+		width: IMAGE_SIZE,
+	},
 } as const
 
 export default function Organism({ data }: { data: Organism }) {
-	// Some organisms' image_key points at an R2 object that no longer exists
-	// (stale data, not something the app can recover from). Hide the card
-	// rather than show a broken/blank image.
+	// Some organisms' image_key points at an R2 object that no longer exists.
+	// Fall back to a plain placeholder instead of a broken image — but keep
+	// the card itself (name + link to the organism), rather than removing it,
+	// so a run of failures doesn't empty out the whole list.
 	const [imageFailed, setImageFailed] = useState(false)
-
-	if (imageFailed) return null
 
 	return (
 		<Link href={`/explore/${data.id}`} style={styles.link}>
-			<Image
-				width={IMAGE_SIZE}
-				height={IMAGE_SIZE}
-				style={styles.image}
-				src={getImageUrl(data.image_key)}
-				alt={data.common_name}
-				onError={() => setImageFailed(true)}
-			/>
+			{imageFailed ? (
+				<div style={styles.placeholder} />
+			) : (
+				<Image
+					width={IMAGE_SIZE}
+					height={IMAGE_SIZE}
+					style={styles.image}
+					src={getImageUrl(data.image_key)}
+					alt={data.common_name}
+					onError={() => setImageFailed(true)}
+					onLoad={(event) => {
+						// A defensive check, not a known-common case: a "load"
+						// event with zero natural dimensions means the browser
+						// couldn't decode the response as an image even though
+						// the request itself succeeded.
+						if (event.currentTarget.naturalWidth === 0) {
+							setImageFailed(true)
+						}
+					}}
+				/>
+			)}
 			<p style={styles.caption}>{data.common_name}</p>
 		</Link>
 	)

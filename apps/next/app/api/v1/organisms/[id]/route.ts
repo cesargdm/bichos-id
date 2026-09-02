@@ -8,24 +8,35 @@ import { getR2Client, R2_BUCKET_NAME } from '@/next/lib/r2'
 
 const cacheMaxAge = 60 * 60 * 3 // 3 hours
 
+/**
+ * Returns `failed: true` (with an empty image list) rather than throwing, so
+ * a transient R2 problem doesn't take down the whole organism response — but
+ * the caller must skip the long cache lifetime in that case, or a bad empty
+ * result gets locked in for `cacheMaxAge`.
+ */
 function getOrganismImages(prefix: string) {
 	return getR2Client()
 		.send(
 			new ListObjectsCommand({
+				// Trailing slash: without it "scans/family/genus/species" (no
+				// slash) also prefix-matches a sibling like
+				// "scans/family/genus/speciesX/...", pulling in another
+				// organism's photos.
 				Bucket: R2_BUCKET_NAME,
-				Prefix: prefix,
+				Prefix: `${prefix}/`,
 			}),
 		)
+		.then(({ Contents = [] }) => ({
+			failed: false,
+			images: Contents.filter(
+				(item): item is typeof item & { Key: string } => !!item.Key,
+			).map(({ Key }) => `${ASSETS_BASE_URL}/${Key}`),
+		}))
 		.catch((error: unknown) => {
 			console.error('getOrganismImages failed', error)
 			Sentry.captureException(error)
-			return { Contents: [] }
+			return { failed: true, images: [] }
 		})
-		.then(({ Contents = [] }) =>
-			Contents.filter(
-				(item): item is typeof item & { Key: string } => !!item.Key,
-			).map(({ Key }) => `${ASSETS_BASE_URL}/${Key}`),
-		)
 }
 
 export async function GET(
@@ -37,7 +48,7 @@ export async function GET(
 
 		const images_path = `scans/${id.replaceAll('-', '/')}`
 
-		const [organism, organismScans, images] = await Promise.all([
+		const [organism, organismScans, imageResult] = await Promise.all([
 			getOrganism(id),
 			getOrganismScans(id),
 			getOrganismImages(images_path),
@@ -46,12 +57,18 @@ export async function GET(
 		return NextResponse.json(
 			{
 				...organism,
-				images,
+				images: imageResult.images,
 				scansCount: organismScans.length,
 			},
 			{
 				headers: {
-					'Cache-Control': `public, s-maxage=${cacheMaxAge}, must-revalidate`,
+					// A transient R2 failure degrades to an empty image list rather
+					// than a 500 (organism info is still useful without photos), but
+					// that empty result must not get locked in by the long cache
+					// lifetime — retry on the next request instead.
+					'Cache-Control': imageResult.failed
+						? 'no-store'
+						: `public, s-maxage=${cacheMaxAge}, must-revalidate`,
 				},
 			},
 		)
