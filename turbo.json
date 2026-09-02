@@ -23,12 +23,6 @@
 				"VERCEL_ENV"
 			]
 		},
-		"lint": {
-			"dependsOn": ["^lint"]
-		},
-		"format": {
-			"dependsOn": ["^format"]
-		},
 		"clean": {
 			"dependsOn": ["^clean"]
 		},

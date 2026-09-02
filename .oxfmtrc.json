@@ -1,0 +1,29 @@
+{
+	"$schema": "./node_modules/oxfmt/configuration_schema.json",
+	"arrowParens": "always",
+	"bracketSameLine": false,
+	"bracketSpacing": true,
+	"embeddedLanguageFormatting": "auto",
+	"endOfLine": "lf",
+	"htmlWhitespaceSensitivity": "css",
+	"ignorePatterns": [
+		"**/.next",
+		"**/.open-next",
+		"**/.wrangler",
+		"**/.expo",
+		"apps/expo/android",
+		"apps/expo/ios",
+		"packages/app/lib/licenses",
+		"**/next-env.d.ts"
+	],
+	"jsxSingleQuote": false,
+	"printWidth": 80,
+	"proseWrap": "preserve",
+	"quoteProps": "as-needed",
+	"semi": false,
+	"singleQuote": true,
+	"sortPackageJson": false,
+	"tabWidth": 2,
+	"trailingComma": "all",
+	"useTabs": true
+}
