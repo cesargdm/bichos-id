@@ -187,29 +187,27 @@ LOCATION
 			.send(new GetObjectCommand({ Bucket: R2_BUCKET_NAME, Key: imageKey }))
 			.catch(() => null)
 
-		// Only recorded once the image the row references is confirmed to
-		// exist in R2 (already there, or just uploaded successfully) — a scan
-		// row inserted before an upload that then fails would point at a key
-		// that was never written.
+		// Only recorded once the image the row references is confirmed to exist
+		// in R2 (already there, or just uploaded successfully) — a scan row
+		// inserted before an upload that then fails would point at a key that was
+		// never written.
+		//
 		// Bumping the counter here, rather than at the call sites, is what keeps
 		// it honest: a scan can be recorded on three different paths (the photo
-		// already being in R2, a new organism, a repeat sighting), and counting
-		// on only one of them left `scan_count` reading 1 for organisms with
-		// dozens of scans. The organism row may not exist yet on the new-organism
-		// path — the update is then a no-op and the insert seeds the count at 1.
-		// Insert and counter bump in one statement, so a failure can't record a
-		// scan that never gets counted — a retry would then add a second scan
-		// while the counter advanced only once. It has to be a data-modifying CTE
-		// rather than `db.transaction()`: the Neon HTTP driver has no interactive
-		// transactions ("NeonDialect doesn't support interactive transactions"),
-		// so that call throws at runtime.
+		// already being in R2, a new organism, a repeat sighting), and counting on
+		// only one of them left `scan_count` reading 1 for organisms with dozens
+		// of scans.
 		//
-		// On the new-organism path the row doesn't exist yet, so the update
-		// matches nothing and the subsequent insert seeds `scan_count` at 1.
-		const insertScanRecord = () => {
+		// Insert and counter move in one statement so a failure can't record a
+		// scan that never gets counted. It has to be a data-modifying CTE rather
+		// than `db.transaction()`: the Neon HTTP driver has no interactive
+		// transactions ("NeonDialect doesn't support interactive transactions"),
+		// so that call throws at runtime. On the new-organism path the row doesn't
+		// exist yet, so the update matches nothing and the insert seeds it at 1.
+		const insertScanRecord = async () => {
 			const now = new Date().toISOString()
 
-			return sql`
+			await sql`
 				with inserted as (
 					insert into organism_scans (
 						created_at, created_by, id, image_key,
@@ -225,6 +223,11 @@ LOCATION
 				set scan_count = scan_count + 1
 				where id = (select organism_id from inserted)
 			`.execute(db)
+
+			// Every path that records a scan moves the counter, so every path has
+			// to drop the cached detail page too — otherwise the person who just
+			// scanned it keeps seeing the old count for the full cache lifetime.
+			revalidatePath(`/explore/${organismId}`)
 		}
 
 		if (existingImage) {

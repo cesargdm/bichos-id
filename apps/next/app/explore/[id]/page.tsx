@@ -40,10 +40,36 @@ export function generateStaticParams() {
 	return []
 }
 
+/**
+ * Resolves an id to its organism, following the repeated-rank repair when the
+ * id misses. Shared with `generateMetadata` because that runs first: if it
+ * called `notFound()` on a legacy id, the 404 would win before the page ever
+ * got the chance to redirect.
+ *
+ * `getOrganism` is request-cached, so the repeated lookups collapse.
+ */
+async function resolveOrganism(id: string) {
+	const organism = await getOrganism(id)
+
+	if (organism) return { canonicalId: id, organism }
+
+	const repaired = repairLegacyOrganismId(id)
+
+	if (repaired !== id) {
+		const repairedOrganism = await getOrganism(repaired)
+
+		if (repairedOrganism) {
+			return { canonicalId: repaired, organism: repairedOrganism }
+		}
+	}
+
+	return { canonicalId: id, organism: undefined }
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
 	const id = (await params).id
 
-	const organism = await getOrganism(id)
+	const { organism } = await resolveOrganism(id)
 
 	if (!organism) {
 		return notFound()
@@ -64,19 +90,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function DiscoveryDetailPage({ params }: Props) {
 	const id = (await params).id
 
-	const organism = await getOrganism(id)
+	const { canonicalId, organism } = await resolveOrganism(id)
 
 	if (!organism) {
-		// Ids used to repeat a rank (`pentatomidae-chinavia-chinavia-hilaris`).
-		// The repair is attempted only after a miss, so a tautonymous species
-		// whose id legitimately repeats a segment still resolves to itself.
-		const repaired = repairLegacyOrganismId(id)
-
-		if (repaired !== id && (await getOrganism(repaired))) {
-			permanentRedirect(`/explore/${repaired}`)
-		}
-
 		return notFound()
+	}
+
+	if (canonicalId !== id) {
+		permanentRedirect(`/explore/${canonicalId}`)
 	}
 
 	const familyMembers = await getFamilyMembers(
