@@ -16,7 +16,11 @@ function getOrganismImages(prefix: string) {
 				Prefix: prefix,
 			}),
 		)
-		.catch(() => ({ Contents: [] }))
+		.catch((error: unknown) => {
+			console.error('getOrganismImages failed', error)
+			Sentry.captureException(error)
+			return { Contents: [] }
+		})
 		.then(({ Contents = [] }) =>
 			Contents.map(({ Key }) => `${ASSETS_BASE_URL}/${Key}`),
 		)
