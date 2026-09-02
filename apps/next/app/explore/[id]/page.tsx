@@ -1,10 +1,20 @@
 import type { Metadata } from 'next'
 
-import { notFound } from 'next/navigation'
+import { notFound, permanentRedirect } from 'next/navigation'
 
-import { ASSETS_BASE_URL } from '@/app/lib/api/constants'
+import { repairLegacyOrganismId } from '@/app/lib/organism-id'
+
+import {
+	DETAIL_IMAGE_WIDTH,
+	getImageUrl,
+	SOCIAL_IMAGE_WIDTH,
+} from '@/app/lib/api/constants'
 import DiscoveryDetailScreen from '@/app/screens/ExploreDetail'
-import { getOrganism, isOrganismIndexable } from '@/next/lib/db'
+import {
+	getFamilyMembers,
+	getOrganism,
+	isOrganismIndexable,
+} from '@/next/lib/db'
 
 type Props = {
 	params: Promise<{ id: string }>
@@ -30,10 +40,36 @@ export function generateStaticParams() {
 	return []
 }
 
+/**
+ * Resolves an id to its organism, following the repeated-rank repair when the
+ * id misses. Shared with `generateMetadata` because that runs first: if it
+ * called `notFound()` on a legacy id, the 404 would win before the page ever
+ * got the chance to redirect.
+ *
+ * `getOrganism` is request-cached, so the repeated lookups collapse.
+ */
+async function resolveOrganism(id: string) {
+	const organism = await getOrganism(id)
+
+	if (organism) return { canonicalId: id, organism }
+
+	const repaired = repairLegacyOrganismId(id)
+
+	if (repaired !== id) {
+		const repairedOrganism = await getOrganism(repaired)
+
+		if (repairedOrganism) {
+			return { canonicalId: repaired, organism: repairedOrganism }
+		}
+	}
+
+	return { canonicalId: id, organism: undefined }
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
 	const id = (await params).id
 
-	const organism = await getOrganism(id)
+	const { organism } = await resolveOrganism(id)
 
 	if (!organism) {
 		return notFound()
@@ -54,11 +90,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function DiscoveryDetailPage({ params }: Props) {
 	const id = (await params).id
 
-	const organism = await getOrganism(id)
+	const { canonicalId, organism } = await resolveOrganism(id)
 
 	if (!organism) {
 		return notFound()
 	}
+
+	if (canonicalId !== id) {
+		permanentRedirect(`/explore/${canonicalId}`)
+	}
+
+	const familyMembers = await getFamilyMembers(
+		organism.classification?.family ?? '',
+		organism.id,
+	)
 
 	const jsonLd = {
 		'@context': 'https://schema.org',
@@ -66,8 +111,15 @@ export default async function DiscoveryDetailPage({ params }: Props) {
 		alternateName: organism.common_name,
 		description: organism.description,
 		identifier: organism.id,
-		image: `${ASSETS_BASE_URL}/${organism.image_key}`,
-		name: `${organism.classification?.genus} ${organism.classification?.species}`,
+		image: getImageUrl(organism.image_key, { width: SOCIAL_IMAGE_WIDTH }),
+		// Only the ranks that exist — an unidentified genus/species used to
+		// render this as the literal "undefined undefined".
+		name:
+			[organism.classification?.genus, organism.classification?.species]
+				.filter(Boolean)
+				.join(' ') ||
+			organism.classification?.family ||
+			organism.common_name,
 	}
 
 	return (
@@ -79,8 +131,11 @@ export default async function DiscoveryDetailPage({ params }: Props) {
 			<DiscoveryDetailScreen
 				fallbackData={{
 					...organism,
-					images: [`${ASSETS_BASE_URL}/${organism.image_key}`],
+					images: [
+						getImageUrl(organism.image_key, { width: DETAIL_IMAGE_WIDTH }),
+					],
 				}}
+				familyMembers={familyMembers}
 			/>
 		</>
 	)

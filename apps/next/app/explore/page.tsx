@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 
 import ExploreScreen from '@/app/screens/Explore'
 import { getOrganisms } from '@/next/lib/db'
+import { getOrganismsSchema } from '@/next/lib/schema'
 
 type Props = {
 	searchParams: Promise<{ [key: string]: string | string[] | undefined }>
@@ -16,7 +17,14 @@ export const metadata: Metadata = {
 }
 
 export default async function ExplorePage({ searchParams }: Props) {
-	const organisms = await getOrganisms(await searchParams)
+	// Parsed with the same schema the API route uses. Passing the raw params
+	// straight through sent the string "false" for `identified`, which is truthy
+	// — so the server rendered a filtered list that the first SWR revalidation
+	// then replaced with an unfiltered one.
+	const parsed = getOrganismsSchema.safeParse(await searchParams)
+	const organisms = await getOrganisms(
+		parsed.success ? parsed.data : getOrganismsSchema.parse({}),
+	)
 
 	return <ExploreScreen fallbackData={organisms} />
 }

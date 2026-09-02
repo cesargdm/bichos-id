@@ -8,23 +8,35 @@ import { z } from 'zod'
 
 import type { Organism } from '@/app/lib/types'
 
+// Every string here comes straight from the model, which occasionally returns
+// values with surrounding whitespace (there is a " abejorro de cabeza grande"
+// in the database, leading space and all, which then renders into headings and
+// page titles). Trimming at the parse boundary keeps it out of the database —
+// and matters most for the classification fields, since those are concatenated
+// into the organism id and its R2 object path.
 export const IdentificationSchema = z.object({
 	_imageQualityRating: z.number(),
 	classification: z.object({
-		class: z.string(),
-		family: z.string(),
-		genus: z.string().optional(),
-		order: z.string(),
-		phylum: z.string(),
-		species: z.string().optional(),
+		class: z.string().trim(),
+		family: z.string().trim(),
+		// `.nullable()`, not `.optional()`: OpenAI's structured outputs require
+		// every field to be present, and `zodResponseFormat` throws outright on
+		// an optional-but-not-nullable field ("uses `.optional()` without
+		// `.nullable()` which is not supported by the API"). That throw happened
+		// before any request reached OpenAI, so identification failed with a
+		// generic 500 for every authenticated request.
+		genus: z.string().trim().nullable(),
+		order: z.string().trim(),
+		phylum: z.string().trim(),
+		species: z.string().trim().nullable(),
 	}),
-	common_name: z.string(),
+	common_name: z.string().trim(),
 })
 
 export const OrganismSchema = z.object({
-	common_name: z.string(),
-	description: z.string(),
-	habitat: z.string(),
+	common_name: z.string().trim(),
+	description: z.string().trim(),
+	habitat: z.string().trim(),
 	metadata: z.object({
 		venomous: z.object({
 			level: z.enum(['NON_VENOMOUS', 'VENOMOUS', 'HIGHLY_VENOMOUS']),
@@ -78,6 +90,14 @@ function isDatabaseConfigured() {
 type GetOrganismsOptions = {
 	sortBy?: AnyColumn<Database, 'organisms'>
 	direction?: 'asc' | 'desc'
+	/**
+	 * Restrict to organisms complete enough to stand on their own — see
+	 * {@link isOrganismIndexable}. Used by the home page's curated lists, which
+	 * otherwise lead with unidentified stubs ("Sin identificación", a family
+	 * with no genus or species) that link to pages the site already marks
+	 * noindex. `/explore` stays unfiltered: it's the exhaustive browse.
+	 */
+	identified?: boolean
 	limit?: number
 	query?: string
 }
@@ -116,18 +136,39 @@ const indexableOrganismFilter = sql<boolean>`
 `
 
 /**
+ * The vision model classifies whatever was photographed, so the catalogue has
+ * accumulated snakes, geckos, earthworms, a heron and a dandelion. They're real
+ * scans and their pages stay reachable — a person who photographed a gecko
+ * still gets their result — but they don't belong in a browse list of bichos.
+ */
+const arthropodOnlyFilter = sql<boolean>`
+	btrim(coalesce(classification ->> 'phylum', '')) = 'Arthropoda'
+`
+
+/**
  * Returns a list of organisms.
  */
 export const getOrganisms = cache((options: GetOrganismsOptions = {}) => {
 	if (!isDatabaseConfigured()) return []
 
-	const { direction, limit = 50, query, sortBy = 'common_name' } = options
+	const {
+		direction,
+		identified,
+		limit = 50,
+		query,
+		sortBy = 'common_name',
+	} = options
 
 	let dbQuery = db
 		.selectFrom('organisms')
+		.where(arthropodOnlyFilter)
 		.orderBy(sortBy, direction)
 		.limit(limit)
 		.selectAll()
+
+	if (identified) {
+		dbQuery = dbQuery.where(indexableOrganismFilter)
+	}
 
 	if (query) {
 		dbQuery = dbQuery.where('common_name', 'ilike', `%${query}%`)
@@ -172,6 +213,43 @@ export const getOrganism = cache((id: string) => {
 		.selectAll()
 		.executeTakeFirst()
 })
+
+/**
+ * Other organisms in the same family, most identified first.
+ *
+ * A family-only record (`apidae--`, no genus or species) is otherwise a dead
+ * end: it describes a family and links nowhere, even though the directory holds
+ * identified members of it. Listing them turns those pages into an index of the
+ * family instead, and gives every organism page a route deeper into the
+ * catalogue.
+ */
+export const getFamilyMembers = cache(
+	(family: string, excludeId: string, limit = 12) => {
+		if (!isDatabaseConfigured() || !family.trim()) return []
+
+		return (
+			db
+				.selectFrom('organisms')
+				.where(
+					sql<boolean>`lower(btrim(coalesce(classification ->> 'family', ''))) = ${family.trim().toLowerCase()}`,
+				)
+				.where('id', '!=', excludeId)
+				// Species-level entries first, then genus-level, then bare stubs, so the
+				// most useful links lead.
+				.orderBy(
+					sql`case
+					when btrim(coalesce(classification ->> 'species', '')) <> '' then 0
+					when btrim(coalesce(classification ->> 'genus', '')) <> '' then 1
+					else 2
+				end`,
+				)
+				.orderBy('common_name', 'asc')
+				.select(['id', 'common_name', 'image_key', 'classification'])
+				.limit(limit)
+				.execute()
+		)
+	},
+)
 
 export const getOrganismScans = cache((id: string) => {
 	if (!isDatabaseConfigured()) return []
