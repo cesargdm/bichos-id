@@ -136,6 +136,16 @@ const indexableOrganismFilter = sql<boolean>`
 `
 
 /**
+ * The vision model classifies whatever was photographed, so the catalogue has
+ * accumulated snakes, geckos, earthworms, a heron and a dandelion. They're real
+ * scans and their pages stay reachable — a person who photographed a gecko
+ * still gets their result — but they don't belong in a browse list of bichos.
+ */
+const arthropodOnlyFilter = sql<boolean>`
+	btrim(coalesce(classification ->> 'phylum', '')) = 'Arthropoda'
+`
+
+/**
  * Returns a list of organisms.
  */
 export const getOrganisms = cache((options: GetOrganismsOptions = {}) => {
@@ -151,6 +161,7 @@ export const getOrganisms = cache((options: GetOrganismsOptions = {}) => {
 
 	let dbQuery = db
 		.selectFrom('organisms')
+		.where(arthropodOnlyFilter)
 		.orderBy(sortBy, direction)
 		.limit(limit)
 		.selectAll()
