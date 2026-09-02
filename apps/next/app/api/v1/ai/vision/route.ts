@@ -178,23 +178,21 @@ ${
 				.where('id', '=', organismId)
 				.select('image_quality_rating')
 				.executeTakeFirst(),
-			getR2Client()
-				.send(
-					new PutObjectCommand({
-						Body: Buffer.from(
-							data.base64Image.replace(/^data:image\/\w+;base64,/, ''),
-							'base64',
-						),
-						Bucket: R2_BUCKET_NAME,
-						CacheControl: 'public, max-age=31536000, immutable',
-						ContentType: `image/${imageExtension}`,
-						Key: imageKey,
-						Metadata: {
-							'X-Image-Sha256': imageSha256,
-						},
-					}),
-				)
-				.catch(() => false),
+			getR2Client().send(
+				new PutObjectCommand({
+					Body: Buffer.from(
+						data.base64Image.replace(/^data:image\/\w+;base64,/, ''),
+						'base64',
+					),
+					Bucket: R2_BUCKET_NAME,
+					CacheControl: 'public, max-age=31536000, immutable',
+					ContentType: `image/${imageExtension}`,
+					Key: imageKey,
+					Metadata: {
+						'X-Image-Sha256': imageSha256,
+					},
+				}),
+			),
 		])
 
 		if (!existing) {

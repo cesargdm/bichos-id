@@ -22,7 +22,9 @@ function getOrganismImages(prefix: string) {
 			return { Contents: [] }
 		})
 		.then(({ Contents = [] }) =>
-			Contents.map(({ Key }) => `${ASSETS_BASE_URL}/${Key}`),
+			Contents.filter(
+				(item): item is typeof item & { Key: string } => !!item.Key,
+			).map(({ Key }) => `${ASSETS_BASE_URL}/${Key}`),
 		)
 }
 
