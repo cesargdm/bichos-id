@@ -10,6 +10,7 @@ import OpenAI from 'openai'
 import { zodResponseFormat } from 'openai/helpers/zod'
 import { z } from 'zod'
 
+import { buildOrganismId } from '@/app/lib/organism-id'
 import { db, IdentificationSchema, OrganismSchema } from '@/next/lib/db'
 import { verifyFirebaseIdToken } from '@/next/lib/firebase-verify'
 import { getR2Client, R2_BUCKET_NAME } from '@/next/lib/r2'
@@ -21,13 +22,6 @@ const requestBodySchema = z.object({
 		.startsWith('data:image/')
 		.max(1024 * 1024 * 10),
 })
-
-function slugify<T extends string>(text: T) {
-	return text
-		.toLowerCase()
-		.replace(/\s+/g, '-')
-		.replace(/[^a-z0-9-]/g, '') as Lowercase<T>
-}
 
 function getRandomId() {
 	// Web Crypto (not node:crypto) so the return type doesn't depend on
@@ -148,19 +142,29 @@ LOCATION
 			},
 		}
 
-		const organismSpecies = `${identification.classification.family}-${
-			identification.classification.genus || ''
-		}-${identification.classification.species || ''}` as const
-
-		if (organismSpecies.startsWith('-')) {
+		// Family is what makes the listing addressable; without it there's no
+		// page worth creating.
+		if (!identification.classification.family?.trim()) {
 			return NextResponse.json(
 				{ error: 'Invalid organism species' },
 				{ status: 400 },
 			)
 		}
 
-		const organismId = slugify(organismSpecies)
-		const imagePath = `scans/${organismSpecies.replaceAll('-', '/')}`
+		const organismId = buildOrganismId([
+			identification.classification.family,
+			identification.classification.genus,
+			identification.classification.species,
+		])
+
+		if (!organismId) {
+			return NextResponse.json(
+				{ error: 'Invalid organism species' },
+				{ status: 400 },
+			)
+		}
+
+		const imagePath = `scans/${organismId.replaceAll('-', '/')}`
 
 		const imageSha256 = crypto
 			.createHash('sha256')

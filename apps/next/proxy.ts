@@ -6,6 +6,11 @@ import { Ratelimit } from '@upstash/ratelimit'
 import { Redis } from '@upstash/redis/cloudflare'
 import { NextResponse } from 'next/server'
 
+import {
+	normalizeOrganismId,
+	UNIDENTIFIED_ORGANISM_ID,
+} from '@/app/lib/organism-id'
+
 declare global {
 	interface CloudflareEnv {
 		UPSTASH_REDIS_REST_TOKEN: string
@@ -84,7 +89,42 @@ async function withRateLimit(request: NextRequest) {
 	}
 }
 
+/**
+ * Organism ids used to be built by joining family/genus/species unconditionally,
+ * so a listing identified only to family produced `/explore/apidae--`. The rows
+ * have since been renamed to the collapsed form, which would leave every
+ * existing link and indexed URL on a 404 — redirect them permanently instead,
+ * so the old and new spellings resolve to one canonical page.
+ *
+ * This runs in middleware rather than as a `redirect()` inside the page so the
+ * old URL never reaches the renderer or the ISR cache.
+ */
+function redirectLegacyOrganismUrl(request: NextRequest) {
+	const { pathname } = request.nextUrl
+
+	if (!pathname.startsWith('/explore/')) return
+
+	const id = pathname.slice('/explore/'.length)
+	// Anything with a further path segment isn't an organism id.
+	if (!id || id.includes('/')) return
+
+	const normalized = normalizeOrganismId(decodeURIComponent(id))
+	// `--` carried no taxonomy at all and normalizes to nothing, so it gets the
+	// explicit unidentified slug rather than an empty path.
+	const target = normalized || (/^-+$/.test(id) ? UNIDENTIFIED_ORGANISM_ID : '')
+
+	if (!target || target === id) return
+
+	const url = request.nextUrl.clone()
+	url.pathname = `/explore/${target}`
+
+	return NextResponse.redirect(url, 301)
+}
+
 export async function proxy(request: NextRequest) {
+	const legacyRedirect = redirectLegacyOrganismUrl(request)
+	if (legacyRedirect) return legacyRedirect
+
 	const response = request.nextUrl.pathname.startsWith('/api/')
 		? await withRateLimit(request)
 		: NextResponse.next()
