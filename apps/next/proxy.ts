@@ -1,6 +1,7 @@
 import type { NextRequest } from 'next/server'
 
 import { getCloudflareContext } from '@opennextjs/cloudflare'
+import * as Sentry from '@sentry/nextjs'
 import { Ratelimit } from '@upstash/ratelimit'
 import { Redis } from '@upstash/redis/cloudflare'
 import { NextResponse } from 'next/server'
@@ -39,8 +40,6 @@ export async function proxy(request: NextRequest) {
 		return NextResponse.next()
 	}
 
-	let waitUntil = Date.now()
-
 	try {
 		const ip = request.headers.get('CF-Connecting-IP') || '127.0.0.1'
 
@@ -48,21 +47,29 @@ export async function proxy(request: NextRequest) {
 		const { reset, success } = await limiter.limit(ip)
 
 		if (!success) {
-			waitUntil = reset
-			throw new Error('Rate limit exceeded')
+			return NextResponse.json(
+				{ error: `Límite alcanzado` },
+				{
+					headers: {
+						'Retry-After': Math.max(
+							0,
+							Math.floor((reset - Date.now()) / 1000),
+						).toString(),
+						'X-RateLimit-Limit': RATE_LIMIT.toString(),
+					},
+					status: 429,
+				},
+			)
 		}
 
 		return NextResponse.next()
-	} catch {
-		return NextResponse.json(
-			{ error: `Límite alcanzado` },
-			{
-				headers: {
-					'Retry-After': Math.floor((waitUntil - Date.now()) / 1000).toString(),
-					'X-RateLimit-Limit': RATE_LIMIT.toString(),
-				},
-				status: 429,
-			},
-		)
+	} catch (error) {
+		// A genuine rate-limiter failure (Redis misconfigured/unreachable) is
+		// not the same as a client being rate-limited — surface it as a real
+		// error instead of masking it as 429, which would otherwise silently
+		// block all API traffic.
+		Sentry.captureException(error)
+
+		return NextResponse.json({ error: 'An error occurred' }, { status: 500 })
 	}
 }

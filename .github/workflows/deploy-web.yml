@@ -7,13 +7,22 @@ on:
     paths:
       - 'apps/next/**'
       - 'packages/app/**'
+      - 'bun.lock'
+      - 'package.json'
       - '.github/workflows/deploy-web.yml'
+
+concurrency:
+  group: deploy-web-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   deploy:
     name: Build and deploy
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    # Skip (rather than fail noisily) until Cloudflare secrets are configured,
+    # e.g. on a fork or before the first real cutover.
+    if: ${{ vars.CLOUDFLARE_DEPLOY_READY == 'true' }}
     permissions:
       contents: read
     steps:
@@ -28,14 +37,15 @@ jobs:
       - name: Install dependencies
         run: bun install
 
-      - name: Typecheck
-        run: bun run typecheck
-        working-directory: ./apps/next
-
-      # `next build` (invoked by `opennextjs-cloudflare build` below) runs the
-      # @sentry/nextjs build plugin, which uploads sourcemaps itself using the
-      # org/project already set in next.config.mjs's sentryConfig, as long as
-      # SENTRY_AUTH_TOKEN is present — no separate sentry-cli step needed.
+      # `opennextjs-cloudflare build` runs `next build` itself, which includes
+      # its own "Running TypeScript" phase — a separate `tsc --noEmit` step
+      # here would fail on a clean checkout anyway, since next-env.d.ts
+      # references .next/types/*.d.ts files that only exist after that build.
+      #
+      # Static/ISR pages (/, /explore, /sitemap.xml) are rendered during this
+      # build step, not at request time, so build-time env vars matter here
+      # even though POSTGRES_URL etc. are otherwise only Worker *secrets*
+      # (runtime bindings, invisible to this local build).
       - name: Build and deploy to Cloudflare Workers
         uses: cloudflare/wrangler-action@v3
         with:
@@ -45,4 +55,6 @@ jobs:
           preCommands: bunx opennextjs-cloudflare build
           command: deploy
         env:
+          NEXT_PUBLIC_ORIGIN: ${{ vars.NEXT_PUBLIC_ORIGIN }}
+          POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
