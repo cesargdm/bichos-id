@@ -13,6 +13,7 @@ import {
 	Platform,
 	StyleSheet,
 	Text,
+	useWindowDimensions,
 } from 'react-native'
 import { Link, TextLink } from 'solito/link'
 import { useSearchParams } from 'solito/navigation'
@@ -56,8 +57,18 @@ type Params = {
 
 const TILE_HEIGHT = Platform.OS === 'web' ? 400 : 200
 
+const DESKTOP_BREAKPOINT = 1024
+
+function getColumnCount(width: number) {
+	if (Platform.OS !== 'web') return 2
+
+	return width >= DESKTOP_BREAKPOINT ? 3 : 2
+}
+
 function DiscoverScreen({ fallbackData }: Props) {
 	const params = useSearchParams<Params>()
+	const { width } = useWindowDimensions()
+	const numColumns = getColumnCount(width)
 
 	const { data, error, isLoading, mutate } = useSWR<
 		Props['fallbackData'],
@@ -87,6 +98,9 @@ function DiscoverScreen({ fallbackData }: Props) {
 			<StatusBar style="light" />
 			<FlatList
 				style={styles.container}
+				// FlatList won't change numColumns on an existing instance, so the
+				// key forces a remount when the breakpoint is crossed.
+				key={numColumns}
 				data={data}
 				refreshControl={
 					Platform.OS !== 'web' ? (
@@ -145,7 +159,7 @@ function DiscoverScreen({ fallbackData }: Props) {
 						</ImageBackground>
 					</Link>
 				)}
-				numColumns={2}
+				numColumns={numColumns}
 			/>
 			<TextLink href="/">Go Home</TextLink>
 		</>

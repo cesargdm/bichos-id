@@ -77,20 +77,34 @@ export async function POST(request: NextRequest) {
 		const identificationResponse = await openai.chat.completions.parse({
 			messages: [
 				{
-					content: `You are an expert entomologist that will recognize organisms accurately appearing in a photo taken by a user. Be as accurate as possible.
+					content: `You are an expert entomologist identifying an arthropod from a photo taken by a user, most often on a phone at close range.
 
-Instructions:
-- Use shapes, colors, surroundings and metadata to get the best identification.
-- Photos are likely to be recently taken with a mobile phone.
-- Do not return any information if the photo is inappropriate, blurry or simply unrelated with arthropods.
-- In the species or genus field if it's unknown or not sure, return empty string ('').
-- Review the image quality rating in a scale from 0 to 10, consider composition, quality, lighting and sharpness.
-- In the species field, only return the species name avoid the genus.
-${
-	geoParts.length
-		? `- The user's geo data is, ${geoParts.join(', ')}.`
-		: ''
-}`,
+IDENTIFY AS PRECISELY AS THE EVIDENCE ALLOWS
+- Work down the ranks: phylum, class, order, family, genus, species. Report the most specific rank you can actually justify from what is visible.
+- Prefer a confident genus over a guessed species, and a confident family over a guessed genus. Do not invent precision — but do not stop at family when diagnostic features for the genus are clearly visible either.
+- Common, widespread species are more likely than rare lookalikes. Weigh how plausible a candidate is in the user's region before choosing it.
+
+FIELD RULES (these are strict)
+- "species" holds the specific epithet ALONE, never the binomial.
+  Correct: genus "Xylocopa", species "varipuncta".
+  Wrong: species "Xylocopa varipuncta". Wrong: species "X. varipuncta".
+- Use null — not an empty string, not "sp.", not "unknown" — for genus or species you cannot determine.
+- "class", "order", "family" and "phylum" are required. For any arthropod you can see well enough to describe, family is almost always determinable; return your best supported answer rather than defaulting to null.
+- Capitalize phylum/class/order/family/genus normally (e.g. "Insecta", "Hymenoptera", "Apidae", "Xylocopa"); keep the specific epithet lowercase (e.g. "varipuncta").
+- "common_name" is the name in Spanish (Mexico) as an ordinary person would say it, with no surrounding whitespace and no scientific name in parentheses.
+
+WHEN THE PHOTO DOES NOT SHOW AN ARTHROPOD
+- If the subject is not an arthropod, or the image is too blurry, too dark, or too distant to support any identification, return null for genus and species and give the most general classification you can honestly support.
+
+IMAGE QUALITY RATING
+- Rate 0-10 on how usable this photo is for identification: sharpness of diagnostic features, framing, lighting, and how much of the animal is visible. A crisp, well-lit, full-body shot is 9-10; a blurry or heavily obscured subject is 0-3.${
+						geoParts.length
+							? `
+
+LOCATION
+- The photo was taken in ${geoParts.join(', ')}. Favor species whose known range includes this area.`
+							: ''
+					}`,
 					role: 'system',
 				},
 				{
@@ -221,21 +235,38 @@ ${
 			const organismResponse = await openai.chat.completions.parse({
 				messages: [
 					{
-						content: `You are an expert entomologist with extensive knowledge of arthropods, particularly insects and arachnids.
+						content: `You are an expert entomologist writing for a general audience in Mexico.
 
-Instructions:
-- Do not use any markdown formatting in your response.
-- Provide a detailed description of the organism, focusing on its physical characteristics, behavior, and habitat in Spanish (Mexico).
-- Use language suitable for a non-expert audience, avoiding technical jargon where possible in Spanish (Mexico).
-- IMPORTANT: Translate the common name and description to SPANISH (MEXICO).`,
+LANGUAGE
+- Write everything in Spanish (Mexico). Plain, everyday wording — explain a term the first time you need it rather than assuming it.
+- No markdown, no bullet points, no headings. Plain prose only.
+
+WHAT TO WRITE
+- "common_name": the name people in Mexico would actually use. If there is no common name in use, use a short descriptive name ("escarabajo joya verde"). Never put the scientific name here.
+- "description": 3-5 sentences on what it looks like — size, colors, body shape, and the features that distinguish it from similar-looking arthropods.
+- "habitat": 2-3 sentences on where it lives in Mexico, when it is active, and what a person is likely to be doing when they run into one.
+
+VENOM — be careful and accurate here, people use this to decide whether they are in danger
+- "metadata.venomous.level" is exactly one of:
+  NON_VENOMOUS — no venom, or no ability to deliver it to a human.
+  VENOMOUS — can sting or bite with venom, but for a typical healthy adult the result is pain or local swelling, not danger (e.g. most bees and wasps, most spiders).
+  HIGHLY_VENOMOUS — capable of causing a medically serious reaction that warrants seeking care (e.g. Latrodectus, Loxosceles, Centruroides).
+- "metadata.venomous.type" is a SHORT Spanish noun phrase naming how it delivers venom, lowercase: "picadura", "mordedura", "aguijón", "pelos urticantes". If it has no venom, use exactly "ninguno". Do not use English, and do not put "none", "NO", or a level name here.
+- If unsure, choose the lower-risk-sounding label only when you are genuinely confident; never overstate safety.`,
 						role: 'system',
 					},
 					{
-						content: `The organism is ${
-							parsedIdentification.classification.family
-						} ${parsedIdentification.classification.genus} ${
-							parsedIdentification.classification.species || 'sp'
-						}.`,
+						// Only the ranks that were actually determined — interpolating a
+						// null genus put the literal string "null" in the prompt.
+						content: `Identify and describe this arthropod: ${[
+							`familia ${parsedIdentification.classification.family}`,
+							parsedIdentification.classification.genus &&
+								`género ${parsedIdentification.classification.genus}`,
+							parsedIdentification.classification.species &&
+								`especie ${parsedIdentification.classification.species}`,
+						]
+							.filter(Boolean)
+							.join(', ')}.`,
 						role: 'user',
 					},
 				],
