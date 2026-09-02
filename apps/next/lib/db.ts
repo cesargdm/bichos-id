@@ -103,8 +103,8 @@ export function isOrganismIndexable(
 ) {
 	return Boolean(
 		organism.common_name?.trim() &&
-			organism.description?.trim() &&
-			organism.classification?.species?.trim(),
+		organism.description?.trim() &&
+		organism.classification?.species?.trim(),
 	)
 }
 
@@ -147,15 +147,17 @@ export const getOrganisms = cache((options: GetOrganismsOptions = {}) => {
 export const getIndexableOrganismRefs = cache((limit = SITEMAP_MAX_URLS) => {
 	if (!isDatabaseConfigured()) return []
 
-	return db
-		.selectFrom('organisms')
-		.where(indexableOrganismFilter)
-		// Ordered by the primary key: stable output for diffing, and free
-		// compared with sorting the whole table on an unindexed column.
-		.orderBy('id', 'asc')
-		.select(['id', 'updated_at'])
-		.limit(limit)
-		.execute()
+	return (
+		db
+			.selectFrom('organisms')
+			.where(indexableOrganismFilter)
+			// Ordered by the primary key: stable output for diffing, and free
+			// compared with sorting the whole table on an unindexed column.
+			.orderBy('id', 'asc')
+			.select(['id', 'updated_at'])
+			.limit(limit)
+			.execute()
+	)
 })
 
 /**

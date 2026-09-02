@@ -86,11 +86,7 @@ Instructions:
 - In the species or genus field if it's unknown or not sure, return empty string ('').
 - Review the image quality rating in a scale from 0 to 10, consider composition, quality, lighting and sharpness.
 - In the species field, only return the species name avoid the genus.
-${
-	geoParts.length
-		? `- The user's geo data is, ${geoParts.join(', ')}.`
-		: ''
-}`,
+${geoParts.length ? `- The user's geo data is, ${geoParts.join(', ')}.` : ''}`,
 					role: 'system',
 				},
 				{
