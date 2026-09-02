@@ -151,21 +151,28 @@ ${
 			.send(new GetObjectCommand({ Bucket: R2_BUCKET_NAME, Key: imageKey }))
 			.catch(() => null)
 
-		void (await db
-			.insertInto('organism_scans')
-			.values({
-				created_at: new Date().toISOString(),
-				created_by: decodedToken.sub,
-				id: getRandomId(),
-				image_key: imageKey,
-				image_quality_rating: _imageQualityRating,
-				model: visionModel,
-				organism_id: organismId,
-				updated_at: new Date().toISOString(),
-			})
-			.execute())
+		// Only recorded once the image the row references is confirmed to
+		// exist in R2 (already there, or just uploaded successfully) — a scan
+		// row inserted before an upload that then fails would point at a key
+		// that was never written.
+		const insertScanRecord = () =>
+			db
+				.insertInto('organism_scans')
+				.values({
+					created_at: new Date().toISOString(),
+					created_by: decodedToken.sub,
+					id: getRandomId(),
+					image_key: imageKey,
+					image_quality_rating: _imageQualityRating,
+					model: visionModel,
+					organism_id: organismId,
+					updated_at: new Date().toISOString(),
+				})
+				.execute()
 
 		if (existingImage) {
+			await insertScanRecord()
+
 			return NextResponse.json(
 				{ id: organismId, ...parsedIdentification },
 				{ status: 200 },
@@ -178,25 +185,24 @@ ${
 				.where('id', '=', organismId)
 				.select('image_quality_rating')
 				.executeTakeFirst(),
-			getR2Client()
-				.send(
-					new PutObjectCommand({
-						Body: Buffer.from(
-							data.base64Image.replace(/^data:image\/\w+;base64,/, ''),
-							'base64',
-						),
-						Bucket: R2_BUCKET_NAME,
-						CacheControl: 'public, max-age=31536000, immutable',
-						ContentEncoding: 'base64',
-						ContentType: `image/${imageExtension}`,
-						Key: imageKey,
-						Metadata: {
-							'X-Image-Sha256': imageSha256,
-						},
-					}),
-				)
-				.catch(() => false),
+			getR2Client().send(
+				new PutObjectCommand({
+					Body: Buffer.from(
+						data.base64Image.replace(/^data:image\/\w+;base64,/, ''),
+						'base64',
+					),
+					Bucket: R2_BUCKET_NAME,
+					CacheControl: 'public, max-age=31536000, immutable',
+					ContentType: `image/${imageExtension}`,
+					Key: imageKey,
+					Metadata: {
+						'X-Image-Sha256': imageSha256,
+					},
+				}),
+			),
 		])
+
+		await insertScanRecord()
 
 		if (!existing) {
 			const organismResponse = await openai.chat.completions.parse({

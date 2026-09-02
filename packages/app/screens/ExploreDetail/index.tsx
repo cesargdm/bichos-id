@@ -89,6 +89,7 @@ function DiscoverDetailScreen({ fallbackData }: Props) {
 							contentFit="cover"
 							width={200}
 							height={300}
+							style={{ borderRadius: 16 }}
 							src={item}
 						/>
 					)}
