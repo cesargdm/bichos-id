@@ -33,9 +33,16 @@ async function getRateLimit() {
 
 // Runs on every rendered page too (not just /api and /sitemap.xml), so the
 // workers.dev-noindex header below can apply site-wide — excludes static
-// assets, which `_headers` already covers with its own cache rules.
+// assets (by extension, since public/ has more than just favicons — icons,
+// the manifest, etc.), which `_headers` already covers with its own cache
+// rules. /sitemap.xml is exempted from that exclusion since, despite the
+// extension, it's a dynamically generated Worker route that still needs the
+// Cache-Control fix below.
 export const config = {
-	matcher: ['/((?!_next/static|_next/image|favicon).*)'],
+	matcher: [
+		'/((?!_next/static|_next/image|.*\\.(?:ico|png|jpg|jpeg|gif|svg|webp|webmanifest)$).*)',
+		'/sitemap.xml',
+	],
 }
 
 async function withRateLimit(request: NextRequest) {
