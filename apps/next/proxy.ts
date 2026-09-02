@@ -1,15 +1,14 @@
 import type { NextRequest } from 'next/server'
 
 import { Ratelimit } from '@upstash/ratelimit'
-import { ipAddress } from '@vercel/functions'
-import { kv } from '@vercel/kv'
+import { Redis } from '@upstash/redis/cloudflare'
 import { NextResponse } from 'next/server'
 
 const RATE_LIMIT = 5
 
 const rateLimit = new Ratelimit({
 	limiter: Ratelimit.slidingWindow(RATE_LIMIT, '24 h'),
-	redis: kv,
+	redis: Redis.fromEnv(),
 })
 
 export const config = {
@@ -24,7 +23,7 @@ export async function proxy(request: NextRequest) {
 	let waitUntil = Date.now()
 
 	try {
-		const ip = ipAddress(request) || '127.0.0.1'
+		const ip = request.headers.get('CF-Connecting-IP') || '127.0.0.1'
 
 		const { reset, success } = await rateLimit.limit(ip)
 

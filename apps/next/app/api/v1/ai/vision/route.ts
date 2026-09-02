@@ -1,10 +1,8 @@
 import type { NextRequest } from 'next/server'
 
 import { GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3'
+import { getCloudflareContext } from '@opennextjs/cloudflare'
 import * as Sentry from '@sentry/nextjs'
-import { geolocation } from '@vercel/functions'
-import { initializeApp, cert } from 'firebase-admin/app'
-import { getAuth } from 'firebase-admin/auth'
 import { revalidatePath } from 'next/cache'
 import { NextResponse } from 'next/server'
 import * as crypto from 'node:crypto'
@@ -13,6 +11,7 @@ import { zodResponseFormat } from 'openai/helpers/zod'
 import { z } from 'zod'
 
 import { db, IdentificationSchema, OrganismSchema } from '@/next/lib/db'
+import { verifyFirebaseIdToken } from '@/next/lib/firebase-verify'
 import { getR2Client, R2_BUCKET_NAME } from '@/next/lib/r2'
 
 const requestBodySchema = z.object({
@@ -30,25 +29,13 @@ function slugify<T extends string>(text: T) {
 		.replace(/[^a-z0-9-]/g, '') as Lowercase<T>
 }
 
-function initializeFirebase() {
-	try {
-		initializeApp({
-			credential: cert({
-				clientEmail: process.env.FIREBASE_CLIENT_EMAIL as string,
-				privateKey: (process.env.FIREBASE_PRIVATE_KEY as string).replace(
-					/\\n/gm,
-					'\n',
-				),
-				projectId: 'bichos-id',
-			}),
-		})
-	} catch (error) {
-		Sentry.captureException(error)
-	}
-}
-
 function getRandomId() {
-	return crypto.randomBytes(20).toString('hex')
+	// Web Crypto (not node:crypto) so the return type doesn't depend on
+	// @types/node's generic Buffer<TArrayBuffer>, whose `toString(encoding)`
+	// overload TS 6 fails to resolve over Uint8Array's 0-arg one.
+	return Array.from(globalThis.crypto.getRandomValues(new Uint8Array(20)))
+		.map((byte) => byte.toString(16).padStart(2, '0'))
+		.join('')
 }
 
 export async function POST(request: NextRequest) {
@@ -62,9 +49,7 @@ export async function POST(request: NextRequest) {
 
 		const idToken = request.headers.get('Authorization')?.split(' ').at(1)
 
-		initializeFirebase()
-
-		const decodedToken = idToken && (await getAuth().verifyIdToken(idToken))
+		const decodedToken = await verifyFirebaseIdToken(idToken)
 		if (!decodedToken) {
 			return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 		}
@@ -83,7 +68,8 @@ export async function POST(request: NextRequest) {
 		const visionModel = 'gpt-5.6-luna'
 		const textModel = 'gpt-5.4-nano'
 
-		const geo = geolocation(request)
+		const { cf } = await getCloudflareContext({ async: true })
+		const geo = cf && { country: cf.country, region: cf.region }
 
 		const identificationResponse = await openai.chat.completions.parse({
 			messages: [
