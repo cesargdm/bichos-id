@@ -8,7 +8,11 @@ import {
 	SOCIAL_IMAGE_WIDTH,
 } from '@/app/lib/api/constants'
 import DiscoveryDetailScreen from '@/app/screens/ExploreDetail'
-import { getOrganism, isOrganismIndexable } from '@/next/lib/db'
+import {
+	getFamilyMembers,
+	getOrganism,
+	isOrganismIndexable,
+} from '@/next/lib/db'
 
 type Props = {
 	params: Promise<{ id: string }>
@@ -64,6 +68,11 @@ export default async function DiscoveryDetailPage({ params }: Props) {
 		return notFound()
 	}
 
+	const familyMembers = await getFamilyMembers(
+		organism.classification?.family ?? '',
+		organism.id,
+	)
+
 	const jsonLd = {
 		'@context': 'https://schema.org',
 		'@type': 'Taxon',
@@ -71,7 +80,14 @@ export default async function DiscoveryDetailPage({ params }: Props) {
 		description: organism.description,
 		identifier: organism.id,
 		image: getImageUrl(organism.image_key, { width: SOCIAL_IMAGE_WIDTH }),
-		name: `${organism.classification?.genus} ${organism.classification?.species}`,
+		// Only the ranks that exist — an unidentified genus/species used to
+		// render this as the literal "undefined undefined".
+		name:
+			[organism.classification?.genus, organism.classification?.species]
+				.filter(Boolean)
+				.join(' ') ||
+			organism.classification?.family ||
+			organism.common_name,
 	}
 
 	return (
@@ -87,6 +103,7 @@ export default async function DiscoveryDetailPage({ params }: Props) {
 						getImageUrl(organism.image_key, { width: DETAIL_IMAGE_WIDTH }),
 					],
 				}}
+				familyMembers={familyMembers}
 			/>
 		</>
 	)

@@ -7,11 +7,13 @@ import { LinearGradient } from 'expo-linear-gradient'
 import { StatusBar } from 'expo-status-bar'
 import { Text, View, ScrollView, FlatList, StyleSheet } from 'react-native'
 import { SolitoImage } from 'solito/image'
+import { Link } from 'solito/link'
 import { useParams } from 'solito/navigation'
 import useSWR from 'swr'
 
 import type { Organism } from '@/app/lib/types'
 
+import { getImageUrl } from '@/app/lib/api/constants'
 import { fetcher } from '@/app/lib/api/fetcher'
 import { keys } from '@/app/lib/api/keys'
 
@@ -19,9 +21,18 @@ import { getTaxonomyLabel, getVenomousColor, getVenomousLabel } from './utils'
 
 const useUserParams = useParams<{ id: string }>
 
+export type FamilyMember = Pick<
+	Organism,
+	'classification' | 'common_name' | 'id' | 'image_key'
+>
+
 type Props = {
 	fallbackData?: Organism & { images?: string[] }
+	/** Other organisms in the same family — see `getFamilyMembers`. */
+	familyMembers?: FamilyMember[]
 }
+
+const FAMILY_MEMBER_SIZE = 120
 
 const styles = StyleSheet.create({
 	tagContainer: {
@@ -36,7 +47,7 @@ const styles = StyleSheet.create({
 	},
 })
 
-function DiscoverDetailScreen({ fallbackData }: Props) {
+function DiscoverDetailScreen({ fallbackData, familyMembers }: Props) {
 	const params = useUserParams()
 
 	const {
@@ -204,14 +215,73 @@ function DiscoverDetailScreen({ fallbackData }: Props) {
 							Taxonomía
 						</Text>
 						<Text style={{ color: 'white', fontSize: 16, lineHeight: 28 }}>
-							{`Filo: ${organism?.classification?.phylum}
-  Clase: ${organism?.classification?.class}
-    Orden: ${organism?.classification?.order}
-      Familia: ${organism?.classification?.family}
-        Género: ${organism?.classification?.genus}
-          Especie: ${organism?.classification?.species}`}
+							{/* Ranks that weren't determined are left out rather than
+							    printed as the literal "undefined". */}
+							{(
+								[
+									['Filo', organism?.classification?.phylum],
+									['Clase', organism?.classification?.class],
+									['Orden', organism?.classification?.order],
+									['Familia', organism?.classification?.family],
+									['Género', organism?.classification?.genus],
+									['Especie', organism?.classification?.species],
+								] as const
+							)
+								.filter(([, value]) => value?.trim())
+								.map(([label, value], index) => `${'  '.repeat(index)}${label}: ${value}`)
+								.join('\n')}
 						</Text>
 					</View>
+
+					{familyMembers && familyMembers.length > 0 ? (
+						<>
+							<View
+								style={{ backgroundColor: '#333', height: 1, width: '100%' }}
+							/>
+
+							<View style={{ gap: 8 }}>
+								<Text
+									style={{ color: 'white', fontSize: 18, fontWeight: '800' }}
+									role="heading"
+									aria-level="2"
+								>
+									Otros de la familia{' '}
+									{organism?.classification?.family ?? ''}
+								</Text>
+								<ScrollView
+									horizontal
+									bounces={false}
+									showsHorizontalScrollIndicator={false}
+									contentContainerStyle={{ gap: 10 }}
+								>
+									{familyMembers.map((member) => (
+										<Link
+											key={member.id}
+											href={`/explore/${member.id}`}
+											style={{ width: FAMILY_MEMBER_SIZE }}
+										>
+											<SolitoImage
+												alt={member.common_name}
+												contentFit="cover"
+												width={FAMILY_MEMBER_SIZE}
+												height={FAMILY_MEMBER_SIZE}
+												style={{ borderRadius: 12 }}
+												src={getImageUrl(member.image_key, {
+													width: FAMILY_MEMBER_SIZE * 2,
+												})}
+											/>
+											<Text
+												numberOfLines={2}
+												style={{ color: 'white', fontSize: 14, paddingTop: 4 }}
+											>
+												{member.common_name}
+											</Text>
+										</Link>
+									))}
+								</ScrollView>
+							</View>
+						</>
+					) : null}
 				</View>
 			</ScrollView>
 		</>

@@ -201,6 +201,41 @@ export const getOrganism = cache((id: string) => {
 		.executeTakeFirst()
 })
 
+/**
+ * Other organisms in the same family, most identified first.
+ *
+ * A family-only record (`apidae--`, no genus or species) is otherwise a dead
+ * end: it describes a family and links nowhere, even though the directory holds
+ * identified members of it. Listing them turns those pages into an index of the
+ * family instead, and gives every organism page a route deeper into the
+ * catalogue.
+ */
+export const getFamilyMembers = cache(
+	(family: string, excludeId: string, limit = 12) => {
+		if (!isDatabaseConfigured() || !family.trim()) return []
+
+		return db
+			.selectFrom('organisms')
+			.where(
+				sql<boolean>`lower(btrim(coalesce(classification ->> 'family', ''))) = ${family.trim().toLowerCase()}`,
+			)
+			.where('id', '!=', excludeId)
+			// Species-level entries first, then genus-level, then bare stubs, so the
+			// most useful links lead.
+			.orderBy(
+				sql`case
+					when btrim(coalesce(classification ->> 'species', '')) <> '' then 0
+					when btrim(coalesce(classification ->> 'genus', '')) <> '' then 1
+					else 2
+				end`,
+			)
+			.orderBy('common_name', 'asc')
+			.select(['id', 'common_name', 'image_key', 'classification'])
+			.limit(limit)
+			.execute()
+	},
+)
+
 export const getOrganismScans = cache((id: string) => {
 	if (!isDatabaseConfigured()) return []
 
