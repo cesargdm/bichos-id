@@ -7,7 +7,7 @@ import { Redis } from '@upstash/redis/cloudflare'
 import { NextResponse } from 'next/server'
 
 import {
-	normalizeOrganismId,
+	repairLegacyOrganismId,
 	UNIDENTIFIED_ORGANISM_ID,
 } from '@/app/lib/organism-id'
 
@@ -108,7 +108,7 @@ function redirectLegacyOrganismUrl(request: NextRequest) {
 	// Anything with a further path segment isn't an organism id.
 	if (!id || id.includes('/')) return
 
-	const normalized = normalizeOrganismId(decodeURIComponent(id))
+	const normalized = repairLegacyOrganismId(decodeURIComponent(id))
 	// `--` carried no taxonomy at all and normalizes to nothing, so it gets the
 	// explicit unidentified slug rather than an empty path.
 	const target = normalized || (/^-+$/.test(id) ? UNIDENTIFIED_ORGANISM_ID : '')

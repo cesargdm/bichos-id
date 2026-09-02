@@ -18,6 +18,19 @@ export function normalizeOrganismId(id: string) {
 }
 
 /**
+ * Ids used to repeat a rank that already appeared in the slug —
+ * `pentatomidae-chinavia-chinavia-hilaris` — because the id was built while the
+ * species field still held the full binomial. Stored ids no longer contain an
+ * adjacent repeated segment, so collapsing one always points at the canonical
+ * page rather than inventing a URL that doesn't exist.
+ */
+export function repairLegacyOrganismId(id: string) {
+	const parts = normalizeOrganismId(id).split('-')
+
+	return parts.filter((part, index) => index === 0 || part !== parts[index - 1]).join('-')
+}
+
+/**
  * Builds the id from the ranks that were actually identified, skipping the ones
  * that weren't. Returns undefined when nothing usable was identified at all.
  */

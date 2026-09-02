@@ -186,8 +186,14 @@ LOCATION
 		// exist in R2 (already there, or just uploaded successfully) — a scan
 		// row inserted before an upload that then fails would point at a key
 		// that was never written.
-		const insertScanRecord = () =>
-			db
+		// Bumping the counter here, rather than at the call sites, is what keeps
+		// it honest: a scan can be recorded on three different paths (the photo
+		// already being in R2, a new organism, a repeat sighting), and counting
+		// on only one of them left `scan_count` reading 1 for organisms with
+		// dozens of scans. The organism row may not exist yet on the new-organism
+		// path — the update is then a no-op and the insert seeds the count at 1.
+		const insertScanRecord = async () => {
+			await db
 				.insertInto('organism_scans')
 				.values({
 					created_at: new Date().toISOString(),
@@ -200,6 +206,13 @@ LOCATION
 					updated_at: new Date().toISOString(),
 				})
 				.execute()
+
+			await db
+				.updateTable('organisms')
+				.where('id', '=', organismId)
+				.set((eb) => ({ scan_count: eb('scan_count', '+', 1) }))
+				.execute()
+		}
 
 		if (existingImage) {
 			await insertScanRecord()
@@ -293,7 +306,7 @@ VENOM — be careful and accurate here, people use this to decide whether they a
 				created_by: decodedToken.sub,
 				image_key: imageKey,
 				image_quality_rating: _imageQualityRating,
-				scan_count: 0,
+				scan_count: 1,
 				taxonomy: identification.classification.species
 					? 'SPECIES'
 					: identification.classification.genus
@@ -315,11 +328,10 @@ VENOM — be careful and accurate here, people use this to decide whether they a
 			await db
 				.updateTable('organisms')
 				.where('id', '=', organismId)
-				.set((eb) => ({
+				.set({
 					image_key: imageKey,
 					image_quality_rating: _imageQualityRating,
-					scan_count: eb('scan_count', '+', 1),
-				}))
+				})
 				.execute()
 
 			// Revalidate existing cache
