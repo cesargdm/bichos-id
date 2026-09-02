@@ -54,6 +54,13 @@ export async function GET(
 			getOrganismImages(images_path),
 		])
 
+		// Without this an unknown id spreads `undefined` into the response and
+		// returns 200 with `{"images":[],"scansCount":0}`, so callers can't tell
+		// a missing organism from one that simply has no photos.
+		if (!organism) {
+			return NextResponse.json({ error: 'Not found' }, { status: 404 })
+		}
+
 		return NextResponse.json(
 			{
 				...organism,

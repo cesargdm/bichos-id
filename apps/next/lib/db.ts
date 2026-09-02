@@ -90,6 +90,14 @@ function isDatabaseConfigured() {
 type GetOrganismsOptions = {
 	sortBy?: AnyColumn<Database, 'organisms'>
 	direction?: 'asc' | 'desc'
+	/**
+	 * Restrict to organisms complete enough to stand on their own — see
+	 * {@link isOrganismIndexable}. Used by the home page's curated lists, which
+	 * otherwise lead with unidentified stubs ("Sin identificación", a family
+	 * with no genus or species) that link to pages the site already marks
+	 * noindex. `/explore` stays unfiltered: it's the exhaustive browse.
+	 */
+	identified?: boolean
 	limit?: number
 	query?: string
 }
@@ -133,13 +141,23 @@ const indexableOrganismFilter = sql<boolean>`
 export const getOrganisms = cache((options: GetOrganismsOptions = {}) => {
 	if (!isDatabaseConfigured()) return []
 
-	const { direction, limit = 50, query, sortBy = 'common_name' } = options
+	const {
+		direction,
+		identified,
+		limit = 50,
+		query,
+		sortBy = 'common_name',
+	} = options
 
 	let dbQuery = db
 		.selectFrom('organisms')
 		.orderBy(sortBy, direction)
 		.limit(limit)
 		.selectAll()
+
+	if (identified) {
+		dbQuery = dbQuery.where(indexableOrganismFilter)
+	}
 
 	if (query) {
 		dbQuery = dbQuery.where('common_name', 'ilike', `%${query}%`)
