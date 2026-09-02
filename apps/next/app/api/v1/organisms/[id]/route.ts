@@ -61,10 +61,24 @@ export async function GET(
 			return NextResponse.json({ error: 'Not found' }, { status: 404 })
 		}
 
+		// The organism's own image always leads, and the R2 listing only adds
+		// *other* scans on top of it.
+		//
+		// Previously `images` was the R2 listing alone, so whenever that listing
+		// came back empty — a failed call, or a key layout the prefix doesn't
+		// match — the detail page rendered its server-side image and then blanked
+		// out the moment SWR revalidated against this endpoint and got `[]`.
+		const primaryImage = getImageUrl(organism.image_key, {
+			width: DETAIL_IMAGE_WIDTH,
+		})
+
 		return NextResponse.json(
 			{
 				...organism,
-				images: imageResult.images,
+				images: [
+					primaryImage,
+					...imageResult.images.filter((image) => image !== primaryImage),
+				],
 				scansCount: organismScans.length,
 			},
 			{
