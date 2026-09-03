@@ -34,8 +34,27 @@ function getOrganismImages(prefix: string) {
 			).map(({ Key }) => getImageUrl(Key, { width: DETAIL_IMAGE_WIDTH })),
 		}))
 		.catch((error: unknown) => {
-			console.error('getOrganismImages failed', error)
+			// Logged field by field rather than as the raw error: passing the
+			// Error straight to console.error in a Worker emits only its stack,
+			// which for an AWS SDK failure is entirely bundled frame numbers and
+			// says nothing about *why* the call was rejected. Diagnosing an
+			// Unauthorized from R2 took a round-trip to production for exactly
+			// this reason.
+			const {
+				$metadata,
+				message,
+				name = 'unknown',
+			} = (error ?? {}) as {
+				$metadata?: { httpStatusCode?: number }
+				message?: string
+				name?: string
+			}
+
+			console.error(
+				`getOrganismImages failed: name=${name} status=${$metadata?.httpStatusCode ?? '?'} bucket=${getR2BucketName() ?? '(unset)'} prefix=${prefix} message=${message ?? '(none)'}`,
+			)
 			Sentry.captureException(error)
+
 			return { failed: true, images: [] as string[] }
 		})
 }
