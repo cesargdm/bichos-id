@@ -28,6 +28,27 @@ jobs:
     permissions:
       contents: read
     steps:
+      # An unset secret or variable expands to an empty string rather than
+      # failing, and most of these don't stop the build: an empty
+      # NEXT_PUBLIC_ORIGIN just bakes relative/localhost URLs into the
+      # prerendered pages and og:image tags, so the deploy reports success and
+      # ships subtly broken output. Check them before anything runs.
+      - name: Verify deploy configuration
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          NEXT_PUBLIC_ORIGIN: ${{ vars.NEXT_PUBLIC_ORIGIN }}
+          POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
+        run: |
+          missing=()
+          for name in CLOUDFLARE_ACCOUNT_ID CLOUDFLARE_API_TOKEN NEXT_PUBLIC_ORIGIN POSTGRES_URL; do
+            [ -n "${!name}" ] || missing+=("$name")
+          done
+          if [ ${#missing[@]} -gt 0 ]; then
+            echo "::error::Missing required deploy configuration: ${missing[*]}"
+            exit 1
+          fi
+
       - name: Checkout repository
         uses: actions/checkout@v4
 
