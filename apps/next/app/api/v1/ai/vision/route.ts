@@ -14,7 +14,7 @@ import { z } from 'zod'
 import { buildOrganismId, buildScanPrefix } from '@/app/lib/organism-id'
 import { db, IdentificationSchema, OrganismSchema } from '@/next/lib/db'
 import { verifyFirebaseIdToken } from '@/next/lib/firebase-verify'
-import { getR2Client, R2_BUCKET_NAME } from '@/next/lib/r2'
+import { getR2BucketName, getR2Client } from '@/next/lib/r2'
 
 const requestBodySchema = z.object({
 	base64Image: z
@@ -184,7 +184,7 @@ LOCATION
 			`${imagePath}/${imageSha256}.${imageExtension}`.toLowerCase()
 
 		const existingImage = await getR2Client()
-			.send(new GetObjectCommand({ Bucket: R2_BUCKET_NAME, Key: imageKey }))
+			.send(new GetObjectCommand({ Bucket: getR2BucketName(), Key: imageKey }))
 			.catch(() => null)
 
 		// Only recorded once the image the row references is confirmed to exist
@@ -251,7 +251,7 @@ LOCATION
 						data.base64Image.replace(/^data:image\/\w+;base64,/, ''),
 						'base64',
 					),
-					Bucket: R2_BUCKET_NAME,
+					Bucket: getR2BucketName(),
 					CacheControl: 'public, max-age=31536000, immutable',
 					ContentType: `image/${imageExtension}`,
 					Key: imageKey,

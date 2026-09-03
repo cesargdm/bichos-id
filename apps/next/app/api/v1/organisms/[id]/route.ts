@@ -5,7 +5,7 @@ import { NextResponse } from 'next/server'
 import { DETAIL_IMAGE_WIDTH, getImageUrl } from '@/app/lib/api/constants'
 import { buildScanPrefix, repairLegacyOrganismId } from '@/app/lib/organism-id'
 import { getOrganism, getOrganismScans } from '@/next/lib/db'
-import { getR2Client, R2_BUCKET_NAME } from '@/next/lib/r2'
+import { getR2BucketName, getR2Client } from '@/next/lib/r2'
 
 const cacheMaxAge = 60 * 60 * 3 // 3 hours
 
@@ -23,7 +23,7 @@ function getOrganismImages(prefix: string) {
 				// slash) also prefix-matches a sibling like
 				// "scans/family/genus/speciesX/...", pulling in another
 				// organism's photos.
-				Bucket: R2_BUCKET_NAME,
+				Bucket: getR2BucketName(),
 				Prefix: `${prefix}/`,
 			}),
 		)
