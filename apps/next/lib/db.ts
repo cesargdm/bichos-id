@@ -1,8 +1,8 @@
 import type { AnyColumn } from 'kysely'
 
-import { neon } from '@neondatabase/serverless'
-import { Kysely, sql } from 'kysely'
-import { NeonDialect } from 'kysely-neon'
+import { getCloudflareContext } from '@opennextjs/cloudflare'
+import { Kysely, ParseJSONResultsPlugin, sql } from 'kysely'
+import { D1Dialect } from 'kysely-d1'
 import { cache } from 'react'
 import { z } from 'zod'
 
@@ -56,35 +56,61 @@ export interface OrganismScan {
 	created_by: string
 }
 
+declare global {
+	interface CloudflareEnv {
+		DB: D1Database
+	}
+}
+
 export interface Database {
 	organisms: Organism
 	organism_scans: OrganismScan
 }
 
-// Constructed lazily: `neon()` throws when POSTGRES_URL is absent, and doing
-// that at module scope makes merely importing this file fatal.
-let neonClient: ReturnType<typeof neon> | undefined
-
-function getNeonClient() {
-	neonClient ??= neon(process.env.POSTGRES_URL!)
-	return neonClient
+/**
+ * The D1 binding, resolved per request.
+ *
+ * Read from the Workers context rather than module scope: bindings are attached
+ * to the request, and reading them at import time is what left the R2 client
+ * holding undefined credentials for the life of an isolate.
+ */
+export function getDatabaseBinding() {
+	try {
+		return getCloudflareContext().env.DB
+	} catch {
+		// Outside a request (a local build prerendering pages, CI) there is no
+		// context at all. Callers fall back to empty results via
+		// isDatabaseConfigured().
+		return undefined
+	}
 }
 
-export const db = new Kysely<Database>({
-	dialect: new NeonDialect({ neon: () => getNeonClient() }),
-})
+/**
+ * Built per call rather than once at module scope, since the binding it wraps
+ * only exists inside a request.
+ *
+ * `ParseJSONResultsPlugin` restores the shape consumers expect: `classification`
+ * and `metadata` were `jsonb` in Postgres and arrived as objects, but SQLite
+ * stores them as TEXT and would otherwise hand back JSON strings.
+ */
+export function getDb() {
+	return new Kysely<Database>({
+		dialect: new D1Dialect({ database: getDatabaseBinding()! }),
+		plugins: [new ParseJSONResultsPlugin()],
+	})
+}
 
 /**
  * Whether a database connection is configured at all.
  *
- * Used only so a build without `POSTGRES_URL` (local, CI) can still prerender
+ * Used only so a build without the binding (local, CI) can still prerender
  * pages instead of failing. Genuine query errors are deliberately NOT
  * swallowed: returning empty data on a transient failure would let ISR cache
  * an empty page — or, worse, a `notFound()` 404 for a real organism — for the
  * whole revalidate window. Letting them throw yields an uncached 500 instead.
  */
 function isDatabaseConfigured() {
-	return Boolean(process.env.POSTGRES_URL)
+	return Boolean(getDatabaseBinding())
 }
 
 type GetOrganismsOptions = {
@@ -130,9 +156,9 @@ export function isOrganismIndexable(
 
 /** SQL counterpart of {@link isOrganismIndexable}. */
 const indexableOrganismFilter = sql<boolean>`
-	btrim(coalesce(common_name, '')) <> ''
-	and btrim(coalesce(description, '')) <> ''
-	and btrim(coalesce(classification ->> 'species', '')) <> ''
+	trim(coalesce(common_name, '')) <> ''
+	and trim(coalesce(description, '')) <> ''
+	and trim(coalesce(json_extract(classification, '$.species'), '')) <> ''
 `
 
 /**
@@ -142,7 +168,7 @@ const indexableOrganismFilter = sql<boolean>`
  * still gets their result — but they don't belong in a browse list of bichos.
  */
 const arthropodOnlyFilter = sql<boolean>`
-	btrim(coalesce(classification ->> 'phylum', '')) = 'Arthropoda'
+	trim(coalesce(json_extract(classification, '$.phylum'), '')) = 'Arthropoda'
 `
 
 /**
@@ -159,7 +185,7 @@ export const getOrganisms = cache((options: GetOrganismsOptions = {}) => {
 		sortBy = 'common_name',
 	} = options
 
-	let dbQuery = db
+	let dbQuery = getDb()
 		.selectFrom('organisms')
 		.where(arthropodOnlyFilter)
 		.orderBy(sortBy, direction)
@@ -171,7 +197,7 @@ export const getOrganisms = cache((options: GetOrganismsOptions = {}) => {
 	}
 
 	if (query) {
-		dbQuery = dbQuery.where('common_name', 'ilike', `%${query}%`)
+		dbQuery = dbQuery.where('common_name', 'like', `%${query}%`)
 	}
 
 	return dbQuery.execute()
@@ -189,7 +215,7 @@ export const getIndexableOrganismRefs = cache((limit = SITEMAP_MAX_URLS) => {
 	if (!isDatabaseConfigured()) return []
 
 	return (
-		db
+		getDb()
 			.selectFrom('organisms')
 			.where(indexableOrganismFilter)
 			// Ordered by the primary key: stable output for diffing, and free
@@ -207,7 +233,7 @@ export const getIndexableOrganismRefs = cache((limit = SITEMAP_MAX_URLS) => {
 export const getOrganism = cache((id: string) => {
 	if (!isDatabaseConfigured()) return undefined
 
-	return db
+	return getDb()
 		.selectFrom('organisms')
 		.where('id', '=', id)
 		.selectAll()
@@ -228,18 +254,18 @@ export const getFamilyMembers = cache(
 		if (!isDatabaseConfigured() || !family.trim()) return []
 
 		return (
-			db
+			getDb()
 				.selectFrom('organisms')
 				.where(
-					sql<boolean>`lower(btrim(coalesce(classification ->> 'family', ''))) = ${family.trim().toLowerCase()}`,
+					sql<boolean>`lower(trim(coalesce(json_extract(classification, '$.family'), ''))) = ${family.trim().toLowerCase()}`,
 				)
 				.where('id', '!=', excludeId)
 				// Species-level entries first, then genus-level, then bare stubs, so the
 				// most useful links lead.
 				.orderBy(
 					sql`case
-					when btrim(coalesce(classification ->> 'species', '')) <> '' then 0
-					when btrim(coalesce(classification ->> 'genus', '')) <> '' then 1
+					when trim(coalesce(json_extract(classification, '$.species'), '')) <> '' then 0
+					when trim(coalesce(json_extract(classification, '$.genus'), '')) <> '' then 1
 					else 2
 				end`,
 				)
@@ -254,7 +280,7 @@ export const getFamilyMembers = cache(
 export const getOrganismScans = cache((id: string) => {
 	if (!isDatabaseConfigured()) return []
 
-	return db
+	return getDb()
 		.selectFrom('organism_scans')
 		.where('organism_id', '=', id)
 		.selectAll()
