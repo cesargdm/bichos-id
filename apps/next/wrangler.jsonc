@@ -13,6 +13,10 @@
 			"binding": "PUBLIC_JWK_CACHE_KV",
 			"id": "a025a0d0cc854d68b4499a8747a7bebc",
 		},
+		{
+			"binding": "RATE_LIMIT_KV",
+			"id": "dfea94ac91924319a1c84924c6c38202",
+		},
 	],
 	"vars": {
 		"CLOUDFLARE_ACCOUNT_ID": "1b22f6fcae34f97236b9f22cc51cfb18",

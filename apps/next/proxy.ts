@@ -2,8 +2,6 @@ import type { NextRequest } from 'next/server'
 
 import { getCloudflareContext } from '@opennextjs/cloudflare'
 import * as Sentry from '@sentry/nextjs'
-import { Ratelimit } from '@upstash/ratelimit'
-import { Redis } from '@upstash/redis/cloudflare'
 import { NextResponse } from 'next/server'
 
 import {
@@ -13,27 +11,41 @@ import {
 
 declare global {
 	interface CloudflareEnv {
-		UPSTASH_REDIS_REST_TOKEN: string
-		UPSTASH_REDIS_REST_URL: string
+		RATE_LIMIT_KV: KVNamespace
 	}
 }
 
 const RATE_LIMIT = 5
+const RATE_LIMIT_WINDOW_SECONDS = 24 * 60 * 60
 
-// Constructed lazily: Redis.fromEnv() (the Cloudflare build of @upstash/redis)
-// doesn't read process.env — it needs the Workers env bindings object passed
-// explicitly, which is only available once a request is in flight.
-let rateLimit: Ratelimit | undefined
+/**
+ * Counts scans per IP per UTC day in KV.
+ *
+ * Deliberately not Cloudflare's native rate-limiting binding: its window "must
+ * be either 10 or 60" seconds, and the cap this enforces is 5 per 24 hours —
+ * the control that keeps a single visitor from running up the OpenAI bill.
+ * Expressing that as 5 per minute would permit 7,200 a day.
+ *
+ * KV is eventually consistent, so a visitor hitting several colos at once can
+ * overshoot slightly before the count propagates. That is acceptable for an
+ * abuse ceiling — and the previous Redis limiter is gone along with its two
+ * secrets and its own eventual-consistency caveat.
+ */
+async function consumeRateLimit(ip: string) {
+	const { env } = await getCloudflareContext({ async: true })
+	const key = `scan:${ip}:${new Date().toISOString().slice(0, 10)}`
 
-async function getRateLimit() {
-	if (!rateLimit) {
-		const { env } = await getCloudflareContext({ async: true })
-		rateLimit = new Ratelimit({
-			limiter: Ratelimit.slidingWindow(RATE_LIMIT, '24 h'),
-			redis: Redis.fromEnv(env),
-		})
+	const used = Number((await env.RATE_LIMIT_KV.get(key)) ?? 0)
+
+	if (used >= RATE_LIMIT) {
+		return { success: false as const }
 	}
-	return rateLimit
+
+	await env.RATE_LIMIT_KV.put(key, String(used + 1), {
+		expirationTtl: RATE_LIMIT_WINDOW_SECONDS,
+	})
+
+	return { success: true as const }
 }
 
 // Runs on every rendered page too (not just /api and /sitemap.xml), so the
@@ -58,17 +70,25 @@ async function withRateLimit(request: NextRequest) {
 	try {
 		const ip = request.headers.get('CF-Connecting-IP') || '127.0.0.1'
 
-		const limiter = await getRateLimit()
-		const { reset, success } = await limiter.limit(ip)
+		const { success } = await consumeRateLimit(ip)
 
 		if (!success) {
+			// Seconds until the UTC day rolls over, which is when the counter's
+			// key changes and the allowance resets.
+			const now = new Date()
+			const resetsAt = Date.UTC(
+				now.getUTCFullYear(),
+				now.getUTCMonth(),
+				now.getUTCDate() + 1,
+			)
+
 			return NextResponse.json(
 				{ error: `Límite alcanzado` },
 				{
 					headers: {
 						'Retry-After': Math.max(
 							0,
-							Math.floor((reset - Date.now()) / 1000),
+							Math.ceil((resetsAt - now.getTime()) / 1000),
 						).toString(),
 						'X-RateLimit-Limit': RATE_LIMIT.toString(),
 					},
@@ -79,7 +99,7 @@ async function withRateLimit(request: NextRequest) {
 
 		return NextResponse.next()
 	} catch (error) {
-		// A genuine rate-limiter failure (Redis misconfigured/unreachable) is
+		// A genuine rate-limiter failure (KV unavailable) is
 		// not the same as a client being rate-limited — surface it as a real
 		// error instead of masking it as 429, which would otherwise silently
 		// block all API traffic.
