@@ -331,6 +331,13 @@ VENOM — be careful and accurate here, people use this to decide whether they a
 				id: organismId,
 				...identification,
 				...parsedOrganismInfo,
+				// Serialized explicitly: these were `jsonb` on Postgres and could be
+				// passed as objects, but D1 stores them as TEXT and cannot bind a
+				// plain object. `ParseJSONResultsPlugin` only parses reads, so
+				// without this the insert fails — after the image and the scan row
+				// have already been written.
+				classification: JSON.stringify(identification.classification),
+				metadata: JSON.stringify(parsedOrganismInfo.metadata),
 				created_at: new Date().toISOString(),
 				created_by: decodedToken.sub,
 				image_key: imageKey,

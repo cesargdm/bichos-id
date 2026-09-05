@@ -1,4 +1,4 @@
-import type { AnyColumn } from 'kysely'
+import type { AnyColumn, ColumnType } from 'kysely'
 
 import { getCloudflareContext } from '@opennextjs/cloudflare'
 import { Kysely, ParseJSONResultsPlugin, sql } from 'kysely'
@@ -62,8 +62,19 @@ declare global {
 	}
 }
 
+/**
+ * `classification` and `metadata` are asymmetric on D1: they come back as
+ * objects (ParseJSONResultsPlugin parses them) but must be written as JSON
+ * strings, since SQLite stores them as TEXT and cannot bind a plain object.
+ * ColumnType is how Kysely expresses that difference between read and write.
+ */
+type OrganismTable = Omit<Organism, 'classification' | 'metadata'> & {
+	classification: ColumnType<Organism['classification'], string, string>
+	metadata: ColumnType<Organism['metadata'], string, string>
+}
+
 export interface Database {
-	organisms: Organism
+	organisms: OrganismTable
 	organism_scans: OrganismScan
 }
 
