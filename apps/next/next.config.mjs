@@ -1,3 +1,4 @@
+import { initOpenNextCloudflareForDev } from '@opennextjs/cloudflare'
 import { withExpo } from '@expo/next-adapter'
 import { withSentryConfig } from '@sentry/nextjs/config'
 
@@ -101,3 +102,10 @@ const sentryConfig = {
 }
 
 export default withSentryConfig(withExpo(nextConfig), sentryConfig)
+
+// Exposes the wrangler.jsonc bindings (D1, KV, R2) to `next dev`. Without it
+// `getCloudflareContext()` throws outside a deployed Worker, so the local
+// catalogue reads as empty and a scan fails after uploading to R2.
+// `void`: the call is async and the config module can't await, which is how
+// the adapter's own documentation calls it.
+void initOpenNextCloudflareForDev()
