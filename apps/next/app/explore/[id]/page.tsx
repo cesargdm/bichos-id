@@ -75,8 +75,25 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 		return notFound()
 	}
 
+	// The organism's own photo, rather than a card rendered by next/og. That
+	// route returned 500 for every request in production: Satori and resvg need
+	// to compile WebAssembly at runtime and Workers disallows it
+	// ("Wasm code generation disallowed by embedder"), so each crawler hit
+	// burned CPU to fail. A real photo is a better preview anyway, and this URL
+	// is the one the JSON-LD already references — so it adds no new billed
+	// image transformation.
+	const socialImage = getImageUrl(organism.image_key, {
+		width: SOCIAL_IMAGE_WIDTH,
+	})
+
 	return {
 		description: organism.description,
+		openGraph: {
+			description: organism.description,
+			images: [socialImage],
+			title: organism.common_name,
+			type: 'article',
+		},
 		// Incomplete taxonomy stubs are thin pages. Mark them noindex so they
 		// stop being crawled as low-quality content, but keep `follow` so link
 		// equity still flows through to the complete organisms they link to.
@@ -84,6 +101,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 			? null
 			: { robots: { follow: true, index: false } }),
 		title: organism.common_name,
+		twitter: {
+			card: 'summary_large_image',
+			description: organism.description,
+			images: [socialImage],
+			title: organism.common_name,
+		},
 	}
 }
 
