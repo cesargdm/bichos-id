@@ -38,10 +38,9 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           NEXT_PUBLIC_ORIGIN: ${{ vars.NEXT_PUBLIC_ORIGIN }}
-          POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
         run: |
           missing=()
-          for name in CLOUDFLARE_ACCOUNT_ID CLOUDFLARE_API_TOKEN NEXT_PUBLIC_ORIGIN POSTGRES_URL; do
+          for name in CLOUDFLARE_ACCOUNT_ID CLOUDFLARE_API_TOKEN NEXT_PUBLIC_ORIGIN; do
             [ -n "${!name}" ] || missing+=("$name")
           done
           if [ ${#missing[@]} -gt 0 ]; then
@@ -81,5 +80,4 @@ jobs:
           command: deploy
         env:
           NEXT_PUBLIC_ORIGIN: ${{ vars.NEXT_PUBLIC_ORIGIN }}
-          POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}

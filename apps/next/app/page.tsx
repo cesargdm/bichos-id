@@ -7,7 +7,14 @@ import {
 import { getOrganisms } from '@/next/lib/db'
 import { getOrganismsSchema } from '@/next/lib/schema'
 
-export const revalidate = 3600 // 1 hour
+// Rendered per request, not prerendered at build.
+//
+// The catalogue now lives in D1, and a D1 binding only exists inside a request:
+// during `next build` there is no Worker context, so a prerender of this route
+// would bake an empty catalogue into the deployed HTML and serve it until the
+// revalidate window elapsed. Middleware sets a shared Cache-Control on the
+// response so the edge still caches it.
+export const dynamic = 'force-dynamic'
 
 export default async function HomePage() {
 	// Same parse the API route applies, so the server-rendered lists and the

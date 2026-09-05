@@ -8,6 +8,13 @@
 		"directory": ".open-next/assets",
 		"binding": "ASSETS",
 	},
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_id": "10e9679c-a134-41f4-a4ad-d54ea2b0700a",
+			"database_name": "bichos-id",
+		},
+	],
 	"kv_namespaces": [
 		{
 			"binding": "PUBLIC_JWK_CACHE_KV",

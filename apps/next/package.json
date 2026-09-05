@@ -11,7 +11,9 @@
 		"licenses": "bunx license-report >| '../../packages/app/lib/licenses/web.json'",
 		"preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
 		"deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
-		"cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts"
+		"cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
+		"d1:local": "wrangler d1 execute bichos-id --local --file=./d1/schema.sql",
+		"d1:remote": "wrangler d1 execute bichos-id --remote --file=./d1/schema.sql"
 	},
 	"dependencies": {
 		"@aws-sdk/client-s3": "3.1124.0",

@@ -20,6 +20,7 @@
 		]
 	},
 	"devDependencies": {
+		"kysely-d1": "^0.4.0",
 		"oxfmt": "~0.66.0",
 		"oxlint": "~1.81.0",
 		"oxlint-tsgolint": "~7.0.2001",

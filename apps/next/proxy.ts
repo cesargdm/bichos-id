@@ -18,6 +18,8 @@ declare global {
 const RATE_LIMIT = 5
 const RATE_LIMIT_WINDOW_SECONDS = 24 * 60 * 60
 
+const CACHED_DYNAMIC_ROUTES = new Set(['/', '/explore', '/sitemap.xml'])
+
 /**
  * Counts scans per IP per UTC day in KV.
  *
@@ -169,11 +171,11 @@ export async function proxy(request: NextRequest) {
 		? await withRateLimit(request)
 		: NextResponse.next()
 
-	if (request.nextUrl.pathname === '/sitemap.xml') {
-		// sitemap.ts's `revalidate` export isn't reflected in the response's
-		// Cache-Control under this adapter (unlike page routes, where it is) —
-		// set it explicitly so the sitemap doesn't get regenerated on every
-		// request.
+	// These three read the catalogue from D1, whose binding only exists inside a
+	// request, so they render per request rather than being prerendered with an
+	// empty database at build time. The edge cache is what keeps that from
+	// meaning a render per visitor.
+	if (CACHED_DYNAMIC_ROUTES.has(request.nextUrl.pathname)) {
 		response.headers.set(
 			'Cache-Control',
 			'public, s-maxage=3600, stale-while-revalidate=86400',
