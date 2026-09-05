@@ -160,6 +160,22 @@ LOCATION
 			)
 		}
 
+		// The model classifies whatever was photographed, so the catalogue had
+		// been accumulating snakes, geckos, earthworms, a heron, a dandelion and
+		// most recently a dog. Filtering them out of the browse lists hid the
+		// symptom; this stops creating them. Rejecting here — before the
+		// description call, the R2 upload and the row — also means a photo of a
+		// pet costs one model call instead of two plus storage.
+		if (identification.classification.phylum?.trim() !== 'Arthropoda') {
+			return NextResponse.json(
+				{
+					error:
+						'Esto no parece ser un artrópodo. Bichos ID identifica insectos, arácnidos y otros artrópodos.',
+				},
+				{ status: 422 },
+			)
+		}
+
 		const organismId = buildOrganismId([
 			identification.classification.family,
 			identification.classification.genus,
