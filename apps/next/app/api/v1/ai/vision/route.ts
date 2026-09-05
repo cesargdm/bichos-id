@@ -10,7 +10,11 @@ import OpenAI from 'openai'
 import { zodResponseFormat } from 'openai/helpers/zod'
 import { z } from 'zod'
 
-import { buildOrganismId, buildScanPrefix } from '@/app/lib/organism-id'
+import {
+	buildOrganismId,
+	buildScanPrefix,
+	toSearchText,
+} from '@/app/lib/organism-id'
 import {
 	getDatabaseBinding,
 	getDb,
@@ -337,6 +341,7 @@ VENOM — be careful and accurate here, people use this to decide whether they a
 				// without this the insert fails — after the image and the scan row
 				// have already been written.
 				classification: JSON.stringify(identification.classification),
+				common_name_search: toSearchText(parsedOrganismInfo.common_name),
 				metadata: JSON.stringify(parsedOrganismInfo.metadata),
 				created_at: new Date().toISOString(),
 				created_by: decodedToken.sub,

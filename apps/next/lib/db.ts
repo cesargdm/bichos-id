@@ -8,6 +8,8 @@ import { z } from 'zod'
 
 import type { Organism } from '@/app/lib/types'
 
+import { toSearchText } from '@/app/lib/organism-id'
+
 // Every string here comes straight from the model, which occasionally returns
 // values with surrounding whitespace (there is a " abejorro de cabeza grande"
 // in the database, leading space and all, which then renders into headings and
@@ -208,7 +210,13 @@ export const getOrganisms = cache((options: GetOrganismsOptions = {}) => {
 	}
 
 	if (query) {
-		dbQuery = dbQuery.where('common_name', 'like', `%${query}%`)
+		// Matched against the folded column, with the query folded the same way:
+		// SQLite's LIKE would otherwise miss "ARAÑA" against "araña".
+		dbQuery = dbQuery.where(
+			'common_name_search',
+			'like',
+			`%${toSearchText(query)}%`,
+		)
 	}
 
 	return dbQuery.execute()

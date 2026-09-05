@@ -1,6 +1,8 @@
 export type Organism = {
 	id: string
 	common_name: string
+	/** Folded copy of common_name used for search; see toSearchText(). */
+	common_name_search: string
 	/** Scientific classification */
 	classification: {
 		phylum: string

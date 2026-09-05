@@ -7,6 +7,10 @@
 CREATE TABLE IF NOT EXISTS organisms (
 	id TEXT PRIMARY KEY,
 	common_name TEXT,
+	-- Lowercase, accent-stripped copy of common_name. SQLite's LIKE folds case
+	-- for ASCII only, so searching accented Spanish names needs both sides
+	-- folded in advance; see toSearchText().
+	common_name_search TEXT,
 	description TEXT,
 	habitat TEXT,
 	classification TEXT,
@@ -40,3 +44,5 @@ CREATE INDEX IF NOT EXISTS organism_scans_organism_id_idx
 CREATE INDEX IF NOT EXISTS organisms_scan_count_idx ON organisms (scan_count DESC);
 CREATE INDEX IF NOT EXISTS organisms_created_at_idx ON organisms (created_at DESC);
 CREATE INDEX IF NOT EXISTS organisms_common_name_idx ON organisms (common_name);
+CREATE INDEX IF NOT EXISTS organisms_common_name_search_idx
+	ON organisms (common_name_search);

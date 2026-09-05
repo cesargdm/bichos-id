@@ -63,3 +63,19 @@ export function buildOrganismId(parts: (string | null | undefined)[]) {
 
 	return id || undefined
 }
+
+/**
+ * Folds text for searching: lowercase, diacritics stripped.
+ *
+ * SQLite's LIKE only folds case for ASCII, so a single accented character
+ * defeats the whole comparison — `'%ARAÑA%'` matches nothing against "araña",
+ * and 186 of this catalogue's 472 names carry an accent. Postgres ILIKE handled
+ * it; on D1 both the stored value and the query have to be folded in advance.
+ */
+export function toSearchText(value: string) {
+	return value
+		.normalize('NFD')
+		.replace(/\p{Diacritic}/gu, '')
+		.toLowerCase()
+		.trim()
+}
