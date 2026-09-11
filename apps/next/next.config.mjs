@@ -94,7 +94,6 @@ const sentryConfig = {
 	// These are webpack-only; they no-op under Turbopack but are kept in the
 	// documented shape so they apply if the build ever falls back to webpack.
 	webpack: {
-		automaticVercelMonitors: true,
 		reactComponentAnnotation: { enabled: true },
 		treeshake: { removeDebugLogging: true },
 	},

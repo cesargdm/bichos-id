@@ -68,7 +68,7 @@ jobs:
       #
       # Static/ISR pages (/, /explore, /sitemap.xml) are rendered during this
       # build step, not at request time, so build-time env vars matter here
-      # even though POSTGRES_URL etc. are otherwise only Worker *secrets*
+      # even though secrets like OPENAI_API_KEY are otherwise only Worker *secrets*
       # (runtime bindings, invisible to this local build).
       - name: Build and deploy to Cloudflare Workers
         uses: cloudflare/wrangler-action@v3
