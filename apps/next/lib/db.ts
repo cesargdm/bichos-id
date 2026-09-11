@@ -213,10 +213,10 @@ export const getOrganisms = cache((options: GetOrganismsOptions = {}) => {
 		// Matched against the folded column, with the query folded the same way:
 		// SQLite's LIKE would otherwise miss "ARAÑA" against "araña".
 		//
-		// The raw column is still matched as a fallback, so a row whose folded
-		// value has not been populated — a freshly created local database, or a
-		// restore that skipped the backfill — degrades to the old ASCII-only
-		// behaviour instead of silently matching nothing.
+		// schema.sql backfills and triggers common_name_search for restores
+		// that skip the JS fold. The raw column is still matched as a fallback
+		// so a row whose folded value is somehow still NULL degrades to the
+		// old ASCII-only behaviour instead of silently matching nothing.
 		dbQuery = dbQuery.where((eb) =>
 			eb.or([
 				eb('common_name_search', 'like', `%${toSearchText(query)}%`),
