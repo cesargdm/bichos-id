@@ -29,9 +29,6 @@ npm-debug.log*
 .env.test.local
 .env.production.local
 
-# vercel
-.vercel
-
 # cloudflare / opennext
 .open-next
 .wrangler

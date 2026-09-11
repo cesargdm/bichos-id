@@ -27,7 +27,7 @@ export const revalidate = 10800 // 3 hours
  *
  * Without `generateStaticParams`, Next renders a dynamic segment on every
  * request and `revalidate` above never engages — the route was serving
- * `x-vercel-cache: MISS` on repeat hits. Returning an empty array prerenders
+ * a cache MISS on repeat hits. Returning an empty array prerenders
  * nothing at build time (so build duration and OG-image generation are
  * unaffected) while opting every organism page into ISR: each is rendered once
  * on first visit, then served from cache until `revalidate` elapses.
