@@ -6,13 +6,13 @@
 		"web": "cd apps/next && bun run next",
 		"prebuild": "cd apps/expo && bun run prebuild",
 		"lint": "oxlint --type-aware",
-		"format": "oxfmt .",
-		"format:check": "oxfmt --check .",
+		"format": "bun fmt .",
+		"format:check": "bun fmt --check .",
 		"clean": "turbo clean",
 		"licenses": "turbo licenses",
 		"typecheck": "turbo typecheck"
 	},
-	"packageManager": "bun@1.3.14",
+	"packageManager": "bun@1.4.4",
 	"workspaces": {
 		"packages": [
 			"apps/*",
@@ -21,7 +21,6 @@
 	},
 	"devDependencies": {
 		"kysely-d1": "^0.4.0",
-		"oxfmt": "~0.66.0",
 		"oxlint": "~1.81.0",
 		"oxlint-tsgolint": "~7.0.2001",
 		"turbo": "~2.10.5"
