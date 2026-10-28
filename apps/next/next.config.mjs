@@ -57,7 +57,7 @@ const nextConfig = {
 		'@react-native-masked-view/masked-view',
 		'@react-native-async-storage/async-storage',
 
-		'@/app',
+		'@bichos/app',
 	],
 	// @expo/next-adapter only configures webpack; Turbopack (the Next 16
 	// default bundler) needs the react-native-web alias and .web.* platform
